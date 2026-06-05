@@ -9,13 +9,13 @@
 /* Summary Bar */
 .alert-summary-bar {
   position: absolute;
-  bottom: -36px;
+  bottom: 10px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
   gap: 16px;
   z-index: 3;
-  width: min(900px, 90vw);
+  width: min(950px, 90vw);
 }
 .summary-card {
   flex: 1;
