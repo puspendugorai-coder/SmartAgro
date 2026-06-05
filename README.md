@@ -1,5 +1,5 @@
 to git clone copy and paste the command in ur vscode terminal:-
-<br> git clone https://github.com/puspendugorai-coder/SmartAgro.git<br>
+<br> "git clone https://github.com/puspendugorai-coder/SmartAgro.git"<br>
 
 Step1:-
 <br> create a .env file in ur vscode folder<br>
