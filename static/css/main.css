@@ -520,6 +520,7 @@ h1,h2,h3,h4 { font-family: 'Syne', sans-serif; line-height: 1.2; }
 
 /* ── Responsive ──────────────────────────────────────── */
 @media (max-width: 900px) {
+  .nav-actions { gap: 8px; }
   .nav-links {
     display: none;
     position: absolute;
@@ -540,4 +541,7 @@ h1,h2,h3,h4 { font-family: 'Syne', sans-serif; line-height: 1.2; }
   .navbar { padding: 0 16px; }
   .container { padding: 0 16px; }
   .section { padding: 56px 0; }
+  .lang-btn span { display: none; }          /* hide "EN" text, keep flag */
+  .nav-actions { gap: 8px; }
+  .toast { bottom: 16px; right: 16px; left: 16px; max-width: none; } /* full-width toast */
 }
