@@ -14,11 +14,10 @@ app = Flask(__name__)
 
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-#GOVT_MANDI_API_KEY= os.getenv("GOVT_MANDI_API_KEY", "")
 
 print(f"[AgroSmart] Groq key:    {'OK (' + GROQ_API_KEY[:8] + '...)' if GROQ_API_KEY else 'MISSING - check .env'}")
 print(f"[AgroSmart] Weather key: {'OK' if OPENWEATHER_API_KEY else 'MISSING'}")
-#print(f"[AgroSmart] Mandi API key: {'OK' if GOVT_MANDI_API_KEY else 'MISSING'}")
+print(f"[AgroSmart] Ninja key:   {'OK' if os.getenv('NINJA_API_KEY') else 'MISSING'}")
 # ─── Routes ──────────────────────────────────────────────────────────────────
 @app.route("/")
 def index():
