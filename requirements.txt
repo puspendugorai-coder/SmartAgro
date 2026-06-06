@@ -6,3 +6,5 @@ certifi==2024.2.2
 idna==3.7
 charset-normalizer==3.3.2
 Pillow==10.3.0
+python-dotenv==1.0.1
+gunicorn==21.2.0
