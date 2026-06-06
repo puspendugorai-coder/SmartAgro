@@ -159,18 +159,28 @@
           <button class="chart-tab" onclick="switchChart('radar')" data-translate="tab_demand">Demand Map</button>
         </div>
         <div class="chart-city-select">
-          <select id="chartCitySelect">
-            <option value="Delhi">Delhi</option>
-            <option value="Mumbai">Mumbai</option>
-            <option value="Kolkata">Kolkata</option>
-            <option value="Chennai">Chennai</option>
-            <option value="Hyderabad">Hyderabad</option>
-            <option value="Pune">Pune</option>
-            <option value="Ahmedabad">Ahmedabad</option>
-            <option value="Lucknow">Lucknow</option>
-            <option value="Jaipur">Jaipur</option>
-            <option value="Bhopal">Bhopal</option>
-          </select>
+          <select id="chartCitySelect" onchange="updateChart()">
+  <option value="Delhi">Delhi</option>
+  <option value="Mumbai">Mumbai</option>
+  <option value="Kolkata">Kolkata</option>
+  <option value="Chennai">Chennai</option>
+  <option value="Hyderabad">Hyderabad</option>
+  <option value="Pune">Pune</option>
+  <option value="Ahmedabad">Ahmedabad</option>
+  <option value="Lucknow">Lucknow</option>
+  <option value="Jaipur">Jaipur</option>
+  <option value="Bhopal">Bhopal</option>
+  <option value="Patna">Patna</option>
+  <option value="Nagpur">Nagpur</option>
+  <option value="Indore">Indore</option>
+  <option value="Surat">Surat</option>
+  <option value="Kanpur">Kanpur</option>
+  <option value="Coimbatore">Coimbatore</option>
+  <option value="Visakhapatnam">Visakhapatnam</option>
+  <option value="Bhubaneswar">Bhubaneswar</option>
+  <option value="Guwahati">Guwahati</option>
+  <option value="Amritsar">Amritsar</option>
+</select>
         </div>
       </div>
       <div class="chart-canvas-wrap">
