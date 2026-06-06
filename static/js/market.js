@@ -19,7 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
 /* ── Load all market data ───────────────────── */
 async function loadAllMarkets() {
     try {
-        const res = await fetch('/api/market-prices');
+        const res = await fetch('/api/market');
         const data = await res.json();
         allMarketData = data.markets || {};
         allLocations = data.locations || [];
@@ -139,11 +139,20 @@ async function searchLocation() {
 
   if (clearBtn) clearBtn.style.display = 'flex';
 
+  // ── Show loading state ──
+  const grid = document.getElementById('marketCitiesGrid');
   const subtitle = document.getElementById('marketSubtitle');
-  if (subtitle) subtitle.textContent = `Showing results for "${query}"`;
+  if (grid) grid.innerHTML = `
+    <div style="grid-column:1/-1;text-align:center;padding:60px 0;">
+      <div class="loading-spinner"></div>
+      <p style="color:var(--text-2);margin-top:12px;font-size:0.9rem">
+        Searching markets for <strong style="color:var(--green)">"${query}"</strong>...
+      </p>
+    </div>`;
+  if (subtitle) subtitle.textContent = `Searching for "${query}"...`;
 
   try {
-    const res  = await fetch(`/api/market-prices?location=${encodeURIComponent(query)}`);
+    const res = await fetch(`/api/market?location=${encodeURIComponent(query)}`);
     const data = await res.json();
 
     if (!data.markets || Object.keys(data.markets).length === 0) {
@@ -168,10 +177,22 @@ function clearSearch() {
   const input    = document.getElementById('locationSearch');
   const clearBtn = document.getElementById('clearSearchBtn');
   const subtitle = document.getElementById('marketSubtitle');
+  const grid     = document.getElementById('marketCitiesGrid');
+  const none     = document.getElementById('noResults');
 
   if (input)    input.value = '';
   if (clearBtn) clearBtn.style.display = 'none';
-  if (subtitle) subtitle.textContent = 'Showing all major Indian markets';
+  if (subtitle) subtitle.textContent = 'Loading all markets...';
+  if (none)     none.style.display = 'none';
+
+  // Show spinner while reloading
+  if (grid) grid.innerHTML = `
+    <div style="grid-column:1/-1;text-align:center;padding:60px 0;">
+      <div class="loading-spinner"></div>
+      <p style="color:var(--text-2);margin-top:12px;font-size:0.9rem">
+        Loading all markets...
+      </p>
+    </div>`;
 
   loadAllMarkets();
 }
