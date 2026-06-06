@@ -17,7 +17,9 @@
 
 **Empowering India's farmers with real-time market intelligence, AI crop diagnostics, and smart weather alerts.**
 
-[Live Demo](https://smartagro-pi6m.onrender.com) · [Report Bug](../../issues) · [Request Feature](../../issues)
+### 🚀 Live Demo
+
+## 👉 [Click Here to Open the App](https://smartagro-pi6m.onrender.com)
 
 </div>
 
