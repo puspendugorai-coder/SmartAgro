@@ -1,10 +1,5 @@
-Flask==3.0.3
-requests==2.32.3
-werkzeug==3.0.3
-urllib3==2.2.1
-certifi==2024.2.2
-idna==3.7
-charset-normalizer==3.3.2
-Pillow==10.3.0
+flask==3.0.3
+requests==2.31.0
 python-dotenv==1.0.1
 gunicorn==21.2.0
+Pillow==10.3.0
