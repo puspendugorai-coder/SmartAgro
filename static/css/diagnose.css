@@ -14,7 +14,7 @@
 ══════════════════════════════════════ */
 .diagnose-layout {
   display: grid;
-  grid-template-columns: 460px 1fr;   /* fixed left, flexible right */
+  grid-template-columns: minmax(300px, 460px) 1fr;  
   gap: 32px;
   align-items: start;
 }
@@ -554,4 +554,9 @@
   .upload-zone { padding: 32px 18px; }
   .result-body { padding: 16px; }
   .result-header { padding: 16px; }
+  .btn-analyze { font-size: 0.92rem; padding: 14px; }
+  .upload-btns { flex-direction: column; align-items: center; }
+  .camera-controls { gap: 14px; }
+  .btn-capture { width: 54px; height: 54px; }
+  .chem-item { flex-direction: column; align-items: flex-start; gap: 4px; }
 }
