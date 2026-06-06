@@ -35,7 +35,6 @@
 - [Environment Variables](#-environment-variables)
 - [API Endpoints](#-api-endpoints)
 - [Contributing](#-contributing)
-- [License](#-license)
 - [Acknowledgements](#-acknowledgements)
 
 ---
@@ -154,13 +153,6 @@ SmartAgro/
 | `POST` | `/api/diagnose` | AI crop disease diagnosis |
 | `POST` | `/api/crop-recommendations` | Crop recommendations by weather data |
 | `POST` | `/api/alerts` | Weather-based smart farming alerts |
-
----
-
-
-## 📄 License
-
-Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information.
 
 ---
 
