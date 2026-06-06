@@ -137,7 +137,7 @@
 
 .market-cities-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(min(380px, 100%), 1fr));
   gap: 24px;
 }
 
@@ -305,4 +305,13 @@
   .market-cities-grid { grid-template-columns: 1fr; }
   .crop-row { grid-template-columns: 1fr 1fr; gap: 6px; }
   .cr-demand { display: none; }
+}
+
+@media (max-width: 600px) {
+  .ticker-label { padding: 0 10px; font-size: 0.62rem; }
+  .ticker-content { font-size: 0.72rem; }
+  .crop-row { grid-template-columns: 1fr 1fr; }
+  .search-bar-section { padding: 14px 0; }
+  .chart-controls { padding: 12px; }
+  .chart-canvas-wrap { padding: 12px; height: 280px; }
 }
