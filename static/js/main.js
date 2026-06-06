@@ -226,4 +226,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const saved = sessionStorage.getItem('alert_count');
     if (saved) updateAlertBadge(parseInt(saved));
     observeAnimations();
+
+    // ── Close lang dropdown on outside tap (mobile) ──
+    document.addEventListener('click', e => {
+        const sel = document.querySelector('.lang-selector');
+        if (sel && !sel.contains(e.target)) {
+            sel.classList.remove('open');
+        }
+    });
 });
