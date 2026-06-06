@@ -31,7 +31,6 @@
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
 - [Environment Variables](#-environment-variables)
 - [API Endpoints](#-api-endpoints)
 - [Contributing](#-contributing)
