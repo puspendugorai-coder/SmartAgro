@@ -3,7 +3,6 @@
 <div align="center">
 
 <!-- Animated SVG Banner -->
-<img src="https://raw.githubusercontent.com/puspendugorai-coder/SmartAgro/main/assets/banner.svg" alt="SmartAgro Banner" width="100%"/>
 
 > ![SmartAgro](https://img.shields.io/badge/SmartAgro-Precision%20Agriculture-22c55e?style=for-the-badge&logo=leaf&logoColor=white)
 > ```
