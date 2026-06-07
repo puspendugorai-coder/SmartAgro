@@ -592,3 +592,6 @@ h1,h2,h3,h4 { font-family: 'Syne', sans-serif; line-height: 1.2; }
   .nav-actions { gap: 8px; }
   .toast { bottom: 16px; right: 16px; left: 16px; max-width: none; } /* full-width toast */
 }
+/* ── Language dropdown fix ── */
+.lang-dropdown { display: none !important; }
+.lang-selector.open .lang-dropdown { display: block !important; }
