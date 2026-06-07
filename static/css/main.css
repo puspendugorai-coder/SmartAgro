@@ -45,7 +45,54 @@
 
   --trans:       all 0.28s cubic-bezier(0.4,0,0.2,1);
 }
+/* ── Light Theme ──────────────────────────────────────── */
+body.light-theme {
+  --bg:          #f0f7f0;
+  --bg-2:        #e4f0e4;
+  --bg-3:        #d8ebd8;
+  --card:        #ffffff;
+  --card-hover:  #f4fbf4;
+  --border:      rgba(22,101,52,0.15);
+  --border-2:    rgba(22,101,52,0.28);
 
+  --text:        #0f2d10;
+  --text-2:      #2e5c30;
+  --text-3:      #5a8c5c;
+
+  --shadow:      0 4px 24px rgba(0,0,0,0.10);
+  --shadow-lg:   0 8px 48px rgba(0,0,0,0.16);
+}
+
+body.light-theme .navbar {
+  background: rgba(240,247,240,0.90);
+}
+body.light-theme .navbar.scrolled {
+  background: rgba(240,247,240,0.98);
+}
+body.light-theme .hero-grid {
+  background-image:
+    linear-gradient(rgba(22,101,52,0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(22,101,52,0.06) 1px, transparent 1px);
+}
+
+/* ── Theme Toggle Button ─────────────────────────────── */
+.theme-toggle {
+  width: 38px; height: 38px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-3);
+  border: 1px solid var(--border);
+  color: var(--text-2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem;
+  transition: var(--trans);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  border-color: var(--amber);
+  color: var(--amber);
+  background: rgba(251,191,36,0.1);
+}
 /* ── Reset ───────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
