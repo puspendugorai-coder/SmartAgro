@@ -78,6 +78,7 @@
 
 ### 🌐 Multilingual Support
 - Supports **10+ Indian languages** including Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, and more
+- Day/Night Theme Toggle Button
 
 ---
 
