@@ -305,13 +305,22 @@
   .market-cities-grid { grid-template-columns: 1fr; }
   .crop-row { grid-template-columns: 1fr 1fr; gap: 6px; }
   .cr-demand { display: none; }
+  .chart-canvas-wrap { height: 260px; }
 }
 
 @media (max-width: 600px) {
   .ticker-label { padding: 0 10px; font-size: 0.62rem; }
   .ticker-content { font-size: 0.72rem; }
   .crop-row { grid-template-columns: 1fr 1fr; }
-  .search-bar-section { padding: 14px 0; }
-  .chart-controls { padding: 12px; }
-  .chart-canvas-wrap { padding: 12px; height: 280px; }
+  .search-bar-section { padding: 12px 0; top: var(--nav-h); }
+  .search-box { padding: 6px 12px; }
+  .search-box input { font-size: 0.85rem; }
+  .search-btn { padding: 7px 12px; font-size: 0.78rem; }
+  .chart-controls { padding: 12px; flex-direction: column; align-items: flex-start; }
+  .chart-canvas-wrap { padding: 12px; height: 240px; }
+  .chart-city-select select { width: 100%; }
+  .market-hero { padding-bottom: 60px; }
+  .price-ticker { height: 38px; }
+  .legend-bar { gap: 12px; }
+  .legend-item { font-size: 0.72rem; }
 }
