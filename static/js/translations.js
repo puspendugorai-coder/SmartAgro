@@ -38,6 +38,9 @@ const LANGUAGES = [
 ════════════════════════════════════════════════ */
 const T = {
     en: {
+        step_upload: 'Upload or capture image',
+        step_click: 'Click Analyze Crop',
+        step_result: 'Get instant AI diagnosis',
         nav_dashboard: 'Dashboard',
         nav_diagnose: 'Diagnose Crop',
         nav_market: 'Market Prices',
@@ -177,6 +180,9 @@ const T = {
     },
 
     hi: {
+        step_upload: 'छवि अपलोड करें या कैप्चर करें',
+        step_click: 'फसल विश्लेषण पर क्लिक करें',
+        step_result: 'तुरंत AI निदान प्राप्त करें',
         nav_dashboard: 'डैशबोर्ड',
         nav_diagnose: 'फसल निदान',
         nav_market: 'बाजार भाव',
