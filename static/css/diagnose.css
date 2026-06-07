@@ -14,7 +14,7 @@
 ══════════════════════════════════════ */
 .diagnose-layout {
   display: grid;
-  grid-template-columns: 460px 1fr;   /* fixed left, flexible right */
+  grid-template-columns: minmax(300px, 460px) 1fr;  
   gap: 32px;
   align-items: start;
 }
@@ -542,16 +542,26 @@
 
 /* ── Responsive ─────────────────────── */
 @media (max-width: 1024px) {
-  .diagnose-layout {
-    grid-template-columns: 1fr;   /* stack vertically */
-  }
+  .diagnose-layout { grid-template-columns: 1fr; }
   .results-panel { min-height: 400px; }
   .results-placeholder { min-height: 400px; }
   .steps-grid { grid-template-columns: 1fr 1fr; }
 }
+
 @media (max-width: 600px) {
   .steps-grid { grid-template-columns: 1fr; }
-  .upload-zone { padding: 32px 18px; }
-  .result-body { padding: 16px; }
-  .result-header { padding: 16px; }
+  .upload-zone { padding: 28px 16px; }
+  .upload-zone h3 { font-size: 0.95rem; }
+  .upload-btns { flex-direction: column; align-items: stretch; }
+  .upload-btns .btn-primary,
+  .upload-btns .btn-secondary { justify-content: center; }
+  .result-body { padding: 14px; }
+  .result-header { padding: 14px; }
+  .result-disease-name { font-size: 1.1rem; }
+  .btn-analyze { font-size: 0.9rem; padding: 13px; }
+  .camera-controls { gap: 14px; }
+  .btn-capture { width: 54px; height: 54px; }
+  .chem-item { flex-direction: column; align-items: flex-start; gap: 4px; }
+  .tips-card { font-size: 0.82rem; }
+  .diagnose-hero { min-height: 220px; }
 }

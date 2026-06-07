@@ -341,12 +341,33 @@
 
 /* Responsive */
 @media (max-width: 900px) {
-  .alert-summary-bar { position: static; transform: none; flex-wrap: wrap; width: auto; margin-top: 24px; }
+  .alert-summary-bar {
+    position: static;
+    transform: none;
+    flex-wrap: wrap;
+    width: auto;
+    margin-top: 24px;
+    padding: 0 16px;
+  }
   .alerts-hero { padding-bottom: 40px; }
   .location-section { padding-top: 40px; }
   .risk-chart-layout { grid-template-columns: 1fr; }
+  .page-hero h1 { font-size: clamp(1.8rem, 5vw, 2.8rem); }
+  .summary-card { padding: 14px 16px; gap: 10px; }
+  .summary-count { font-size: 1.3rem; }
 }
+
 @media (max-width: 600px) {
-  .alert-filters { gap: 6px; }
+  .alert-summary-bar { gap: 10px; }
+  .summary-card { flex: calc(50% - 5px); min-width: 0; }   /* 2-column grid */
+  .alert-filters { gap: 6px; padding: 12px; }
   .alert-tab { padding: 6px 10px; font-size: 0.72rem; }
+  .alert-card { flex-direction: column; gap: 12px; padding: 16px; }
+  .alert-card-icon { width: 40px; height: 40px; font-size: 1.2rem; }
+  .risk-chart-layout { grid-template-columns: 1fr; }
+  .pesticide-grid { grid-template-columns: 1fr; }
+  .harmful-grid, .safe-grid { grid-template-columns: 1fr; }
+  .location-prompt { padding: 28px 20px; }
+  .pest-calendar-grid { grid-template-columns: 1fr; }
+}
 }
