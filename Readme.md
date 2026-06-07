@@ -1,6 +1,6 @@
 # 🌿 SmartAgro — AI-Powered Precision Agriculture Platform 
 
-<div align="center">
+<div align="center"> 
 
 <!-- Animated SVG Banner -->
 
