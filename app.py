@@ -3,22 +3,24 @@ import requests
 import os
 import json
 import re
+import random
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
-import random
-# Load .env from the same folder as app.py — works regardless of where you run from
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 load_dotenv(os.path.join(basedir, '.env'))
 
 app = Flask(__name__)
 
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
-GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_API_KEY        = os.getenv("GROQ_API_KEY", "")
+KINDWISE_API_KEY    = os.getenv("KINDWISE_API_KEY", "")
 
-print(f"[AgroSmart] Groq key:    {'OK (' + GROQ_API_KEY[:8] + '...)' if GROQ_API_KEY else 'MISSING - check .env'}")
-print(f"[AgroSmart] Weather key: {'OK' if OPENWEATHER_API_KEY else 'MISSING'}")
-print(f"[AgroSmart] Ninja key:   {'OK' if os.getenv('NINJA_API_KEY') else 'MISSING'}")
-# ─── Routes ──────────────────────────────────────────────────────────────────
+print(f"[SmartAgro] Weather key : {'OK' if OPENWEATHER_API_KEY else 'MISSING'}")
+print(f"[SmartAgro] Groq key    : {'OK (' + GROQ_API_KEY[:8] + '...)' if GROQ_API_KEY else 'MISSING'}")
+print(f"[SmartAgro] Kindwise key: {'OK' if KINDWISE_API_KEY else 'MISSING'}")
+
+# ─── Routes ───────────────────────────────────────────────────────────────────
 @app.route("/")
 def index():
     return render_template("index.html")
@@ -58,7 +60,6 @@ def get_weather():
         current_data  = current_resp.json()
         forecast_data = forecast_resp.json()
 
-        # Group forecast by day
         daily = {}
         if forecast_data.get("list"):
             for item in forecast_data["list"]:
@@ -121,69 +122,81 @@ def crop_recommendations():
 
 
 def get_season(month):
-    if month in [6,7,8,9]:    return "Kharif (Monsoon)"
+    if month in [6,7,8,9]:        return "Kharif (Monsoon)"
     elif month in [10,11,12,1,2]: return "Rabi (Winter)"
-    else:                      return "Zaid (Summer)"
+    else:                          return "Zaid (Summer)"
 
 
 def recommend_crops(temp, humidity, rain, season):
     all_crops = [
-        {"name":"Rice",      "icon":"🌾","temp_range":(20,38),"humidity_range":(70,100),"season":"Kharif (Monsoon)","water":"High","yield":"3-5 tonnes/ha","profit":"₹45,000-65,000/ha","duration":"90-150 days","description":"Ideal for high humidity and warm conditions","soil":"Clay loam, alluvial","fertilizer":"NPK 120:60:60 kg/ha"},
-        {"name":"Wheat",     "icon":"🌿","temp_range":(10,25),"humidity_range":(40,65), "season":"Rabi (Winter)",   "water":"Medium","yield":"4-6 tonnes/ha","profit":"₹50,000-75,000/ha","duration":"100-150 days","description":"Best suited for cool, dry winters","soil":"Well-drained loam","fertilizer":"NPK 120:60:40 kg/ha"},
-        {"name":"Maize",     "icon":"🌽","temp_range":(18,35),"humidity_range":(50,80), "season":"Kharif (Monsoon)","water":"Medium","yield":"5-8 tonnes/ha","profit":"₹40,000-60,000/ha","duration":"80-110 days","description":"Versatile crop for warm humid weather","soil":"Sandy loam to clay loam","fertilizer":"NPK 150:75:75 kg/ha"},
-        {"name":"Cotton",    "icon":"☁️","temp_range":(25,40),"humidity_range":(40,70), "season":"Kharif (Monsoon)","water":"Medium","yield":"2-3 tonnes/ha","profit":"₹60,000-90,000/ha","duration":"150-180 days","description":"Thrives in hot dry spells with moderate rain","soil":"Black cotton soil","fertilizer":"NPK 90:45:45 kg/ha"},
-        {"name":"Tomato",    "icon":"🍅","temp_range":(18,30),"humidity_range":(60,80), "season":"Zaid (Summer)",   "water":"Medium","yield":"20-40 tonnes/ha","profit":"₹80,000-1,50,000/ha","duration":"60-80 days","description":"High value crop for moderate climates","soil":"Sandy loam, rich organic matter","fertilizer":"NPK 100:60:60 kg/ha"},
-        {"name":"Sugarcane", "icon":"🎋","temp_range":(24,38),"humidity_range":(75,90), "season":"Kharif (Monsoon)","water":"Very High","yield":"70-100 tonnes/ha","profit":"₹70,000-1,00,000/ha","duration":"300-360 days","description":"Requires hot climate and heavy rainfall","soil":"Deep loam, good drainage","fertilizer":"NPK 250:80:100 kg/ha"},
-        {"name":"Soybean",   "icon":"🫘","temp_range":(20,32),"humidity_range":(60,80), "season":"Kharif (Monsoon)","water":"Medium","yield":"2-3 tonnes/ha","profit":"₹35,000-55,000/ha","duration":"90-120 days","description":"Nitrogen-fixing legume for warm monsoon","soil":"Well-drained loam","fertilizer":"NPK 30:60:40 kg/ha"},
-        {"name":"Mustard",   "icon":"🌻","temp_range":(10,25),"humidity_range":(40,60), "season":"Rabi (Winter)",   "water":"Low","yield":"1-2 tonnes/ha","profit":"₹25,000-40,000/ha","duration":"90-110 days","description":"Cool weather oil seed crop","soil":"Sandy loam, well-drained","fertilizer":"NPK 80:40:40 kg/ha"},
+        {"name":"Rice",      "icon":"🌾","temp_range":(20,38),"humidity_range":(70,100),"season":"Kharif (Monsoon)","water":"High",     "yield":"3-5 t/ha",  "profit":"₹45,000-65,000/ha","duration":"90-150 days","description":"Best for high humidity & warm weather","soil":"Clay loam","fertilizer":"NPK 120:60:60 kg/ha"},
+        {"name":"Wheat",     "icon":"🌿","temp_range":(10,25),"humidity_range":(40,65), "season":"Rabi (Winter)",   "water":"Medium",   "yield":"4-6 t/ha",  "profit":"₹50,000-75,000/ha","duration":"100-150 days","description":"Cool dry winters — most popular rabi crop","soil":"Loam","fertilizer":"NPK 120:60:40 kg/ha"},
+        {"name":"Maize",     "icon":"🌽","temp_range":(18,35),"humidity_range":(50,80), "season":"Kharif (Monsoon)","water":"Medium",   "yield":"5-8 t/ha",  "profit":"₹40,000-60,000/ha","duration":"80-110 days","description":"Versatile crop for warm humid weather","soil":"Sandy loam","fertilizer":"NPK 150:75:75 kg/ha"},
+        {"name":"Cotton",    "icon":"☁️","temp_range":(25,40),"humidity_range":(40,70), "season":"Kharif (Monsoon)","water":"Medium",   "yield":"2-3 t/ha",  "profit":"₹60,000-90,000/ha","duration":"150-180 days","description":"Hot dry spells with moderate rain","soil":"Black cotton soil","fertilizer":"NPK 90:45:45 kg/ha"},
+        {"name":"Tomato",    "icon":"🍅","temp_range":(18,30),"humidity_range":(60,80), "season":"Zaid (Summer)",   "water":"Medium",   "yield":"20-40 t/ha","profit":"₹80,000-1,50,000/ha","duration":"60-80 days","description":"High value crop for moderate climates","soil":"Sandy loam","fertilizer":"NPK 100:60:60 kg/ha"},
+        {"name":"Sugarcane", "icon":"🎋","temp_range":(24,38),"humidity_range":(75,90), "season":"Kharif (Monsoon)","water":"Very High","yield":"70-100 t/ha","profit":"₹70,000-1,00,000/ha","duration":"300-360 days","description":"Hot climate and heavy rainfall needed","soil":"Deep loam","fertilizer":"NPK 250:80:100 kg/ha"},
+        {"name":"Soybean",   "icon":"🫘","temp_range":(20,32),"humidity_range":(60,80), "season":"Kharif (Monsoon)","water":"Medium",   "yield":"2-3 t/ha",  "profit":"₹35,000-55,000/ha","duration":"90-120 days","description":"Nitrogen-fixing legume for warm monsoon","soil":"Well-drained loam","fertilizer":"NPK 30:60:40 kg/ha"},
+        {"name":"Mustard",   "icon":"🌻","temp_range":(10,25),"humidity_range":(40,60), "season":"Rabi (Winter)",   "water":"Low",      "yield":"1-2 t/ha",  "profit":"₹25,000-40,000/ha","duration":"90-110 days","description":"Cool weather oil seed crop","soil":"Sandy loam","fertilizer":"NPK 80:40:40 kg/ha"},
+        {"name":"Onion",     "icon":"🧅","temp_range":(13,28),"humidity_range":(50,75), "season":"Rabi (Winter)",   "water":"Medium",   "yield":"15-25 t/ha","profit":"₹50,000-1,00,000/ha","duration":"100-120 days","description":"High demand vegetable — good income","soil":"Sandy loam","fertilizer":"NPK 100:50:50 kg/ha"},
+        {"name":"Potato",    "icon":"🥔","temp_range":(10,22),"humidity_range":(60,80), "season":"Rabi (Winter)",   "water":"Medium",   "yield":"20-30 t/ha","profit":"₹40,000-80,000/ha","duration":"70-90 days","description":"Cool weather staple — high yield","soil":"Sandy loam","fertilizer":"NPK 120:80:100 kg/ha"},
+        {"name":"Chilli",    "icon":"🌶️","temp_range":(20,35),"humidity_range":(60,80), "season":"Zaid (Summer)",   "water":"Medium",   "yield":"6-10 t/ha", "profit":"₹60,000-1,20,000/ha","duration":"90-120 days","description":"Warm climate spice with high market value","soil":"Sandy loam","fertilizer":"NPK 100:50:50 kg/ha"},
+        {"name":"Groundnut", "icon":"🥜","temp_range":(22,36),"humidity_range":(50,75), "season":"Kharif (Monsoon)","water":"Medium",   "yield":"1.5-3 t/ha","profit":"₹30,000-55,000/ha","duration":"90-130 days","description":"Warm season oilseed — good for dry areas","soil":"Sandy loam","fertilizer":"NPK 25:50:25 kg/ha"},
     ]
     scored = []
     for crop in all_crops:
         score = 0
-        if crop["temp_range"][0] <= temp <= crop["temp_range"][1]:       score += 40
-        elif abs(temp - sum(crop["temp_range"])/2) < 5:                  score += 20
-        if crop["humidity_range"][0] <= humidity <= crop["humidity_range"][1]: score += 30
-        if crop["season"] == season:                                     score += 30
+        if crop["temp_range"][0] <= temp <= crop["temp_range"][1]:              score += 40
+        elif abs(temp - sum(crop["temp_range"])/2) < 5:                         score += 20
+        if crop["humidity_range"][0] <= humidity <= crop["humidity_range"][1]:  score += 30
+        if crop["season"] == season:                                             score += 30
         crop["score"] = score
-        crop["match"] = f"{min(100,score)}%"
+        crop["match"] = f"{min(100, score)}%"
         scored.append(crop)
     scored.sort(key=lambda x: x["score"], reverse=True)
     return scored
 
 
 def generate_advisory_calendar(crops):
-    today      = datetime.now()
+    today = datetime.now()
     activities = [
-        {"week":1,  "activity":"Soil preparation & ploughing",       "type":"preparation"},
-        {"week":2,  "activity":"Seed treatment & sowing",            "type":"sowing"},
-        {"week":3,  "activity":"First irrigation",                   "type":"irrigation"},
-        {"week":4,  "activity":"Apply basal fertilizer (NPK)",       "type":"fertilizer"},
-        {"week":6,  "activity":"Weeding & thinning",                 "type":"maintenance"},
-        {"week":8,  "activity":"Apply Urea (top dressing)",          "type":"fertilizer"},
-        {"week":10, "activity":"Pest & disease inspection",          "type":"pesticide"},
-        {"week":12, "activity":"Spray fungicide if required",        "type":"pesticide"},
-        {"week":16, "activity":"Foliar spray micronutrients",        "type":"fertilizer"},
-        {"week":20, "activity":"Pre-harvest irrigation stop",        "type":"irrigation"},
-        {"week":22, "activity":"Harvest preparation",                "type":"harvest"},
+        {"week":1,  "activity":"Soil preparation & ploughing",     "type":"preparation"},
+        {"week":2,  "activity":"Seed treatment & sowing",          "type":"sowing"},
+        {"week":3,  "activity":"First irrigation",                 "type":"irrigation"},
+        {"week":4,  "activity":"Apply basal fertilizer (NPK)",     "type":"fertilizer"},
+        {"week":6,  "activity":"Weeding & thinning",               "type":"maintenance"},
+        {"week":8,  "activity":"Apply Urea (top dressing)",        "type":"fertilizer"},
+        {"week":10, "activity":"Pest & disease inspection",        "type":"pesticide"},
+        {"week":12, "activity":"Spray fungicide if required",      "type":"pesticide"},
+        {"week":16, "activity":"Foliar spray micronutrients",      "type":"fertilizer"},
+        {"week":20, "activity":"Pre-harvest irrigation stop",      "type":"irrigation"},
+        {"week":22, "activity":"Harvest preparation",              "type":"harvest"},
     ]
     calendar = []
     for act in activities:
         date = today + timedelta(weeks=act["week"])
-        calendar.append({"date": date.strftime("%d %b %Y"), "activity": act["activity"],
-                         "type": act["type"], "week": act["week"]})
+        calendar.append({
+            "date":     date.strftime("%d %b %Y"),
+            "activity": act["activity"],
+            "type":     act["type"],
+            "week":     act["week"]
+        })
     return calendar
 
 
 def get_pesticide_guide(crops):
     guides = {
-        "Rice":   [{"pest":"Brown Plant Hopper","pesticide":"Imidacloprid 17.8 SL","dose":"125 ml/ha","timing":"At 30 & 60 days after transplanting","eco":False},
-                   {"pest":"Leaf folder",       "pesticide":"Neem Oil 5%",          "dose":"2.5 L/ha", "timing":"At first sign of damage","eco":True}],
-        "Wheat":  [{"pest":"Aphids",            "pesticide":"Dimethoate 30 EC",     "dose":"1 L/ha",   "timing":"At tillering stage","eco":False},
-                   {"pest":"Yellow rust",       "pesticide":"Propiconazole 25 EC",  "dose":"500 ml/ha","timing":"At boot leaf stage","eco":False}],
-        "Maize":  [{"pest":"Fall Armyworm",     "pesticide":"Spinetoram 11.7 SC",   "dose":"450 ml/ha","timing":"7-10 days after infestation","eco":False},
-                   {"pest":"Stem borer",        "pesticide":"Emamectin Benzoate 5 SG","dose":"220 g/ha","timing":"At whorl stage","eco":False}],
-        "Cotton": [{"pest":"Bollworm",          "pesticide":"Chlorpyriphos 20 EC",  "dose":"2.5 ml/L", "timing":"At first boll formation","eco":False},
-                   {"pest":"Whitefly",          "pesticide":"Neem Oil 5%",          "dose":"5 ml/L",   "timing":"Every 7 days","eco":True}],
+        "Rice":     [{"pest":"Brown Plant Hopper","pesticide":"Imidacloprid 17.8 SL","dose":"125 ml/ha","timing":"At 30 & 60 days after transplanting","eco":False},
+                     {"pest":"Leaf folder",        "pesticide":"Neem Oil 5%",         "dose":"2.5 L/ha", "timing":"At first sign of damage","eco":True}],
+        "Wheat":    [{"pest":"Aphids",             "pesticide":"Dimethoate 30 EC",    "dose":"1 L/ha",   "timing":"At tillering stage","eco":False},
+                     {"pest":"Yellow rust",        "pesticide":"Propiconazole 25 EC", "dose":"500 ml/ha","timing":"At boot leaf stage","eco":False}],
+        "Maize":    [{"pest":"Fall Armyworm",      "pesticide":"Spinetoram 11.7 SC",  "dose":"450 ml/ha","timing":"7-10 days after infestation","eco":False},
+                     {"pest":"Stem borer",         "pesticide":"Emamectin Benzoate",  "dose":"220 g/ha", "timing":"At whorl stage","eco":False}],
+        "Cotton":   [{"pest":"Bollworm",           "pesticide":"Chlorpyriphos 20 EC", "dose":"2.5 ml/L", "timing":"At first boll formation","eco":False},
+                     {"pest":"Whitefly",           "pesticide":"Neem Oil 5%",         "dose":"5 ml/L",   "timing":"Every 7 days","eco":True}],
+        "Tomato":   [{"pest":"Early Blight",       "pesticide":"Mancozeb 75 WP",      "dose":"2.5 g/L",  "timing":"Every 7-10 days","eco":False},
+                     {"pest":"Fruit borer",        "pesticide":"Neem Oil 5%",         "dose":"5 ml/L",   "timing":"At flowering","eco":True}],
+        "Onion":    [{"pest":"Thrips",             "pesticide":"Spinosad 45 SC",      "dose":"0.5 ml/L", "timing":"At 30 & 60 days","eco":False},
+                     {"pest":"Purple blotch",      "pesticide":"Mancozeb 75 WP",      "dose":"2.5 g/L",  "timing":"Every 10 days","eco":False}],
     }
     result = []
     for crop in crops:
@@ -192,131 +205,199 @@ def get_pesticide_guide(crops):
     return result
 
 
-# ─── Diagnose Crop via Claude Vision API ──────────────────────────────────────
-# ─── Diagnose Crop via Google Gemini Vision API (FREE) ────────────────────────
-# ─── Diagnose Crop via Groq API (FREE, no quota issues) ──────────────────────
+# ─── Diagnose via Kindwise API ────────────────────────────────────────────────
 @app.route("/api/diagnose", methods=["POST"])
 def diagnose_crop():
-    GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-    if not GROQ_API_KEY:
-        return jsonify({"error": "GROQ_API_KEY not set in .env"}), 500
+    if not KINDWISE_API_KEY:
+        return jsonify({"error": "KINDWISE_API_KEY not set"}), 500
 
     data      = request.json or {}
     image_b64 = data.get("image", "")
     if not image_b64:
         return jsonify({"error": "No image data received"}), 400
 
+    try:
+        print("[Diagnose] Trying Kindwise crop.health API...")
+
+        # Kindwise Crop Health API
+        kindwise_resp = requests.post(
+            "https://crop.kindwise.com/api/v1/identification",
+            headers={
+                "Api-Key": KINDWISE_API_KEY,
+                "Content-Type": "application/json"
+            },
+            json={
+                "images": [f"data:image/jpeg;base64,{image_b64}"],
+                "latitude":  28.6,
+                "longitude": 77.2,
+                "similar_images": True
+            },
+            timeout=30
+        )
+
+        print(f"[Diagnose] Kindwise status: {kindwise_resp.status_code}")
+
+        if kindwise_resp.status_code == 200:
+            kw_data = kindwise_resp.json()
+            result  = parse_kindwise_response(kw_data)
+            if result:
+                print(f"[Diagnose] ✅ Kindwise success: {result.get('disease')}")
+                return jsonify(result)
+
+    except Exception as e:
+        print(f"[Diagnose] Kindwise error: {e}")
+
+    # Fallback to Groq if Kindwise fails
+    print("[Diagnose] Falling back to Groq vision...")
+    return diagnose_via_groq(image_b64)
+
+
+def parse_kindwise_response(kw_data):
+    """Convert Kindwise API response to our standard format."""
+    try:
+        result = kw_data.get("result", {})
+        disease_info = result.get("disease", {})
+        suggestions  = disease_info.get("suggestions", [])
+
+        if not suggestions:
+            # No disease found — plant is healthy
+            return {
+                "disease":           "Healthy Plant",
+                "confidence":        95,
+                "severity":          "None",
+                "affected_part":     "N/A",
+                "cause":             "No disease or pest damage detected. Plant appears healthy.",
+                "eco_remedies":      [{"remedy": "Continue regular care", "method": "Maintain proper irrigation and fertilization", "frequency": "As needed", "effectiveness": 100}],
+                "chemical_remedies": [],
+                "prevention":        ["Maintain proper spacing for air circulation", "Water at base of plant", "Monitor regularly for early signs of disease"],
+                "recovery_timeline": "Plant is healthy — no treatment needed"
+            }
+
+        top = suggestions[0]
+        disease_name  = top.get("name", "Unknown Disease")
+        confidence    = round(top.get("probability", 0) * 100)
+        details       = top.get("details", {})
+        description   = details.get("description", "")
+        treatment     = details.get("treatment", {})
+
+        # Build eco remedies from Kindwise treatment data
+        bio_control   = treatment.get("biological", [])
+        chemical_ctrl = treatment.get("chemical", [])
+        prevention    = treatment.get("prevention", [])
+
+        eco_remedies = []
+        for i, remedy in enumerate(bio_control[:3]):
+            eco_remedies.append({
+                "remedy":        remedy if isinstance(remedy, str) else str(remedy),
+                "method":        "Apply as directed on the affected area",
+                "frequency":     "Every 7 days until symptoms improve",
+                "effectiveness": max(60, 90 - i * 10)
+            })
+        if not eco_remedies:
+            eco_remedies = [{"remedy": "Neem oil spray", "method": "Mix 5ml per litre water, spray on affected parts", "frequency": "Every 5-7 days", "effectiveness": 75}]
+
+        chem_remedies = []
+        for chem in chemical_ctrl[:3]:
+            chem_remedies.append({
+                "name":     chem if isinstance(chem, str) else str(chem),
+                "dose":     "As per label instructions",
+                "interval": "Every 10-14 days"
+            })
+
+        prev_tips = []
+        for tip in prevention[:4]:
+            prev_tips.append(tip if isinstance(tip, str) else str(tip))
+        if not prev_tips:
+            prev_tips = [
+                "Ensure proper plant spacing for air circulation",
+                "Avoid overhead watering",
+                "Remove and destroy infected plant material",
+                "Use certified disease-free seeds"
+            ]
+
+        # Determine severity from confidence
+        if confidence > 80:   severity = "Severe"
+        elif confidence > 55: severity = "Moderate"
+        else:                  severity = "Mild"
+
+        return {
+            "disease":           disease_name,
+            "confidence":        confidence,
+            "severity":          severity,
+            "affected_part":     details.get("classification", {}).get("crop", ["Leaves"])[0] if details.get("classification") else "Leaves",
+            "cause":             description[:300] if description else f"{disease_name} — identified by AI plant pathology model.",
+            "eco_remedies":      eco_remedies,
+            "chemical_remedies": chem_remedies,
+            "prevention":        prev_tips,
+            "recovery_timeline": "2-4 weeks with proper treatment"
+        }
+
+    except Exception as e:
+        print(f"[parse_kindwise] Error: {e}")
+        return None
+
+
+def diagnose_via_groq(image_b64):
+    """Fallback: use Groq vision if Kindwise fails."""
+    if not GROQ_API_KEY:
+        return jsonify({"error": "Both Kindwise and Groq API keys missing"}), 500
+
     prompt = """You are an expert agricultural plant pathologist AI.
-Look very carefully at this crop image. Identify the EXACT disease, pest damage, or nutrient deficiency you can see.
+Look carefully at this crop image and identify the disease, pest damage, or nutrient deficiency.
 
-Be very specific — different diseases look completely different:
-- Tomato Early Blight: dark concentric rings on leaves
-- Tomato Late Blight: water-soaked dark patches
-- Maize Smut: large black/grey galls on corn cob
-- Powdery Mildew: white powder coating on leaves
-- Rust Disease: orange/brown pustules on leaves
-- Bacterial Leaf Spot: water soaked angular spots
-- Anthracnose: dark sunken lesions on fruit/stem
-- Mosaic Virus: yellow-green mottled pattern
-- Leaf Miner: white winding trails on leaves
-- Healthy: normal green color, no symptoms
-
-Look at the actual image carefully and identify what you truly see.
-
-Respond ONLY with valid JSON, absolutely no markdown or backticks:
+Respond ONLY with valid JSON, no markdown or backticks:
 {
-  "disease": "Exact specific disease name you can see in this image",
-  "confidence": 88,
+  "disease": "Exact disease name",
+  "confidence": 85,
   "severity": "Mild or Moderate or Severe",
-  "affected_part": "Exact part affected e.g. Leaves/Stem/Fruit/Root/Cob",
-  "cause": "Specific pathogen name and how it spreads",
+  "affected_part": "Leaves/Stem/Fruit/Root",
+  "cause": "Specific pathogen and how it spreads",
   "eco_remedies": [
-    {"remedy": "Specific remedy for THIS disease", "method": "Exact application steps", "frequency": "How often to apply", "effectiveness": 80}
+    {"remedy": "Remedy name", "method": "How to apply", "frequency": "How often", "effectiveness": 80}
   ],
   "chemical_remedies": [
-    {"name": "Specific chemical for THIS disease", "dose": "Exact dose per litre", "interval": "Days between sprays"}
+    {"name": "Chemical name", "dose": "Dose per litre", "interval": "Days between sprays"}
   ],
-  "prevention": [
-    "Prevention tip specific to this exact disease",
-    "Cultural practice to avoid this disease",
-    "Variety or season management tip"
-  ],
-  "recovery_timeline": "Realistic weeks for recovery with treatment"
+  "prevention": ["Tip 1", "Tip 2", "Tip 3"],
+  "recovery_timeline": "2-4 weeks with treatment"
 }"""
 
-    # Groq vision models — try in order
+    headers = {"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"}
     vision_models = [
         "meta-llama/llama-4-scout-17b-16e-instruct",
         "meta-llama/llama-4-maverick-17b-128e-instruct",
     ]
 
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type":  "application/json"
-    }
-
     for model in vision_models:
         try:
-            print(f"[Diagnose] Trying Groq vision model: {model}")
-
             body = {
                 "model": model,
                 "messages": [
-                    {
-                        "role": "system",
-                        "content": "You are an expert plant pathologist. Look at the image carefully. Return ONLY valid JSON. Never give generic answers — always base your diagnosis on what you actually see in the image."
-                    },
-                    {
-                        "role": "user",
-                        "content": [
-                            {
-                                "type": "image_url",
-                                "image_url": {
-                                    "url": f"data:image/jpeg;base64,{image_b64}"
-                                }
-                            },
-                            {
-                                "type": "text",
-                                "text": prompt
-                            }
-                        ]
-                    }
+                    {"role": "system", "content": "You are an expert plant pathologist. Return ONLY valid JSON."},
+                    {"role": "user", "content": [
+                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_b64}"}},
+                        {"type": "text", "text": prompt}
+                    ]}
                 ],
                 "temperature": 0.2,
                 "max_tokens":  1200,
             }
+            resp = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=headers, json=body, timeout=45)
+            if resp.status_code == 429: continue
+            if resp.status_code != 200: continue
 
-            resp = requests.post(
-                "https://api.groq.com/openai/v1/chat/completions",
-                headers=headers,
-                json=body,
-                timeout=45
-            )
-            print(f"[Diagnose] {model} status: {resp.status_code}")
-
-            if resp.status_code == 429:
-                print(f"[Diagnose] {model} rate limited, trying next...")
-                continue
-
-            if resp.status_code != 200:
-                print(f"[Diagnose] {model} error: {resp.text[:300]}")
-                continue
-
-            raw_text = resp.json()["choices"][0]["message"]["content"].strip()
-            print(f"[Diagnose] Raw: {raw_text[:200]}")
-
-            cleaned = re.sub(r"```(?:json)?", "", raw_text).replace("```", "").strip()
-            match   = re.search(r"\{.*\}", cleaned, re.DOTALL)
+            raw  = resp.json()["choices"][0]["message"]["content"].strip()
+            clean = re.sub(r"```(?:json)?", "", raw).replace("```", "").strip()
+            match = re.search(r"\{.*\}", clean, re.DOTALL)
             if match:
-                result = json.loads(match.group())
-                print(f"[Diagnose] ✅ Success with {model}: {result.get('disease')}")
-                return jsonify(result)
-
+                return jsonify(json.loads(match.group()))
         except Exception as e:
-            print(f"[Diagnose] {model} exception: {e}")
+            print(f"[Groq fallback] {model} error: {e}")
             continue
 
-    return jsonify({"error": "All vision models failed. Check your GROQ_API_KEY in .env"}), 500
+    return jsonify({"error": "All diagnosis models failed. Please try again."}), 500
+
+
 # ─── Alerts ───────────────────────────────────────────────────────────────────
 @app.route("/api/alerts", methods=["POST"])
 def get_alerts():
@@ -326,99 +407,118 @@ def get_alerts():
     wind_speed  = data.get("wind_speed", 10)
     rain        = data.get("rain", 0)
     description = data.get("description", "").lower()
-    alerts      = []
+    alerts_list = []
 
     if temp > 40:
-        alerts.append({"type":"danger","category":"Weather","icon":"🌡️","title":"Extreme Heat Alert","message":"Temperature above 40°C. Provide shade netting and increase irrigation frequency.","action":"Schedule irrigation every 4-5 hours. Avoid afternoon spraying."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"🌡️","title":"Extreme Heat Alert","message":"Temperature above 40°C. Risk of crop wilting and soil moisture loss.","action":"Provide shade netting. Irrigate every 4-5 hours. Avoid afternoon work."})
     if temp < 5:
-        alerts.append({"type":"danger","category":"Weather","icon":"❄️","title":"Frost Warning","message":"Sub-zero temperatures expected. Frost can destroy standing crops overnight.","action":"Cover crops with frost cloth. Use smudge pots or sprinkler irrigation."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"❄️","title":"Frost Warning","message":"Very cold temperature. Frost can destroy standing crops overnight.","action":"Cover crops with frost cloth. Use sprinkler irrigation at night."})
     if humidity > 85:
-        alerts.append({"type":"warning","category":"Disease","icon":"🍄","title":"High Fungal Disease Risk","message":"Humidity above 85% creates ideal conditions for fungal diseases like blight and rust.","action":"Apply preventive fungicide (Mancozeb 75 WP at 2.5 g/L) immediately."})
+        alerts_list.append({"type":"warning","category":"Disease","icon":"🍄","title":"High Fungal Disease Risk","message":"Humidity above 85% — ideal for blight, rust and other fungal diseases.","action":"Apply Mancozeb 75 WP (2.5 g/L) as preventive spray immediately."})
     if wind_speed > 50:
-        alerts.append({"type":"danger","category":"Weather","icon":"💨","title":"High Wind Speed Alert","message":"Strong winds can cause lodging in tall crops like maize and wheat.","action":"Avoid spraying. Support tall crops with stakes. Harvest if near maturity."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"💨","title":"High Wind Alert","message":"Strong winds can lodge tall crops like maize and wheat.","action":"Avoid spraying. Support tall crops. Harvest if near maturity."})
     if rain > 50:
-        alerts.append({"type":"warning","category":"Weather","icon":"🌧️","title":"Heavy Rainfall Alert","message":"Excessive rain may cause waterlogging and root rot.","action":"Ensure field drainage channels are open. Pause irrigation."})
+        alerts_list.append({"type":"warning","category":"Weather","icon":"🌧️","title":"Heavy Rainfall Alert","message":"Excess rain may cause waterlogging and root rot.","action":"Open drainage channels. Stop irrigation immediately."})
     if "storm" in description or "thunder" in description:
-        alerts.append({"type":"danger","category":"Weather","icon":"⛈️","title":"Thunderstorm Warning","message":"Thunderstorm conditions detected. Risk of lightning and hail damage.","action":"Stay indoors. Secure farm equipment. Do not operate machinery."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"⛈️","title":"Thunderstorm Warning","message":"Thunderstorm detected. Risk of lightning and hail damage.","action":"Stay indoors. Secure equipment. Do not operate machinery."})
     if 25 <= temp <= 35 and humidity > 70:
-        alerts.append({"type":"warning","category":"Pest","icon":"🐛","title":"Aphid & Whitefly Risk","message":"Warm humid conditions are ideal for aphid multiplication.","action":"Spray Neem oil (5 ml/L) or Imidacloprid 0.3 ml/L at dusk."})
+        alerts_list.append({"type":"warning","category":"Pest","icon":"🐛","title":"Aphid & Whitefly Risk","message":"Warm humid conditions — ideal for aphid and whitefly outbreak.","action":"Spray Neem oil (5 ml/L) at dusk. Check undersides of leaves."})
     if temp > 30 and humidity < 50:
-        alerts.append({"type":"warning","category":"Pest","icon":"🕷️","title":"Spider Mite Alert","message":"Hot dry conditions favour rapid spider mite population growth.","action":"Apply Abamectin 1.8 EC (0.5 ml/L). Increase soil moisture."})
+        alerts_list.append({"type":"warning","category":"Pest","icon":"🕷️","title":"Spider Mite Alert","message":"Hot dry conditions — spider mites multiply rapidly.","action":"Apply Abamectin 1.8 EC (0.5 ml/L). Increase soil moisture."})
 
     harmful = []
     if temp > 38: harmful.append("Wheat (grain shriveling risk)")
     if humidity > 85 and rain > 20: harmful.append("Cotton (boll rot risk)")
     if temp < 10: harmful.append("Rice (cold injury risk)")
     if harmful:
-        alerts.append({"type":"info","category":"Crop Advisory","icon":"🌾","title":"Crops at Risk in Current Conditions","message":f"Avoid growing: {', '.join(harmful)}","action":"Consider alternate crops better suited to current climate."})
+        alerts_list.append({"type":"info","category":"Crop Advisory","icon":"🌾","title":"Crops at Risk","message":f"Avoid growing: {', '.join(harmful)}","action":"Consider alternate crops better suited to current weather."})
 
-    return jsonify({"alerts": alerts, "total": len(alerts)})
+    return jsonify({"alerts": alerts_list, "total": len(alerts_list)})
 
-@app.route('/api/market')
-def get_market_data():
-    key = os.getenv("NINJA_API_KEY")
-    
-    # These crops actually work on API Ninjas
-    crop_map = {
-        "corn":    "Corn",
-        "cotton":  "Cotton", 
-        "coffee":  "Coffee",
-        "cocoa":   "Cocoa",
-        "oat":     "Oats",
-        "soybean": "Soybean",
-    }
-    
-    # Indian cities to spread data across
-    cities = [
-        "Delhi", "Mumbai", "Kolkata", "Chennai",
-        "Hyderabad", "Pune", "Ahmedabad", "Lucknow",
-        "Jaipur", "Bhopal", "Patna", "Nagpur",
-        "Indore", "Surat", "Kanpur", "Coimbatore",
-        "Visakhapatnam", "Bhubaneswar", "Guwahati", "Amritsar"
-    ]
-    
-    fetched_crops = []
-    
-    for endpoint, display_name in crop_map.items():
-        try:
-            resp = requests.get(
-                f"https://api.api-ninjas.com/v1/commodityprice?name={endpoint}",
-                headers={"X-Api-Key": key},
-                timeout=5
-            )
-            data = resp.json()
-            price = data.get("price", 0)
-            change = data.get("1_day_change_percent", 0)  # real change from API
-            
-            if price and price > 0:
-                fetched_crops.append({
-                    "crop":   display_name,
-                    "price":  int(float(price) * 83),  # USD → INR
-                    "change": round(float(change), 2) if change else round(random.uniform(-3, 3), 2),
-                    "unit":   "quintal",
-                })
-        except:
-            continue
 
-    # Spread crops across cities with slight price variation per city
-    # Spread crops across cities with slight price variation per city
+# ─── Market Prices (Hardcoded MSP-based Indian mandi data) ───────────────────
+# Prices based on 2024-25 MSP rates. Random seed = date so prices are
+# consistent per day but change daily — giving a "live" feel.
+
+BASE_PRICES = {
+    "Rice":     2300,
+    "Wheat":    2275,
+    "Maize":    2090,
+    "Cotton":   7121,
+    "Soybean":  4892,
+    "Mustard":  5650,
+    "Groundnut":6377,
+    "Onion":    1800,
+    "Potato":   1200,
+    "Tomato":   2500,
+    "Chilli":   8000,
+    "Sugarcane":3150,
+    "Arhar":    7550,
+    "Moong":    8682,
+    "Urad":     7400,
+}
+
+CITIES = [
+    "Delhi", "Mumbai", "Kolkata", "Chennai", "Hyderabad",
+    "Pune", "Ahmedabad", "Lucknow", "Jaipur", "Bhopal",
+    "Patna", "Nagpur", "Indore", "Surat", "Kanpur",
+    "Coimbatore", "Visakhapatnam", "Bhubaneswar", "Guwahati", "Amritsar"
+]
+
+# City price multipliers (some cities are higher/lower for certain crops)
+CITY_FACTORS = {
+    "Delhi":         1.05, "Mumbai":       1.08, "Kolkata":       1.02,
+    "Chennai":       1.06, "Hyderabad":    1.04, "Pune":          1.07,
+    "Ahmedabad":     1.03, "Lucknow":      0.98, "Jaipur":        1.01,
+    "Bhopal":        0.97, "Patna":        0.96, "Nagpur":        1.02,
+    "Indore":        1.00, "Surat":        1.04, "Kanpur":        0.99,
+    "Coimbatore":    1.05, "Visakhapatnam":1.03, "Bhubaneswar":   0.98,
+    "Guwahati":      1.01, "Amritsar":     1.00,
+}
+
+def get_daily_seed():
+    """Same seed per day — prices stable within a day."""
+    return int(datetime.now().strftime("%Y%m%d"))
+
+def get_market_prices():
+    seed = get_daily_seed()
+    rng  = random.Random(seed)
+
     markets = {}
-    for city in cities:
-        markets[city] = []
-        for crop in fetched_crops:
-            variation = random.uniform(0.92, 1.08)
-            city_price = int(crop["price"] * variation)
-            city_change = round(crop["change"] + random.uniform(-0.5, 0.5), 2)
-            markets[city].append({
-                "crop":   crop["crop"],
-                "price":  city_price,
+    for city in CITIES:
+        city_factor = CITY_FACTORS.get(city, 1.0)
+        crops_data  = []
+
+        for crop, base_price in BASE_PRICES.items():
+            # Daily variation ±6%
+            variation    = rng.uniform(0.94, 1.06)
+            price        = int(base_price * city_factor * variation)
+            # Daily change ±4%
+            change       = round(rng.uniform(-4.0, 4.0), 2)
+
+            crops_data.append({
+                "crop":   crop,
+                "price":  price,
                 "unit":   "quintal",
-                "change": city_change,
-                "demand": get_demand(city_price, city_change)
+                "change": change,
+                "demand": get_demand(change)
             })
 
-    # ← ADD THIS: filter by location if provided
-    location = request.args.get('location', '').strip().lower()
+        markets[city] = crops_data
+
+    return markets
+
+def get_demand(change):
+    if change > 2:    return "Very High"
+    elif change > 0:  return "High"
+    elif change > -2: return "Medium"
+    else:             return "Low"
+
+@app.route("/api/market")
+def get_market_data():
+    markets  = get_market_prices()
+    location = request.args.get("location", "").strip().lower()
+
     if location:
         markets = {
             city: crops
@@ -432,24 +532,5 @@ def get_market_data():
     })
 
 
-def get_demand(price, change):
-    if change > 2:    return "Very High"
-    elif change > 0:  return "High"
-    elif change > -2: return "Medium"
-    else:             return "Low"
-    
-@app.route('/api/debug-ninja')
-def debug_ninja():
-    key = os.getenv("NINJA_API_KEY")
-    resp = requests.get(
-        "https://api.api-ninjas.com/v1/commodityprice?name=corn",
-        headers={"X-Api-Key": key}
-    )
-    return jsonify(resp.json())  # see exact field names
-
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
-
-
-# if __name__ == "__main__":
-#     app.run(host="localhost", debug=True, port=5000)
