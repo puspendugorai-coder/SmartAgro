@@ -234,4 +234,33 @@ document.addEventListener('DOMContentLoaded', () => {
             sel.classList.remove('open');
         }
     });
+    /* ── Day / Night Theme Toggle ───────────────────────── */
+    (function initTheme() {
+        const btn = document.getElementById('themeToggle');
+        const icon = document.getElementById('themeIcon');
+        const saved = localStorage.getItem('smartagro_theme');
+
+        function applyTheme(mode) {
+            if (mode === 'light') {
+                document.body.classList.add('light-theme');
+                if (icon) { icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun'); }
+            } else {
+                document.body.classList.remove('light-theme');
+                if (icon) { icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon'); }
+            }
+            localStorage.setItem('smartagro_theme', mode);
+        }
+
+        // Restore saved preference on load
+        applyTheme(saved === 'light' ? 'light' : 'dark');
+
+        if (btn) {
+            btn.addEventListener('click', () => {
+                const isLight = document.body.classList.contains('light-theme');
+                applyTheme(isLight ? 'dark' : 'light');
+            });
+        }
+    })();
 });
