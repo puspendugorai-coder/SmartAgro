@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>SmartAgro – AI Crop Intelligence</title>
   <link rel="stylesheet" href="/static/css/main.css"/>
@@ -11,52 +11,32 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-
-<!-- ═══════════════════════════ NAVBAR ═══════════════════════════ -->
 <nav class="navbar" id="navbar">
   <div class="nav-brand">
     <div class="brand-icon"><i class="fas fa-seedling"></i></div>
     <span class="brand-text">Smart<span class="brand-accent">Agro</span></span>
   </div>
   <div class="nav-links" id="navLinks">
-    <a href="/" class="nav-item active" data-translate="nav_dashboard">
-      <i class="fas fa-th-large"></i><span>Dashboard</span>
-    </a>
-    <a href="/diagnose" class="nav-item" data-translate="nav_diagnose">
-      <i class="fas fa-microscope"></i><span>Diagnose Crop</span>
-    </a>
-    <a href="/market" class="nav-item" data-translate="nav_market">
-      <i class="fas fa-chart-line"></i><span>Market Prices</span>
-    </a>
-    <a href="/alerts" class="nav-item" data-translate="nav_alerts">
-      <i class="fas fa-bell"></i><span>Alerts</span>
-      <span class="alert-badge" id="alertBadge">0</span>
-    </a>
+    <a href="/" class="nav-item active"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
+    <a href="/diagnose" class="nav-item"><i class="fas fa-microscope"></i><span>Diagnose Crop</span></a>
+    <a href="/market" class="nav-item"><i class="fas fa-chart-line"></i><span>Market Prices</span></a>
+    <a href="/alerts" class="nav-item"><i class="fas fa-bell"></i><span>Alerts</span><span class="alert-badge" id="alertBadge" style="display:none">0</span></a>
   </div>
   <div class="nav-actions">
-    <!-- Language Selector -->
-     <button class="theme-toggle" id="themeToggle" title="Toggle day/night theme">
-    <i class="fas fa-moon" id="themeIcon"></i>
-    </button>
+    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon" id="themeIcon"></i></button>
     <div class="lang-selector" id="langSelector">
       <button class="lang-btn" id="langBtn">
-        <i class="fas fa-globe"></i>
-        <span id="currentLang">EN</span>
-        <i class="fas fa-chevron-down"></i>
+        <i class="fas fa-globe"></i><span id="currentLang">EN</span><i class="fas fa-chevron-down"></i>
       </button>
       <div class="lang-dropdown" id="langDropdown">
         <div class="lang-search"><input type="text" placeholder="Search language..." id="langSearch"/></div>
         <div class="lang-list" id="langList"></div>
       </div>
     </div>
-    <!-- Hamburger -->
-    <button class="hamburger" id="hamburger" aria-label="Menu">
-      <span></span><span></span><span></span>
-    </button>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
   </div>
 </nav>
 
-<!-- ═══════════════════════════ HERO ═══════════════════════════ -->
 <section class="hero">
   <div class="hero-bg">
     <div class="hero-orb orb-1"></div>
@@ -65,156 +45,293 @@
     <div class="hero-grid"></div>
   </div>
   <div class="hero-content">
-    <div class="hero-badge" data-translate="hero_badge">
-      <i class="fas fa-robot"></i> AI-Powered Precision Agriculture
-    </div>
-    <h1 class="hero-title" data-translate="hero_title">
-    <br/><span class="gradient-text">Smart Farming Intelligence</span>
-    </h1>
-    <p class="hero-subtitle" data-translate="hero_subtitle">
-      Real-time crop advisory, disease detection & market insights powered by AI
-    </p>
+    <div class="hero-badge"><i class="fas fa-robot"></i> AI-Powered Farming Help</div>
+    <h1 class="hero-title"><span class="gradient-text">Smart Farming Intelligence</span></h1>
+    <p class="hero-subtitle">Weather updates, crop advice, disease detection and market prices — all in one place</p>
     <div class="hero-cta">
       <button class="btn-primary" onclick="requestLocation()" id="locationBtn">
-        <i class="fas fa-location-crosshairs"></i>
-        <span data-translate="btn_location">Get My Location</span>
+        <i class="fas fa-location-crosshairs"></i> Get My Location
       </button>
       <a href="/diagnose" class="btn-secondary">
-        <i class="fas fa-camera"></i>
-        <span data-translate="btn_diagnose">Diagnose Crop</span>
+        <i class="fas fa-camera"></i> Diagnose Crop
       </a>
     </div>
   </div>
   <div class="hero-visual">
     <div class="weather-card-hero" id="heroWeatherCard">
-      <div class="hwc-loading"><i class="fas fa-location-dot fa-pulse"></i><span>Awaiting location...</span></div>
+      <div class="hwc-loading"><i class="fas fa-location-dot fa-pulse"></i><span>Waiting for location...</span></div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════════════ WEATHER SECTION ═══════════════════════════ -->
 <section class="section weather-section" id="weatherSection" style="display:none">
   <div class="container">
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-cloud-sun-rain"></i></div>
-      <h2 data-translate="section_weather">Current Weather Conditions</h2>
-      <p data-translate="section_weather_sub">Live data from your location</p>
+      <h2>Current Weather</h2>
+      <p>Live data from your location</p>
     </div>
     <div class="weather-main" id="weatherMain"></div>
     <div class="forecast-section">
-      <h3 data-translate="forecast_title">6-Day Forecast</h3>
+      <h3>6-Day Forecast</h3>
       <div class="forecast-grid" id="forecastGrid"></div>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════════════ STATS BAR ═══════════════════════════ -->
 <section class="stats-bar" id="statsBar" style="display:none">
   <div class="container">
-    <div class="stat-item">
-      <i class="fas fa-temperature-half"></i>
-      <div><span class="stat-val" id="statTemp">--</span><span class="stat-label" data-translate="stat_temp">Temperature</span></div>
-    </div>
-    <div class="stat-item">
-      <i class="fas fa-droplets"></i>
-      <div><span class="stat-val" id="statHumidity">--</span><span class="stat-label" data-translate="stat_humidity">Humidity</span></div>
-    </div>
-    <div class="stat-item">
-      <i class="fas fa-wind"></i>
-      <div><span class="stat-val" id="statWind">--</span><span class="stat-label" data-translate="stat_wind">Wind</span></div>
-    </div>
-    <div class="stat-item">
-      <i class="fas fa-eye"></i>
-      <div><span class="stat-val" id="statVisibility">--</span><span class="stat-label" data-translate="stat_visibility">Visibility</span></div>
-    </div>
-    <div class="stat-item">
-      <i class="fas fa-gauge-high"></i>
-      <div><span class="stat-val" id="statPressure">--</span><span class="stat-label" data-translate="stat_pressure">Pressure</span></div>
-    </div>
+    <div class="stat-item"><i class="fas fa-temperature-half"></i><div><span class="stat-val" id="statTemp">--</span><span class="stat-label">Temperature</span></div></div>
+    <div class="stat-item"><i class="fas fa-droplets"></i><div><span class="stat-val" id="statHumidity">--</span><span class="stat-label">Humidity</span></div></div>
+    <div class="stat-item"><i class="fas fa-wind"></i><div><span class="stat-val" id="statWind">--</span><span class="stat-label">Wind</span></div></div>
+    <div class="stat-item"><i class="fas fa-eye"></i><div><span class="stat-val" id="statVisibility">--</span><span class="stat-label">Visibility</span></div></div>
+    <div class="stat-item"><i class="fas fa-gauge-high"></i><div><span class="stat-val" id="statPressure">--</span><span class="stat-label">Pressure</span></div></div>
   </div>
 </section>
 
-<!-- ═══════════════════════════ CROP RECOMMENDATIONS ═══════════════════════════ -->
 <section class="section crop-section" id="cropSection" style="display:none">
   <div class="container">
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-seedling"></i></div>
-      <h2 data-translate="section_crops">Crop Recommendations</h2>
-      <p id="seasonLabel" data-translate="section_crops_sub">Based on your climate & location</p>
+      <h2>Best Crops for You</h2>
+      <p id="seasonLabel">Based on your weather and location</p>
     </div>
     <div class="crops-grid" id="cropsGrid"></div>
   </div>
 </section>
 
-<!-- ═══════════════════════════ ADVISORY CALENDAR ═══════════════════════════ -->
 <section class="section advisory-section" id="advisorySection" style="display:none">
   <div class="container">
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-calendar-days"></i></div>
-      <h2 data-translate="section_advisory">Crop Advisory Calendar</h2>
-      <p data-translate="section_advisory_sub">Week-by-week action plan for your crops</p>
+      <h2>Farming Calendar</h2>
+      <p>Week by week plan for your crops</p>
     </div>
     <div class="calendar-timeline" id="calendarTimeline"></div>
   </div>
 </section>
 
-<!-- ═══════════════════════════ PESTICIDE GUIDE ═══════════════════════════ -->
 <section class="section pest-section" id="pestSection" style="display:none">
   <div class="container">
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-bug"></i></div>
-      <h2 data-translate="section_pest">Pesticide & Pest Control Guide</h2>
-      <p data-translate="section_pest_sub">Safe and effective crop protection plan</p>
+      <h2>Pest Control Guide</h2>
+      <p>Safe and effective crop protection</p>
     </div>
     <div class="pest-cards" id="pestCards"></div>
   </div>
 </section>
 
-<!-- ═══════════════════════════ QUICK ACTIONS ═══════════════════════════ -->
 <section class="section quick-section">
   <div class="container">
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-bolt"></i></div>
-      <h2 data-translate="section_quick">Quick Actions</h2>
+      <h2>Quick Actions</h2>
     </div>
     <div class="quick-grid">
       <a href="/diagnose" class="quick-card card-diagnose">
         <div class="qc-icon"><i class="fas fa-microscope"></i></div>
-        <h3 data-translate="quick_diagnose">Diagnose Crop Disease</h3>
-        <p data-translate="quick_diagnose_sub">Upload or take a photo of your crop</p>
+        <h3>Check Crop Disease</h3>
+        <p>Take a photo of your crop and get instant diagnosis</p>
         <div class="qc-arrow"><i class="fas fa-arrow-right"></i></div>
       </a>
       <a href="/market" class="quick-card card-market">
         <div class="qc-icon"><i class="fas fa-chart-bar"></i></div>
-        <h3 data-translate="quick_market">Check Market Prices</h3>
-        <p data-translate="quick_market_sub">Live mandi prices across India</p>
+        <h3>Mandi Prices</h3>
+        <p>Today's crop prices across Indian cities</p>
         <div class="qc-arrow"><i class="fas fa-arrow-right"></i></div>
       </a>
       <a href="/alerts" class="quick-card card-alerts">
         <div class="qc-icon"><i class="fas fa-triangle-exclamation"></i></div>
-        <h3 data-translate="quick_alerts">View Active Alerts</h3>
-        <p data-translate="quick_alerts_sub">Weather & pest warnings for your area</p>
+        <h3>Weather Alerts</h3>
+        <p>Pest and weather warnings for your area</p>
         <div class="qc-arrow"><i class="fas fa-arrow-right"></i></div>
       </a>
     </div>
   </div>
 </section>
 
-<!-- ═══════════════════════════ FOOTER ═══════════════════════════ -->
 <footer class="footer">
   <div class="container">
     <div class="footer-brand">
       <div class="brand-icon small"><i class="fas fa-seedling"></i></div>
       <span>Smart<span class="brand-accent">Agro</span></span>
     </div>
-    <p data-translate="footer_text">Empowering farmers with AI-driven precision agriculture</p>
-    <p class="footer-copy">© 2026 SmartAgro. Built for India's farmers.</p>
+    <p>Helping India's farmers with AI-powered advice</p>
+    <p class="footer-copy">© 2025 SmartAgro. Made for Indian farmers.</p>
   </div>
 </footer>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
+<script src="/static/js/translations.js"></script>
+<script src="/static/js/main.js"></script>
+<script src="/static/js/dashboard.js"></script>
+</body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SmartAgro – AI Crop Intelligence</title>
+  <link rel="stylesheet" href="/static/css/main.css"/>
+  <link rel="stylesheet" href="/static/css/dashboard.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+<nav class="navbar" id="navbar">
+  <div class="nav-brand">
+    <div class="brand-icon"><i class="fas fa-seedling"></i></div>
+    <span class="brand-text">Smart<span class="brand-accent">Agro</span></span>
+  </div>
+  <div class="nav-links" id="navLinks">
+    <a href="/" class="nav-item active"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
+    <a href="/diagnose" class="nav-item"><i class="fas fa-microscope"></i><span>Diagnose Crop</span></a>
+    <a href="/market" class="nav-item"><i class="fas fa-chart-line"></i><span>Market Prices</span></a>
+    <a href="/alerts" class="nav-item"><i class="fas fa-bell"></i><span>Alerts</span><span class="alert-badge" id="alertBadge" style="display:none">0</span></a>
+  </div>
+  <div class="nav-actions">
+    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon" id="themeIcon"></i></button>
+    <div class="lang-selector" id="langSelector">
+      <button class="lang-btn" id="langBtn">
+        <i class="fas fa-globe"></i><span id="currentLang">EN</span><i class="fas fa-chevron-down"></i>
+      </button>
+      <div class="lang-dropdown" id="langDropdown">
+        <div class="lang-search"><input type="text" placeholder="Search language..." id="langSearch"/></div>
+        <div class="lang-list" id="langList"></div>
+      </div>
+    </div>
+    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+  </div>
+</nav>
 
+<section class="hero">
+  <div class="hero-bg">
+    <div class="hero-orb orb-1"></div>
+    <div class="hero-orb orb-2"></div>
+    <div class="hero-orb orb-3"></div>
+    <div class="hero-grid"></div>
+  </div>
+  <div class="hero-content">
+    <div class="hero-badge"><i class="fas fa-robot"></i> AI-Powered Farming Help</div>
+    <h1 class="hero-title"><span class="gradient-text">Smart Farming Intelligence</span></h1>
+    <p class="hero-subtitle">Weather updates, crop advice, disease detection and market prices — all in one place</p>
+    <div class="hero-cta">
+      <button class="btn-primary" onclick="requestLocation()" id="locationBtn">
+        <i class="fas fa-location-crosshairs"></i> Get My Location
+      </button>
+      <a href="/diagnose" class="btn-secondary">
+        <i class="fas fa-camera"></i> Diagnose Crop
+      </a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="weather-card-hero" id="heroWeatherCard">
+      <div class="hwc-loading"><i class="fas fa-location-dot fa-pulse"></i><span>Waiting for location...</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="section weather-section" id="weatherSection" style="display:none">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag"><i class="fas fa-cloud-sun-rain"></i></div>
+      <h2>Current Weather</h2>
+      <p>Live data from your location</p>
+    </div>
+    <div class="weather-main" id="weatherMain"></div>
+    <div class="forecast-section">
+      <h3>6-Day Forecast</h3>
+      <div class="forecast-grid" id="forecastGrid"></div>
+    </div>
+  </div>
+</section>
+
+<section class="stats-bar" id="statsBar" style="display:none">
+  <div class="container">
+    <div class="stat-item"><i class="fas fa-temperature-half"></i><div><span class="stat-val" id="statTemp">--</span><span class="stat-label">Temperature</span></div></div>
+    <div class="stat-item"><i class="fas fa-droplets"></i><div><span class="stat-val" id="statHumidity">--</span><span class="stat-label">Humidity</span></div></div>
+    <div class="stat-item"><i class="fas fa-wind"></i><div><span class="stat-val" id="statWind">--</span><span class="stat-label">Wind</span></div></div>
+    <div class="stat-item"><i class="fas fa-eye"></i><div><span class="stat-val" id="statVisibility">--</span><span class="stat-label">Visibility</span></div></div>
+    <div class="stat-item"><i class="fas fa-gauge-high"></i><div><span class="stat-val" id="statPressure">--</span><span class="stat-label">Pressure</span></div></div>
+  </div>
+</section>
+
+<section class="section crop-section" id="cropSection" style="display:none">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag"><i class="fas fa-seedling"></i></div>
+      <h2>Best Crops for You</h2>
+      <p id="seasonLabel">Based on your weather and location</p>
+    </div>
+    <div class="crops-grid" id="cropsGrid"></div>
+  </div>
+</section>
+
+<section class="section advisory-section" id="advisorySection" style="display:none">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag"><i class="fas fa-calendar-days"></i></div>
+      <h2>Farming Calendar</h2>
+      <p>Week by week plan for your crops</p>
+    </div>
+    <div class="calendar-timeline" id="calendarTimeline"></div>
+  </div>
+</section>
+
+<section class="section pest-section" id="pestSection" style="display:none">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag"><i class="fas fa-bug"></i></div>
+      <h2>Pest Control Guide</h2>
+      <p>Safe and effective crop protection</p>
+    </div>
+    <div class="pest-cards" id="pestCards"></div>
+  </div>
+</section>
+
+<section class="section quick-section">
+  <div class="container">
+    <div class="section-header">
+      <div class="section-tag"><i class="fas fa-bolt"></i></div>
+      <h2>Quick Actions</h2>
+    </div>
+    <div class="quick-grid">
+      <a href="/diagnose" class="quick-card card-diagnose">
+        <div class="qc-icon"><i class="fas fa-microscope"></i></div>
+        <h3>Check Crop Disease</h3>
+        <p>Take a photo of your crop and get instant diagnosis</p>
+        <div class="qc-arrow"><i class="fas fa-arrow-right"></i></div>
+      </a>
+      <a href="/market" class="quick-card card-market">
+        <div class="qc-icon"><i class="fas fa-chart-bar"></i></div>
+        <h3>Mandi Prices</h3>
+        <p>Today's crop prices across Indian cities</p>
+        <div class="qc-arrow"><i class="fas fa-arrow-right"></i></div>
+      </a>
+      <a href="/alerts" class="quick-card card-alerts">
+        <div class="qc-icon"><i class="fas fa-triangle-exclamation"></i></div>
+        <h3>Weather Alerts</h3>
+        <p>Pest and weather warnings for your area</p>
+        <div class="qc-arrow"><i class="fas fa-arrow-right"></i></div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-brand">
+      <div class="brand-icon small"><i class="fas fa-seedling"></i></div>
+      <span>Smart<span class="brand-accent">Agro</span></span>
+    </div>
+    <p>Helping India's farmers with AI-powered advice</p>
+    <p class="footer-copy">© 2025 SmartAgro. Made for Indian farmers.</p>
+  </div>
+</footer>
+
+<div class="toast" id="toast"></div>
 <script src="/static/js/translations.js"></script>
 <script src="/static/js/main.js"></script>
 <script src="/static/js/dashboard.js"></script>
