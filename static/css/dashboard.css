@@ -24,7 +24,7 @@
   to   { opacity: 1; transform: translateX(0); }
 }
 .hero-title {
-  font-size: clamp(2.8rem, 6vw, 4.5rem);
+  font-size: clamp(2rem, 10vw, 4.5rem);
   font-weight: 730;
   line-height: 1.05;
   margin: 12px 0 20px;
@@ -63,6 +63,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  overflow: hidden;
 }
 .hwc-loading {
   display: flex;
@@ -75,17 +76,18 @@
 .hwc-loaded { width: 100%; }
 .hwc-city {
   font-family: 'Syne', sans-serif;
-  font-size: 1.1rem;
+  font-size: 1rem; 
   font-weight: 700;
   color: var(--text-2);
   margin-bottom: 16px;
   display: flex;
   align-items: center;
   gap: 6px;
+  word-break: break-word;
 }
 .hwc-temp {
   font-family: 'Syne', sans-serif;
-  font-size: 4rem;
+  font-size: clamp(2.2rem, 8vw, 4rem); 
   font-weight: 800;
   color: var(--green);
   line-height: 1;
@@ -101,13 +103,15 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 10px;
+  margin-top: 8px;
 }
 .hwc-stat {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.8rem;
+  font-size: 0.75rem; 
   color: var(--text-2);
+  word-break: break-word;
 }
 .hwc-stat i { color: var(--green); font-size: 0.85rem; }
 .hwc-icon-large { font-size: 3.5rem; text-align: right; }
@@ -509,13 +513,23 @@
   .forecast-grid { grid-template-columns: repeat(4, 1fr); }
   .quick-grid { grid-template-columns: 1fr; }
 }
+
 @media (max-width: 700px) {
   .forecast-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .forecast-card { padding: 12px 8px; }
   .crops-grid { grid-template-columns: 1fr; }
   .pest-cards { grid-template-columns: 1fr; }
-  .hero { padding: 100px 20px 48px; }
+  .hero { padding: 90px 16px 40px; gap: 24px; }
+  .hero-title { font-size: clamp(1.8rem, 8vw, 3rem); }
+  .hero-subtitle { font-size: 0.95rem; margin-bottom: 24px; }
+  .hero-cta { flex-direction: column; gap: 10px; }
+  .hero-cta .btn-primary,
+  .hero-cta .btn-secondary { width: 100%; justify-content: center; }
   .timeline-card { flex-direction: column; align-items: flex-start; gap: 8px; }
   .tc-date { min-width: unset; }
   .calendar-timeline { padding-left: 28px; }
+  .wpc-temp { font-size: clamp(2.5rem, 12vw, 5rem); }
+  .weather-primary-card { flex-direction: column; align-items: flex-start; gap: 12px; padding: 20px; }
+  .stats-bar .container { gap: 14px; }
+  .stat-item { min-width: 100px; }
 }
