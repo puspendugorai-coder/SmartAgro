@@ -1,8 +1,10 @@
+// Navbar scroll
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
-  navbar.classList.toggle('scrolled', window.scrollY > 40);
-}, { passive: true });
+  if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 40);
+}, {passive: true});
 
+// Hamburger
 const hamburger = document.getElementById('hamburger');
 const navLinks  = document.getElementById('navLinks');
 if (hamburger && navLinks) {
@@ -18,38 +20,40 @@ if (hamburger && navLinks) {
   });
 }
 
+// Toast
 let toastTimer = null;
 function showToast(msg, type = 'success', duration = 3500) {
   const toast = document.getElementById('toast');
   if (!toast) return;
   toast.textContent = msg;
-  toast.className = `toast show ${type}`;
+  toast.className   = `toast show ${type}`;
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
 }
 
+// Fetch weather
 async function fetchWeather(lat, lon) {
   try {
     const res  = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
-    if (!res.ok) throw new Error('Weather API error');
+    if (!res.ok) throw new Error('error');
     const data = await res.json();
     window.weatherData = data;
     return data;
-  } catch (err) {
-    showToast('Could not load weather data.', 'error');
+  } catch {
+    showToast('Could not load weather.', 'error');
     return null;
   }
 }
 
-function getWeatherEmoji(iconCode) {
+// Weather emoji
+function getWeatherEmoji(code) {
   const map = {
     '01d':'☀️','01n':'🌙','02d':'⛅','02n':'⛅',
     '03d':'☁️','03n':'☁️','04d':'☁️','04n':'☁️',
     '09d':'🌧️','09n':'🌧️','10d':'🌦️','10n':'🌧️',
-    '11d':'⛈️','11n':'⛈️','13d':'❄️','13n':'❄️',
-    '50d':'🌫️','50n':'🌫️',
+    '11d':'⛈️','11n':'⛈️','13d':'❄️','13n':'❄️','50d':'🌫️','50n':'🌫️'
   };
-  return map[iconCode] || '🌤️';
+  return map[code] || '🌤️';
 }
 
 function getDayName(dateStr) {
@@ -57,75 +61,74 @@ function getDayName(dateStr) {
   const d     = new Date(dateStr);
   const today = new Date();
   if (d.toDateString() === today.toDateString()) return 'Today';
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-  if (d.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
+  const tom = new Date(today);
+  tom.setDate(today.getDate() + 1);
+  if (d.toDateString() === tom.toDateString()) return 'Tomorrow';
   return days[d.getDay()];
 }
 
 function capitalize(str) {
-  return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+  return str ? str[0].toUpperCase() + str.slice(1) : '';
 }
 
 function updateAlertBadge(count) {
-  const badge = document.getElementById('alertBadge');
-  if (badge) {
-    badge.textContent = count;
-    badge.style.display = count > 0 ? 'inline-flex' : 'none';
-  }
+  const b = document.getElementById('alertBadge');
+  if (b) { b.textContent = count; b.style.display = count > 0 ? 'inline-flex' : 'none'; }
 }
 
+// Ripple
 document.addEventListener('click', e => {
-  const btn = e.target.closest('.btn-primary,.btn-secondary,.btn-analyze,.chart-tab,.alert-tab,.chip');
+  const btn = e.target.closest('.btn-primary,.btn-secondary,.btn-analyze,.chart-tab,.alert-tab,.chip,.btn-hero-primary,.btn-hero-secondary');
   if (!btn) return;
-  const ripple = document.createElement('span');
-  const rect   = btn.getBoundingClientRect();
-  const size   = Math.max(rect.width, rect.height);
-  ripple.style.cssText = `position:absolute;border-radius:50%;width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;background:rgba(255,255,255,0.18);transform:scale(0);animation:ripple 0.55s linear;pointer-events:none;`;
+  const r    = document.createElement('span');
+  const rect = btn.getBoundingClientRect();
+  const size = Math.max(rect.width, rect.height);
+  r.style.cssText = `position:absolute;border-radius:50%;width:${size}px;height:${size}px;left:${e.clientX-rect.left-size/2}px;top:${e.clientY-rect.top-size/2}px;background:rgba(255,255,255,0.2);transform:scale(0);animation:ripple 0.5s linear;pointer-events:none;`;
   if (getComputedStyle(btn).position === 'static') btn.style.position = 'relative';
   btn.style.overflow = 'hidden';
-  btn.appendChild(ripple);
-  setTimeout(() => ripple.remove(), 600);
+  btn.appendChild(r);
+  setTimeout(() => r.remove(), 550);
 });
-const rippleStyle = document.createElement('style');
-rippleStyle.textContent = `@keyframes ripple{to{transform:scale(2.5);opacity:0}}`;
-document.head.appendChild(rippleStyle);
+document.head.insertAdjacentHTML('beforeend', '<style>@keyframes ripple{to{transform:scale(2.5);opacity:0}}</style>');
 
+// Intersection observer
 function observeAnimations() {
-  const observer = new IntersectionObserver(entries => {
+  const obs = new IntersectionObserver(entries => {
     entries.forEach(e => {
       if (e.isIntersecting) {
         e.target.style.animationPlayState = 'running';
-        observer.unobserve(e.target);
+        obs.unobserve(e.target);
       }
     });
-  }, { threshold: 0.1 });
-  document.querySelectorAll('.crop-card,.forecast-card,.timeline-item,.alert-card,.city-card').forEach(el => {
+  }, {threshold: 0.1});
+  document.querySelectorAll('.crop-card,.forecast-card,.alert-card,.city-card,.quick-card').forEach(el => {
     el.style.animationPlayState = 'paused';
-    observer.observe(el);
+    obs.observe(el);
   });
 }
 
+// Theme
 function initTheme() {
   const btn   = document.getElementById('themeToggle');
   const icon  = document.getElementById('themeIcon');
-  const saved = localStorage.getItem('smartagro_theme') || 'dark';
-  function applyTheme(mode) {
-    if (mode === 'light') {
-      document.body.classList.add('light-theme');
+  const saved = localStorage.getItem('smartagro_theme') || 'light';
+  function apply(mode) {
+    if (mode === 'dark') {
+      document.body.classList.add('dark');
       if (icon) { icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); }
     } else {
-      document.body.classList.remove('light-theme');
+      document.body.classList.remove('dark');
       if (icon) { icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); }
     }
     localStorage.setItem('smartagro_theme', mode);
   }
-  applyTheme(saved);
+  apply(saved);
   if (btn) btn.addEventListener('click', () => {
-    applyTheme(document.body.classList.contains('light-theme') ? 'dark' : 'light');
+    apply(document.body.classList.contains('dark') ? 'light' : 'dark');
   });
 }
 
+// Language dropdown — fixed single listener
 function initLangDropdown() {
   const btn = document.getElementById('langBtn');
   const sel = document.getElementById('langSelector');
@@ -137,11 +140,20 @@ function initLangDropdown() {
   document.addEventListener('click', e => {
     if (!sel.contains(e.target)) sel.classList.remove('open');
   });
-  const searchEl = document.getElementById('langSearch');
-  if (searchEl) {
-    searchEl.addEventListener('input', e => buildLangList(e.target.value));
-    searchEl.addEventListener('click', e => e.stopPropagation());
+  const s = document.getElementById('langSearch');
+  if (s) {
+    s.addEventListener('input', e => buildLangList(e.target.value));
+    s.addEventListener('click', e => e.stopPropagation());
   }
+}
+
+// Bottom nav active state for mobile
+function setBottomNavActive() {
+  const path = window.location.pathname;
+  document.querySelectorAll('.bottom-nav-item').forEach(item => {
+    const href = item.getAttribute('href');
+    item.classList.toggle('active', href === path || (path === '/' && href === '/'));
+  });
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -150,4 +162,5 @@ document.addEventListener('DOMContentLoaded', () => {
   observeAnimations();
   initTheme();
   initLangDropdown();
+  setBottomNavActive();
 });
