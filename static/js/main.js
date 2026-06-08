@@ -243,12 +243,16 @@ document.addEventListener('DOMContentLoaded', () => {
         function applyTheme(mode) {
             if (mode === 'light') {
                 document.body.classList.add('light-theme');
-                if (icon) { icon.classList.remove('fa-moon');
-                    icon.classList.add('fa-sun'); }
+                if (icon) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                }
             } else {
                 document.body.classList.remove('light-theme');
-                if (icon) { icon.classList.remove('fa-sun');
-                    icon.classList.add('fa-moon'); }
+                if (icon) {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
             }
             localStorage.setItem('smartagro_theme', mode);
         }
@@ -264,3 +268,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     })();
 });
+/* ── PWA Service Worker Registration ───────── */
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/static/service-worker.js')
+            .then(reg => console.log('SmartAgro SW registered:', reg.scope))
+            .catch(err => console.error('SW registration failed:', err));
+    });
+}
