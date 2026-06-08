@@ -1,8 +1,10 @@
-let chatOpen      = false;
-let recognition   = null;
-let isListening   = false;
-let chatHistory   = [];
+// Scope-isolated variables to prevent global collisions
+let chatOpen        = false;
+let recognition     = null;
+let isListening     = false;
+let chatHistory     = [];
 let currentLangCode = localStorage.getItem('agrosmart_lang') || 'hi';
+let speechTimeout   = null; // Manages the Gemini-style silence detection
 
 const LANG_SPEECH_CODES = {
   'hi':'hi-IN','bn':'bn-IN','ta':'ta-IN','te':'te-IN',
@@ -10,19 +12,33 @@ const LANG_SPEECH_CODES = {
   'ml':'ml-IN','en':'en-IN'
 };
 
+// Conflict-free notification fallback
+function safeToast(message, type = 'info') {
+  if (typeof showToast === 'function') {
+    showToast(message, type);
+  } else {
+    console.log(`[ChatBot Mini-Toast - ${type}]: ${message}`);
+  }
+}
+
 function toggleChat() {
   chatOpen = !chatOpen;
   const box = document.getElementById('chatBox');
-  const fab  = document.getElementById('chatFab');
+  const fab = document.getElementById('chatFab');
+  
   if (chatOpen) {
-    box.style.display  = 'flex';
-    fab.innerHTML      = '<i class="fas fa-times"></i>';
-    setTimeout(() => box.classList.add('open'), 10);
+    if (box) {
+      box.style.display = 'flex';
+      setTimeout(() => box.classList.add('open'), 10);
+    }
+    if (fab) fab.innerHTML = '<i class="fas fa-times"></i>';
     if (chatHistory.length === 0) addBotMessage(getWelcomeMsg());
   } else {
-    box.classList.remove('open');
-    fab.innerHTML = '<i class="fas fa-microphone"></i>';
-    setTimeout(() => { box.style.display='none'; }, 300);
+    if (box) {
+      box.classList.remove('open');
+      setTimeout(() => { box.style.display = 'none'; }, 300);
+    }
+    if (fab) fab.innerHTML = '<i class="fas fa-microphone"></i>';
   }
 }
 
@@ -38,6 +54,7 @@ function getWelcomeMsg() {
 
 function addBotMessage(text) {
   const list = document.getElementById('chatMessages');
+  if (!list) return;
   const div  = document.createElement('div');
   div.className = 'chat-msg bot';
   div.innerHTML = `<div class="msg-bubble">${text}</div>`;
@@ -47,6 +64,7 @@ function addBotMessage(text) {
 
 function addUserMessage(text) {
   const list = document.getElementById('chatMessages');
+  if (!list) return;
   const div  = document.createElement('div');
   div.className = 'chat-msg user';
   div.innerHTML = `<div class="msg-bubble">${text}</div>`;
@@ -56,6 +74,7 @@ function addUserMessage(text) {
 
 function addTypingIndicator() {
   const list = document.getElementById('chatMessages');
+  if (!list) return null;
   const div  = document.createElement('div');
   div.className = 'chat-msg bot typing-msg';
   div.innerHTML = '<div class="msg-bubble"><span class="typing-dots"><span></span><span></span><span></span></span></div>';
@@ -66,30 +85,33 @@ function addTypingIndicator() {
 
 async function sendMessage() {
   const input = document.getElementById('chatInput');
-  const msg   = input.value.trim();
+  if (!input) return;
+  
+  const msg = input.value.trim();
   if (!msg) return;
   input.value = '';
+  
   addUserMessage(msg);
   const typing = addTypingIndicator();
 
-  // Get weather context if available
-  const weather = window.weatherData?.current || {};
+  // Safeguard against missing global window context variables
+  const weather = (window.weatherData && window.weatherData.current) ? window.weatherData.current : {};
 
   try {
-    const res  = await fetch('/api/chat', {
+    const res = await fetch('/api/chat', {
       method:  'POST',
       headers: {'Content-Type':'application/json'},
       body:    JSON.stringify({
-        message:         msg,
-        language:        currentLangCode,
+        message:        msg,
+        language:       currentLangCode,
         weather_context: weather
       })
     });
     const data = await res.json();
-    typing.remove();
+    if (typing) typing.remove();
     addBotMessage(data.reply || 'Sorry, try again.');
-  } catch {
-    typing.remove();
+  } catch (err) {
+    if (typing) typing.remove();
     addBotMessage('Connection error. Please try again.');
   }
 }
@@ -101,45 +123,73 @@ function handleChatKey(e) {
 function startVoice() {
   const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
   if (!SpeechRecognition) {
-    showToast('Voice not supported. Use Chrome browser.', 'error');
+    safeToast('Voice not supported. Use Chrome browser.', 'error');
     return;
   }
 
+  // Gemini Style Action: Clicking while active shuts it down instantly
   if (isListening) {
-    recognition?.stop();
-    isListening = false;
-    updateMicBtn(false);
+    if (recognition) recognition.stop();
     return;
   }
 
   if (!chatOpen) toggleChat();
 
   recognition = new SpeechRecognition();
-  recognition.lang        = LANG_SPEECH_CODES[currentLangCode] || 'hi-IN';
-  recognition.interimResults = false;
+  recognition.lang = LANG_SPEECH_CODES[currentLangCode] || 'hi-IN';
+  
+  // Gemini settings: continuous listening with real-time text streaming
+  recognition.continuous = true; 
+  recognition.interimResults = true; 
   recognition.maxAlternatives = 1;
 
   recognition.onstart = () => {
     isListening = true;
     updateMicBtn(true);
-    showToast('🎤 Listening... speak now', 'success');
+    safeToast('🎤 Listening... speak freely', 'success');
   };
 
   recognition.onresult = e => {
-    const transcript = e.results[0][0].transcript;
-    document.getElementById('chatInput').value = transcript;
-    sendMessage();
+    let interimTranscript = '';
+    let finalTranscript = '';
+
+    for (let i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) {
+        finalTranscript += e.results[i][0].transcript;
+      } else {
+        interimTranscript += e.results[i][0].transcript;
+      }
+    }
+
+    const currentText = finalTranscript || interimTranscript;
+    const inputEl = document.getElementById('chatInput');
+    if (inputEl && currentText) {
+      inputEl.value = currentText;
+    }
+
+    // Smart Auto-Submit: Wait for 2 seconds of total silence before firing
+    clearTimeout(speechTimeout);
+    speechTimeout = setTimeout(() => {
+      if (inputEl && inputEl.value.trim()) {
+        sendMessage();
+        if (recognition) recognition.stop(); 
+      }
+    }, 2000); 
   };
 
-  recognition.onerror = () => {
+  recognition.onerror = e => {
+    // Ignore minor silence triggers so the layout doesn't crash prematurely
+    if (e.error === 'no-speech') return; 
+    
     isListening = false;
     updateMicBtn(false);
-    showToast('Could not hear. Try again.', 'error');
+    safeToast('Mic issue or timed out. Please try again.', 'error');
   };
 
   recognition.onend = () => {
     isListening = false;
     updateMicBtn(false);
+    clearTimeout(speechTimeout);
   };
 
   recognition.start();
@@ -147,7 +197,8 @@ function startVoice() {
 
 function updateMicBtn(listening) {
   const btn = document.getElementById('micBtn');
-  const fab  = document.getElementById('chatFab');
+  const fab = document.getElementById('chatFab');
+  
   if (btn) {
     btn.classList.toggle('listening', listening);
     btn.innerHTML = listening
@@ -159,14 +210,14 @@ function updateMicBtn(listening) {
   }
 }
 
-// Sync language with translations.js
+// Safely listen to DOM content events
 document.addEventListener('DOMContentLoaded', () => {
   currentLangCode = localStorage.getItem('agrosmart_lang') || 'hi';
 });
 
-// Watch for language changes
+// Avoid overwriting window methods unsafely
 const origSetLang = window.setLanguage;
 window.setLanguage = function(code) {
   currentLangCode = code;
-  if (origSetLang) origSetLang(code);
+  if (typeof origSetLang === 'function') origSetLang(code);
 };
