@@ -36,7 +36,7 @@ def market():
 def alerts():
     return render_template("alerts.html")
 
-# ── Weather ──────────────────────────────────────────────
+# ── Weather API Module ───────────────────────────────────
 @app.route("/api/weather")
 def get_weather():
     lat = request.args.get("lat")
@@ -52,9 +52,11 @@ def get_weather():
             timeout=10)
         if current_resp.status_code != 200:
             return jsonify({"error": "Weather API error"}), 500
+            
         current_data  = current_resp.json()
         forecast_data = forecast_resp.json()
         daily = {}
+        
         for item in forecast_data.get("list", []):
             day = datetime.fromtimestamp(item["dt"]).strftime("%Y-%m-%d")
             if day not in daily:
@@ -73,6 +75,7 @@ def get_weather():
                     daily[day]["temp_max"] = item["main"]["temp_max"]
                 if item["main"]["temp_min"] < daily[day]["temp_min"]:
                     daily[day]["temp_min"] = item["main"]["temp_min"]
+                    
         return jsonify({
             "current": {
                 "city":        current_data.get("name", "Your Location"),
@@ -91,7 +94,7 @@ def get_weather():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-# ── Crop Recommendations ─────────────────────────────────
+# ── Crop Recommendations Module ──────────────────────────
 @app.route("/api/crop-recommendations", methods=["POST"])
 def crop_recommendations():
     data     = request.json or {}
@@ -158,7 +161,7 @@ def get_pesticide_guide(crops):
             result.append({"crop": crop["name"], "guides": guides[crop["name"]]})
     return result
 
-# ── Kindwise Diagnosis ───────────────────────────────────
+# ── Kindwise Diagnosis Module ────────────────────────────
 @app.route("/api/diagnose", methods=["POST"])
 def diagnose_crop():
     if not KINDWISE_API_KEY:
@@ -237,151 +240,259 @@ Return ONLY valid JSON no markdown:
             )
             if resp.status_code != 200: continue
             raw   = resp.json()["choices"][0]["message"]["content"].strip()
-            clean = re.sub(r"```(?:json)?", "", raw).replace("```", "").strip()
-            match = re.search(r"\{.*\}", clean, re.DOTALL)
-            if match:
-                return jsonify(json.loads(match.group()))
-        except:
-            continue
-    return jsonify({"error": "Diagnosis failed. Try again."}), 500
+            clean = re.sub(r"
+http://googleusercontent.com/immersive_entry_chip/0
 
-# ── Alerts ───────────────────────────────────────────────
-@app.route("/api/alerts", methods=["POST"])
-def get_alerts():
-    data        = request.json or {}
-    temp        = data.get("temp", 25)
-    humidity    = data.get("humidity", 60)
-    wind_speed  = data.get("wind_speed", 10)
-    rain        = data.get("rain", 0)
-    description = data.get("description", "").lower()
-    alerts_list = []
-    if temp > 40:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"🌡️","title":"Extreme Heat","message":"Temperature above 40°C. Crops may wilt.","action":"Irrigate every 4-5 hours. Provide shade netting."})
-    if temp < 5:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"❄️","title":"Frost Warning","message":"Very cold. Frost can destroy crops overnight.","action":"Cover crops. Use sprinkler irrigation at night."})
-    if humidity > 85:
-        alerts_list.append({"type":"warning","category":"Disease","icon":"🍄","title":"Fungal Disease Risk","message":"High humidity — blight and rust risk is high.","action":"Spray Mancozeb 75 WP (2.5 g/L) immediately."})
-    if wind_speed > 50:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"💨","title":"Strong Winds","message":"Strong winds can damage tall crops.","action":"Avoid spraying. Support tall crops with stakes."})
-    if rain > 50:
-        alerts_list.append({"type":"warning","category":"Weather","icon":"🌧️","title":"Heavy Rain","message":"Waterlogging and root rot risk.","action":"Open drainage channels. Stop irrigation."})
-    if "storm" in description or "thunder" in description:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"⛈️","title":"Thunderstorm","message":"Risk of lightning and hail damage.","action":"Stay indoors. Secure farm equipment."})
-    if 25 <= temp <= 35 and humidity > 70:
-        alerts_list.append({"type":"warning","category":"Pest","icon":"🐛","title":"Aphid & Whitefly Risk","message":"Warm humid weather — aphids multiplying fast.","action":"Spray Neem oil (5 ml/L) at dusk."})
-    if temp > 30 and humidity < 50:
-        alerts_list.append({"type":"warning","category":"Pest","icon":"🕷️","title":"Spider Mite Alert","message":"Hot dry conditions — mites spreading fast.","action":"Apply Abamectin 1.8 EC (0.5 ml/L)."})
-    harmful = []
-    if temp > 38: harmful.append("Wheat")
-    if humidity > 85 and rain > 20: harmful.append("Cotton")
-    if temp < 10: harmful.append("Rice")
-    if harmful:
-        alerts_list.append({"type":"info","category":"Crop Advisory","icon":"🌾","title":"Crops at Risk","message":f"Avoid growing: {', '.join(harmful)} in current weather.","action":"Consider alternate crops better suited now."})
-    return jsonify({"alerts": alerts_list, "total": len(alerts_list)})
+---
 
-# ── Market Prices ────────────────────────────────────────
-BASE_PRICES = {
-    "Rice":2300,"Wheat":2275,"Maize":2090,"Cotton":7121,
-    "Soybean":4892,"Mustard":5650,"Groundnut":6377,"Onion":1800,
-    "Potato":1200,"Tomato":2500,"Chilli":8000,"Sugarcane":3150,
-    "Arhar":7550,"Moong":8682,"Urad":7400,
-}
-MSP_PRICES = {
-    "Rice":2300,"Wheat":2275,"Maize":2090,"Cotton":7121,
-    "Soybean":4892,"Mustard":5650,"Groundnut":6377,"Onion":1700,
-    "Potato":1000,"Tomato":2000,"Chilli":7500,"Sugarcane":3050,
-    "Arhar":7550,"Moong":8682,"Urad":7400,
-}
-CITIES = ["Delhi","Mumbai","Kolkata","Chennai","Hyderabad","Pune","Ahmedabad",
-          "Lucknow","Jaipur","Bhopal","Patna","Nagpur","Indore","Surat","Kanpur",
-          "Coimbatore","Visakhapatnam","Bhubaneswar","Guwahati","Amritsar"]
-CITY_FACTORS = {
-    "Delhi":1.05,"Mumbai":1.08,"Kolkata":1.02,"Chennai":1.06,"Hyderabad":1.04,
-    "Pune":1.07,"Ahmedabad":1.03,"Lucknow":0.98,"Jaipur":1.01,"Bhopal":0.97,
-    "Patna":0.96,"Nagpur":1.02,"Indore":1.00,"Surat":1.04,"Kanpur":0.99,
-    "Coimbatore":1.05,"Visakhapatnam":1.03,"Bhubaneswar":0.98,"Guwahati":1.01,"Amritsar":1.00,
+## 2. The Complete Frontend (`static/js/chatbot.js`)
+This script contains isolated storage instances, silence trackers, and a translation string array matched completely to native voice modules.
+
+```javascript
+// Scope-isolated variables to prevent global collisions
+let chatOpen         = false;
+let recognition      = null;
+let isListening      = false;
+let userClickedStop  = false; // Tracks if the user explicitly hit the stop button
+let chatHistory      = [];
+let currentLangCode  = (localStorage.getItem('agrosmart_lang') || 'hi').toLowerCase();
+let speechTimeout    = null; // Manages the Gemini-style silence detection
+
+const LANG_SPEECH_CODES = {
+  'hi':'hi-IN','bn':'bn-IN','ta':'ta-IN','te':'te-IN',
+  'mr':'mr-IN','pa':'pa-IN','gu':'gu-IN','kn':'kn-IN',
+  'ml':'ml-IN','en':'en-IN'
+};
+
+// Conflict-free notification fallback
+function safeToast(message, type = 'info') {
+  if (typeof showToast === 'function') {
+    showToast(message, type);
+  } else {
+    console.log(`[ChatBot Mini-Toast - ${type}]: ${message}`);
+  }
 }
 
-@app.route("/api/market")
-def get_market_data():
-    seed = int(datetime.now().strftime("%Y%m%d"))
-    rng  = random.Random(seed)
-    markets = {}
-    for city in CITIES:
-        factor = CITY_FACTORS.get(city, 1.0)
-        crops  = []
-        for crop, base in BASE_PRICES.items():
-            price  = int(base * factor * rng.uniform(0.94, 1.06))
-            change = round(rng.uniform(-4.0, 4.0), 2)
-            msp    = MSP_PRICES.get(crop, base)
-            crops.append({
-                "crop":   crop,
-                "price":  price,
-                "msp":    msp,
-                "above_msp": price >= msp,
-                "unit":   "quintal",
-                "change": change,
-                "demand": "Very High" if change > 2 else "High" if change > 0 else "Medium" if change > -2 else "Low"
-            })
-        markets[city] = crops
-    location = request.args.get("location", "").strip().lower()
-    if location:
-        markets = {c: v for c, v in markets.items() if location in c.lower()}
-    return jsonify({"markets": markets, "locations": list(markets.keys())})
-
-# ── Voice Chatbot ────────────────────────────────────────
-@app.route("/api/chat", methods=["POST"])
-def chat():
-    if not GROQ_API_KEY:
-        return jsonify({"reply": "Groq API key missing."}), 500
-    data     = request.json or {}
-    message  = data.get("message", "").strip()
-    language = data.get("language", "en")
-    weather  = data.get("weather_context", {})
-    if not message:
-        return jsonify({"reply": "Please ask a question."}), 400
-
-    lang_names = {
-        "hi": "Hindi", "bn": "Bengali", "ta": "Tamil",
-        "te": "Telugu", "mr": "Marathi", "pa": "Punjabi",
-        "gu": "Gujarati", "kn": "Kannada", "ml": "Malayalam", "en": "English"
+function toggleChat() {
+  chatOpen = !chatOpen;
+  const box = document.getElementById('chatBox');
+  const fab = document.getElementById('chatFab');
+  
+  if (chatOpen) {
+    if (box) {
+      box.style.display = 'flex';
+      setTimeout(() => box.classList.add('open'), 10);
     }
-    lang_name = lang_names.get(language, "English")
+    if (fab) fab.innerHTML = '<i class="fas fa-times"></i>';
+    if (chatHistory.length === 0) addBotMessage(getWelcomeMsg());
+  } else {
+    if (box) {
+      box.classList.remove('open');
+      setTimeout(() => { box.style.display = 'none'; }, 300);
+    }
+    if (fab) fab.innerHTML = '<i class="fas fa-microphone"></i>';
+  }
+}
 
-    weather_context = ""
-    if weather:
-        weather_context = f"Current weather: {weather.get('temp','?')}°C, {weather.get('humidity','?')}% humidity, {weather.get('description','')}, city: {weather.get('city','India')}."
+function getWelcomeMsg() {
+  const msgs = {
+    hi: '🌾 नमस्ते किसान भाई! मैं SmartAgro सहायक हूं। आप मुझसे मौसम, फसल, बाजार भाव या सरकारी योजनाओं के बारे में पूछ सकते हैं।',
+    bn: '🌾 নমস্কার! আমি SmartAgro সহায়ক। আপনি আমাকে আবহাওয়া, ফসল বা বাজার সম্পর্কে জিজ্ঞাসা করতে পারেন।',
+    ta: '🌾 வணக்கம்! நான் SmartAgro உதவியாளர். வானிலை, பயிர் அல்லது சந்தை பற்றி கேளுங்கள்.',
+    te: '🌾 నమస్కாரம் రైతు సోదరులారా! నేను SmartAgro సహాయకుడిని. వాతావరణం, పంటలు, మార్కెట్ ధరలు లేదా ప్రభుత్వ పథకాల గురించి నన్ను అడಗండి.',
+    mr: '🌾 नमस्कार शेतकरी बंधूंनो! मी SmartAgro सहाय्यक आहे. तुम्ही मला हवामान, पिके, बाजारभाव किंवा सरकारी योजनांबद्दल विचारू शकता.',
+    pa: '🌾 ਨਮਸਤੇ ਕਿਸਾਨ ਵੀਰੋ! ਮੈਂ SmartAgro ਸਹਾਇਕ ਹਾਂ। ਤੁਸੀਂ ਮੇਰੇ ਕੋਲੋਂ ਮੌਸਮ, ਫਸਲਾਂ, ਮੰਡੀ ਦੇ ਭਾਅ ਜਾਂ ਸਰਕਾਰੀ ਸਕੀਮਾਂ ਬਾਰੇ ਪੁੱਛ ਸਕਦੇ ਹੋ।',
+    gu: '🌾 નમસ્તે ખેડૂત ભાઈઓ! હું SmartAgro સહાયક છું. તમે મને હવામાન, પાક, બજારના ભાવ અથવા સરકારી યોજનાઓ વિશે પૂછી શકો છો.',
+    kn: '🌾 ನಮಸ್ಕಾರ ರೈತ ಬಾಂಧವರೇ! ನಾನು SmartAgro ಸಹಾಯಕ. ನೀವು ನನ್ನ ಬಳಿ ಹವಾಮಾನ, ಬೆಳೆಗಳು, ಮಾರುಕಟ್ಟೆ ಬೆಲೆ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ಕೇಳಬಹುದು.',
+    ml: '🌾 നമസ്കാരം കർഷക സുഹൃത്തുക്കളെ! ഞാൻ SmartAgro സഹായിയാണ്. കാലാവസ്ഥ, വിളകൾ, വിപണി വിലകൾ അല്ലെങ്കിൽ സർക്കാർ പദ്ധതികളെക്കുറിച്ച് നിങ്ങൾക്ക് എന്നോട് ചോദിക്കാം.',
+    en: '🌾 Hello farmer! I am SmartAgro Assistant. Ask me about weather, crops, market prices or government schemes.',
+  };
+  return msgs[currentLangCode] || msgs.en;
+}
 
-    system_prompt = f"""You are SmartAgro Assistant — an AI helper for Indian farmers.
-You MUST reply in {lang_name} language only, regardless of what language the question is in.
-Keep answers SHORT, SIMPLE and PRACTICAL — farmers need easy advice.
-{weather_context}
-You know about: crops, diseases, weather, mandi prices, government schemes, fertilizers, pesticides, irrigation.
-For government schemes mention: PM-KISAN, Fasal Bima Yojana, Kisan Credit Card, Soil Health Card.
-Kisan helpline: 1800-180-1551 (free call).
-Always be helpful and encouraging to farmers."""
+function addBotMessage(text) {
+  const list = document.getElementById('chatMessages');
+  if (!list) return;
+  const div  = document.createElement('div');
+  div.className = 'chat-msg bot';
+  div.innerHTML = `<div class="msg-bubble">${text}</div>`;
+  list.appendChild(div);
+  list.scrollTop = list.scrollHeight;
+}
 
-    try:
-        resp = requests.post(
-            "https://api.groq.com/openai/v1/chat/completions",
-            headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
-            json={
-                "model": "llama-3.3-70b-versatile",
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user",   "content": message}
-                ],
-                "temperature": 0.7,
-                "max_tokens":  400
-            },
-            timeout=30
-        )
-        if resp.status_code == 200:
-            reply = resp.json()["choices"][0]["message"]["content"].strip()
-            return jsonify({"reply": reply})
-        return jsonify({"reply": "Sorry, could not get answer. Try again."}), 500
-    except Exception as e:
-        return jsonify({"reply": f"Error: {str(e)}"}), 500
+function addUserMessage(text) {
+  const list = document.getElementById('chatMessages');
+  if (!list) return;
+  const div  = document.createElement('div');
+  div.className = 'chat-msg user';
+  div.innerHTML = `<div class="msg-bubble">${text}</div>`;
+  list.appendChild(div);
+  list.scrollTop = list.scrollHeight;
+}
 
-if __name__ == "__main__":
-    app.run(debug=True, port=5000)
+function addTypingIndicator() {
+  const list = document.getElementById('chatMessages');
+  if (!list) return null;
+  const div  = document.createElement('div');
+  div.className = 'chat-msg bot typing-msg';
+  div.innerHTML = '<div class="msg-bubble"><span class="typing-dots"><span></span><span></span><span></span></span></div>';
+  list.appendChild(div);
+  list.scrollTop = list.scrollHeight;
+  return div;
+}
+
+async function sendMessage() {
+  const input = document.getElementById('chatInput');
+  if (!input) return;
+  
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  
+  addUserMessage(msg);
+  const typing = addTypingIndicator();
+
+  const weather = (window.weatherData && window.weatherData.current) ? window.weatherData.current : {};
+
+  try {
+    const res = await fetch('/api/chat', {
+      method:  'POST',
+      headers: {'Content-Type':'application/json'},
+      body:    JSON.stringify({
+        message:         msg,
+        language:        currentLangCode, // Lowercase variable structure sent perfectly
+        weather_context: weather
+      })
+    });
+    const data = await res.json();
+    if (typing) typing.remove();
+    addBotMessage(data.reply || 'Sorry, try again.');
+  } catch (err) {
+    if (typing) typing.remove();
+    addBotMessage('Connection error. Please try again.');
+  }
+}
+
+function handleChatKey(e) {
+  if (e.key === 'Enter') sendMessage();
+}
+
+function startVoice() {
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SpeechRecognition) {
+    safeToast('Voice not supported. Use Chrome browser.', 'error');
+    return;
+  }
+
+  const inputEl = document.getElementById('chatInput');
+
+  if (isListening) {
+    isListening = false;
+    userClickedStop = true; 
+    clearTimeout(speechTimeout);
+    if (recognition) {
+      recognition.stop();
+    }
+    updateMicBtn(false);
+    return;
+  }
+
+  if (!chatOpen) toggleChat();
+
+  userClickedStop = false; 
+  recognition = new SpeechRecognition();
+  recognition.lang = LANG_SPEECH_CODES[currentLangCode] || 'hi-IN';
+  
+  recognition.continuous = true; 
+  recognition.interimResults = true; 
+  recognition.maxAlternatives = 1;
+
+  recognition.onstart = () => {
+    isListening = true;
+    updateMicBtn(true);
+    if (inputEl) {
+      inputEl.classList.add('listening-mode');
+      inputEl.placeholder = "Listening... बोलिए / बोलुन...";
+    }
+    safeToast('🎤 Listening... speak freely', 'success');
+  };
+
+  recognition.onresult = e => {
+    let interimTranscript = '';
+    let finalTranscript = '';
+
+    for (let i = e.resultIndex; i < e.results.length; ++i) {
+      if (e.results[i].isFinal) {
+        finalTranscript += e.results[i][0].transcript;
+      } else {
+        interimTranscript += e.results[i][0].transcript;
+      }
+    }
+
+    const currentText = finalTranscript || interimTranscript;
+    if (inputEl && currentText) {
+      inputEl.value = currentText;
+    }
+
+    // Smart Auto-Submit after 2 seconds of silence
+    clearTimeout(speechTimeout);
+    speechTimeout = setTimeout(() => {
+      if (inputEl && inputEl.value.trim()) {
+        isListening = false;
+        userClickedStop = true; 
+        sendMessage();
+        if (recognition) recognition.stop(); 
+      }
+    }, 2000); 
+  };
+
+  recognition.onerror = e => {
+    if (e.error === 'no-speech' || e.error === 'aborted') return; 
+    console.error("Speech error caught safely: ", e.error);
+  };
+
+  recognition.onend = () => {
+    if (isListening && !userClickedStop) {
+      try {
+        recognition.start();
+      } catch (err) {
+        console.log("Mic restarting loop active...");
+      }
+    } else {
+      isListening = false;
+      updateMicBtn(false);
+      if (inputEl) {
+        inputEl.classList.remove('listening-mode');
+        inputEl.placeholder = "Type or speak...";
+      }
+      clearTimeout(speechTimeout);
+    }
+  };
+
+  recognition.start();
+}
+
+function updateMicBtn(listening) {
+  const btn = document.getElementById('micBtn');
+  const fab = document.getElementById('chatFab');
+  
+  if (btn) {
+    btn.classList.toggle('listening', listening);
+    btn.innerHTML = listening
+      ? '<i class="fas fa-stop"></i>'
+      : '<i class="fas fa-microphone"></i>';
+  }
+  if (fab && !chatOpen) {
+    fab.classList.toggle('listening', listening);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  currentLangCode = (localStorage.getItem('agrosmart_lang') || 'hi').toLowerCase();
+});
+
+const origSetLang = window.setLanguage;
+window.setLanguage = function(code) {
+  if(code) currentLangCode = code.toLowerCase();
+  if (typeof origSetLang === 'function') origSetLang(code);
+};
