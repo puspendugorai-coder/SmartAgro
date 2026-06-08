@@ -1,67 +1,47 @@
-// Scope-isolated variables to prevent global collisions
-let chatOpen         = false;
-let recognition      = null;
-let isListening      = false;
-let userClickedStop  = false; // Tracks if the user explicitly hit the stop button
-let chatHistory      = [];
-let currentLangCode  = (localStorage.getItem('agrosmart_lang') || 'hi').toLowerCase();
-let speechTimeout    = null; // Manages the Gemini-style silence detection
+let chatOpen    = false;
+let recognition = null;
+let isListening = false;
+let chatHistory = [];
 
-const LANG_SPEECH_CODES = {
+// Speech language codes
+const SPEECH_LANGS = {
   'hi':'hi-IN','bn':'bn-IN','ta':'ta-IN','te':'te-IN',
   'mr':'mr-IN','pa':'pa-IN','gu':'gu-IN','kn':'kn-IN',
-  'ml':'ml-IN','en':'en-IN'
+  'ml':'ml-IN','en':'en-IN','ur':'ur-IN','or':'or-IN'
 };
-
-// Conflict-free notification fallback
-function safeToast(message, type = 'info') {
-  if (typeof showToast === 'function') {
-    showToast(message, type);
-  } else {
-    console.log(`[ChatBot Mini-Toast - ${type}]: ${message}`);
-  }
-}
 
 function toggleChat() {
   chatOpen = !chatOpen;
   const box = document.getElementById('chatBox');
   const fab = document.getElementById('chatFab');
-  
   if (chatOpen) {
-    if (box) {
-      box.style.display = 'flex';
-      setTimeout(() => box.classList.add('open'), 10);
-    }
-    if (fab) fab.innerHTML = '<i class="fas fa-times"></i>';
-    if (chatHistory.length === 0) addBotMessage(getWelcomeMsg());
+    box.style.display = 'flex';
+    fab.innerHTML = '<i class="fas fa-times"></i>';
+    setTimeout(() => box.classList.add('open'), 10);
+    if (chatHistory.length === 0) showWelcome();
   } else {
-    if (box) {
-      box.classList.remove('open');
-      setTimeout(() => { box.style.display = 'none'; }, 300);
-    }
-    if (fab) fab.innerHTML = '<i class="fas fa-microphone"></i>';
+    box.classList.remove('open');
+    fab.innerHTML = '<i class="fas fa-microphone"></i>';
+    setTimeout(() => { box.style.display = 'none'; }, 300);
   }
 }
 
-function getWelcomeMsg() {
+function showWelcome() {
+  const lang = localStorage.getItem('agrosmart_lang') || 'hi';
   const msgs = {
-    hi: '🌾 नमस्ते किसान भाई! मैं SmartAgro सहायक हूं। आप मुझसे मौसम, फसल, बाजार भाव या सरकारी योजनाओं के बारे में पूछ सकते हैं।',
-    bn: '🌾 নমস্কার! আমি SmartAgro সহায়ক। আপনি আমাকে আবহাওয়া, ফসল বা বাজার সম্পর্কে জিজ্ঞাসা করতে পারেন।',
-    ta: '🌾 வணக்கம்! நான் SmartAgro உதவியாளர். வானிலை, பயிர் அல்லது சந்தை பற்றி கேளுங்கள்.',
-    te: '🌾 నమస్కారం రైతు సోదరులారా! నేను SmartAgro సహాయకుడిని. వాతావరణం, పంటలు, మార్కెట్ ధరలు లేదా ప్రభుత్వ పథకాల గురించి నన్ను അడగండి.',
-    mr: '🌾 नमस्कार शेतकरी बंधूंनो! मी SmartAgro सहाय्यक आहे. तुम्ही मला हवामान, पिके, बाजारभाव किंवा सरकारी योजनांबद्दल विचारू शकता.',
-    pa: '🌾 ਨਮਸਤੇ ਕਿਸਾਨ ਵੀਰੋ! ਮੈਂ SmartAgro ਸਹਾਇਕ ਹਾਂ। ਤੁਸੀਂ ਮੇਰੇ ਕੋਲੋਂ ਮੌਸਮ, ਫਸਲਾਂ, ਮੰਡੀ ਦੇ ਭਾਅ ਜਾਂ ਸਰਕਾਰੀ ਸਕੀਮਾਂ ਬਾਰੇ ਪੁੱਛ ਸਕਦੇ ਹੋ।',
-    gu: '🌾 નમસ્તે ખેડૂત ભાઈઓ! હું SmartAgro સહાયક છું. તમે મને હવામાન, પાક, બજારના ભાવ અથવા સરકારી યોજનાઓ વિશે પૂછી શકો છો.',
-    kn: '🌾 ನಮಸ್ಕಾರ ರೈತ ಬಾಂಧವರೇ! ನಾನು SmartAgro ಸಹಾಯಕ. ನೀವು ನನ್ನ ಬಳಿ ಹವಾಮಾನ, ಬೆಳೆಗಳು, ಮಾರುಕಟ್ಟೆ ಬೆಲೆ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ಕೇಳಬಹುದು.',
-    ml: '🌾 നമസ്കാരം കർഷക സുഹൃത്തുക്കളെ! ഞാൻ SmartAgro സഹായിയാണ്. കാലാവസ്ഥ, വിളകൾ, വിപണി വിലകൾ അല്ലെങ്കിൽ സർക്കാർ പദ്ധതികളെക്കുറിച്ച് നിങ്ങൾക്ക് എന്നോട് ചോദിക്കാം.',
-    en: '🌾 Hello farmer! I am SmartAgro Assistant. Ask me about weather, crops, market prices or government schemes.',
+    hi: '🌾 नमस्ते! मैं SmartAgro सहायक हूं। मुझसे फसल, मौसम, बाजार भाव या सरकारी योजनाओं के बारे में पूछें।',
+    bn: '🌾 নমস্কার! আমি SmartAgro সহায়ক। ফসল, আবহাওয়া বা বাজার সম্পর্কে জিজ্ঞাসা করুন।',
+    ta: '🌾 வணக்கம்! நான் SmartAgro உதவியாளர். பயிர், வானிலை அல்லது சந்தை பற்றி கேளுங்கள்।',
+    te: '🌾 నమస్కారం! నేను SmartAgro సహాయకుడిని। పంట, వాతావరణం లేదా మార్కెట్ గురించి అడగండి।',
+    mr: '🌾 नमस्कार! मी SmartAgro सहाय्यक आहे। पीक, हवामान किंवा बाजारभाव विचारा।',
+    pa: '🌾 ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ SmartAgro ਸਹਾਇਕ ਹਾਂ। ਫਸਲ, ਮੌਸਮ ਜਾਂ ਮੰਡੀ ਭਾਅ ਬਾਰੇ ਪੁੱਛੋ।',
+    en: '🌾 Hello! I am SmartAgro Assistant. Ask me about crops, weather, market prices or government schemes.',
   };
-  return msgs[currentLangCode] || msgs.en;
+  addBotMsg(msgs[lang] || msgs.en);
 }
 
-function addBotMessage(text) {
+function addBotMsg(text) {
   const list = document.getElementById('chatMessages');
-  if (!list) return;
   const div  = document.createElement('div');
   div.className = 'chat-msg bot';
   div.innerHTML = `<div class="msg-bubble">${text}</div>`;
@@ -69,9 +49,8 @@ function addBotMessage(text) {
   list.scrollTop = list.scrollHeight;
 }
 
-function addUserMessage(text) {
+function addUserMsg(text) {
   const list = document.getElementById('chatMessages');
-  if (!list) return;
   const div  = document.createElement('div');
   div.className = 'chat-msg user';
   div.innerHTML = `<div class="msg-bubble">${text}</div>`;
@@ -79,12 +58,11 @@ function addUserMessage(text) {
   list.scrollTop = list.scrollHeight;
 }
 
-function addTypingIndicator() {
+function addTyping() {
   const list = document.getElementById('chatMessages');
-  if (!list) return null;
   const div  = document.createElement('div');
   div.className = 'chat-msg bot typing-msg';
-  div.innerHTML = '<div class="msg-bubble"><span class="typing-dots"><span></span><span></span><span></span></span></div>';
+  div.innerHTML  = '<div class="msg-bubble"><span class="typing-dots"><span></span><span></span><span></span></span></div>';
   list.appendChild(div);
   list.scrollTop = list.scrollHeight;
   return div;
@@ -92,35 +70,32 @@ function addTypingIndicator() {
 
 async function sendMessage() {
   const input = document.getElementById('chatInput');
-  if (!input) return;
-  
-  const msg = input.value.trim();
+  const msg   = input.value.trim();
   if (!msg) return;
   input.value = '';
-  
-  addUserMessage(msg);
-  const typing = addTypingIndicator();
-
-  const weather = (window.weatherData && window.weatherData.current) ? window.weatherData.current : {};
-
+  addUserMsg(msg);
+  chatHistory.push({role: 'user', content: msg});
+  const typing = addTyping();
+  const weather = window.weatherData?.current || {};
   try {
-    const res = await fetch('/api/chat', {
+    const res  = await fetch('/api/chat', {
       method:  'POST',
-      headers: {'Content-Type':'application/json'},
+      headers: {'Content-Type': 'application/json'},
       body:    JSON.stringify({
         message:         msg,
-        language:        currentLangCode.toUpperCase(), // Normalize to UPPERCASE ("HI", "BN") so app.py safely catches it
-        weather_context: weather
+        weather_context: weather,
+        history:         chatHistory.slice(-6)
       })
     });
     const data = await res.json();
-    if (typing) typing.remove();
-    
-    // Fallback handler safely maps BOTH data.reply or data.response structures smoothly
-    addBotMessage(data.reply || data.response || 'Sorry, try again.');
-  } catch (err) {
-    if (typing) typing.remove();
-    addBotMessage('Connection error. Please try again.');
+    typing.remove();
+    const reply = data.reply || 'Sorry, try again.';
+    addBotMsg(reply);
+    chatHistory.push({role: 'assistant', content: reply});
+    if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
+  } catch {
+    typing.remove();
+    addBotMsg('Connection error. Please try again.');
   }
 }
 
@@ -128,122 +103,88 @@ function handleChatKey(e) {
   if (e.key === 'Enter') sendMessage();
 }
 
+// ── Voice input — auto detects language ──────────────────
 function startVoice() {
-  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SpeechRecognition) {
-    safeToast('Voice not supported. Use Chrome browser.', 'error');
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) {
+    showToast('Voice not supported. Use Chrome browser.', 'error');
     return;
   }
-
-  const inputEl = document.getElementById('chatInput');
-
   if (isListening) {
-    isListening = false;
-    userClickedStop = true; 
-    clearTimeout(speechTimeout);
-    if (recognition) {
-      recognition.stop();
-    }
-    updateMicBtn(false);
+    recognition?.stop();
     return;
   }
-
   if (!chatOpen) toggleChat();
 
-  userClickedStop = false; 
-  recognition = new SpeechRecognition();
-  recognition.lang = LANG_SPEECH_CODES[currentLangCode] || 'hi-IN';
-  
-  recognition.continuous = true; 
-  recognition.interimResults = true; 
-  recognition.maxAlternatives = 1;
+  recognition = new SR();
+
+  // Use current UI language as hint but allow any language
+  const uiLang = localStorage.getItem('agrosmart_lang') || 'hi';
+  recognition.lang = SPEECH_LANGS[uiLang] || 'hi-IN';
+
+  // Allow continuous recognition for better accuracy
+  recognition.interimResults  = false;
+  recognition.maxAlternatives = 3;
 
   recognition.onstart = () => {
     isListening = true;
-    updateMicBtn(true);
-    if (inputEl) {
-      inputEl.classList.add('listening-mode');
-      inputEl.placeholder = "Listening... बोलिए / बोलुन...";
-    }
-    safeToast('🎤 Listening... speak freely', 'success');
+    updateMicState(true);
+    showToast('🎤 Listening... speak now', 'success');
   };
 
   recognition.onresult = e => {
-    let interimTranscript = '';
-    let finalTranscript = '';
-
-    for (let i = e.resultIndex; i < e.results.length; ++i) {
-      if (e.results[i].isFinal) {
-        finalTranscript += e.results[i][0].transcript;
-      } else {
-        interimTranscript += e.results[i][0].transcript;
-      }
+    // Get best result
+    const transcript = e.results[0][0].transcript;
+    const confidence = e.results[0][0].confidence;
+    console.log(`[Voice] "${transcript}" (confidence: ${confidence})`);
+    document.getElementById('chatInput').value = transcript;
+    // Auto send if confidence is good
+    if (confidence > 0.7) {
+      sendMessage();
+    } else {
+      // Show in input and let user confirm
+      showToast('Please check your message and press send', 'warning');
     }
-
-    const currentText = finalTranscript || interimTranscript;
-    if (inputEl && currentText) {
-      inputEl.value = currentText;
-    }
-
-    // Smart Auto-Submit after 2 seconds of silence
-    clearTimeout(speechTimeout);
-    speechTimeout = setTimeout(() => {
-      if (inputEl && inputEl.value.trim()) {
-        isListening = false;
-        userClickedStop = true; 
-        sendMessage();
-        if (recognition) recognition.stop(); 
-      }
-    }, 2000); 
   };
 
   recognition.onerror = e => {
-    if (e.error === 'no-speech' || e.error === 'aborted') return; 
-    console.error("Speech error caught safely: ", e.error);
+    isListening = false;
+    updateMicState(false);
+    if (e.error === 'no-speech') showToast('No speech detected. Try again.', 'warning');
+    else if (e.error === 'not-allowed') showToast('Microphone access denied.', 'error');
+    else showToast('Voice error. Try again.', 'error');
   };
 
   recognition.onend = () => {
-    if (isListening && !userClickedStop) {
-      try {
-        recognition.start();
-      } catch (err) {
-        console.log("Mic restarting loop active...");
-      }
-    } else {
-      isListening = false;
-      updateMicBtn(false);
-      if (inputEl) {
-        inputEl.classList.remove('listening-mode');
-        inputEl.placeholder = "Type or speak...";
-      }
-      clearTimeout(speechTimeout);
-    }
+    isListening = false;
+    updateMicState(false);
   };
 
   recognition.start();
 }
 
-function updateMicBtn(listening) {
-  const btn = document.getElementById('micBtn');
-  const fab = document.getElementById('chatFab');
-  
-  if (btn) {
-    btn.classList.toggle('listening', listening);
-    btn.innerHTML = listening
+function updateMicState(listening) {
+  const micBtn = document.getElementById('micBtn');
+  const fab    = document.getElementById('chatFab');
+  if (micBtn) {
+    micBtn.classList.toggle('listening', listening);
+    micBtn.innerHTML = listening
       ? '<i class="fas fa-stop"></i>'
       : '<i class="fas fa-microphone"></i>';
   }
   if (fab && !chatOpen) {
+    fab.innerHTML = listening
+      ? '<i class="fas fa-stop"></i>'
+      : '<i class="fas fa-microphone"></i>';
     fab.classList.toggle('listening', listening);
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-  currentLangCode = (localStorage.getItem('agrosmart_lang') || 'hi').toLowerCase();
+// Close chat on outside click
+document.addEventListener('click', e => {
+  const box = document.getElementById('chatBox');
+  const fab = document.getElementById('chatFab');
+  if (chatOpen && box && !box.contains(e.target) && fab && !fab.contains(e.target)) {
+    toggleChat();
+  }
 });
-
-const origSetLang = window.setLanguage;
-window.setLanguage = function(code) {
-  if(code) currentLangCode = code.toLowerCase();
-  if (typeof origSetLang === 'function') origSetLang(code);
-};
