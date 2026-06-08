@@ -1,9 +1,8 @@
-# 🌿 SmartAgro — AI-Powered Precision Agriculture Platform
+# 🌿 SmartAgro — AI-Powered Precision Agriculture Platform 
 
-<div align="center">
+<div align="center"> 
 
 <!-- Animated SVG Banner -->
-<img src="https://raw.githubusercontent.com/puspendugorai-coder/SmartAgro/main/assets/banner.svg" alt="SmartAgro Banner" width="100%"/>
 
 > ![SmartAgro](https://img.shields.io/badge/SmartAgro-Precision%20Agriculture-22c55e?style=for-the-badge&logo=leaf&logoColor=white)
 > ```
@@ -18,7 +17,9 @@
 
 **Empowering India's farmers with real-time market intelligence, AI crop diagnostics, and smart weather alerts.**
 
-[Live Demo](https://smartagro-pi6m.onrender.com) · [Report Bug](../../issues) · [Request Feature](../../issues)
+### 🚀 Live Demo
+
+## 👉 [Click Here to Open the App](https://smartagro-pi6m.onrender.com)
 
 </div>
 
@@ -30,11 +31,9 @@
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
-- [Getting Started](#-getting-started)
 - [Environment Variables](#-environment-variables)
 - [API Endpoints](#-api-endpoints)
 - [Contributing](#-contributing)
-- [License](#-license)
 - [Acknowledgements](#-acknowledgements)
 
 ---
@@ -79,6 +78,7 @@
 
 ### 🌐 Multilingual Support
 - Supports **10+ Indian languages** including Hindi, Bengali, Tamil, Telugu, Marathi, Gujarati, and more
+- Day/Night Theme Toggle Button
 
 ---
 
@@ -153,33 +153,6 @@ SmartAgro/
 | `POST` | `/api/diagnose` | AI crop disease diagnosis |
 | `POST` | `/api/crop-recommendations` | Crop recommendations by weather data |
 | `POST` | `/api/alerts` | Weather-based smart farming alerts |
-
----
-
-## 🤝 Contributing
-
-Contributions are welcome and appreciated!
-
-1. Fork the project
-2. Create your feature branch
-```bash
-git checkout -b feature/YourFeatureName
-```
-3. Commit your changes
-```bash
-git commit -m "Add: YourFeatureName"
-```
-4. Push to the branch
-```bash
-git push origin feature/YourFeatureName
-```
-5. Open a Pull Request
-
----
-
-## 📄 License
-
-Distributed under the MIT License. See [`LICENSE`](LICENSE) for more information.
 
 ---
 

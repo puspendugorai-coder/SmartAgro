@@ -105,8 +105,8 @@ function resetResultsPanel() {
     panel.innerHTML = `
     <div class="results-placeholder" id="resultsPlaceholder">
       <div class="placeholder-icon"><i class="fas fa-leaf"></i></div>
-      <h3>Upload a crop image to begin diagnosis</h3>
-      <p>Our AI will identify the disease and suggest eco-friendly treatments</p>
+      <h3>${t('results_placeholder')}</h3>
+      <p>${t('results_placeholder_sub')}</p>
       <div class="placeholder-steps">
         <div class="ps-item"><span class="ps-num">1</span> Upload or capture image</div>
         <div class="ps-item"><span class="ps-num">2</span> Click Analyze Crop</div>
@@ -241,7 +241,7 @@ async function analyzeImage() {
       </div>`;
   } finally {
     if (analyzeBtn) {
-      analyzeBtn.innerHTML = `<i class="fas fa-wand-magic-sparkles"></i> Analyze Crop<div class="btn-shine"></div>`;
+      analyzeBtn.innerHTML = `<i class="fas fa-wand-magic-sparkles"></i> ${t('btn_analyze')}<div class="btn-shine"></div>`;
       analyzeBtn.disabled  = false;
     }
   }

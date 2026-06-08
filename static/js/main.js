@@ -226,4 +226,53 @@ document.addEventListener('DOMContentLoaded', () => {
     const saved = sessionStorage.getItem('alert_count');
     if (saved) updateAlertBadge(parseInt(saved));
     observeAnimations();
+
+    // ── Close lang dropdown on outside tap (mobile) ──
+    document.addEventListener('click', e => {
+        const sel = document.querySelector('.lang-selector');
+        if (sel && !sel.contains(e.target)) {
+            sel.classList.remove('open');
+        }
+    });
+    /* ── Day / Night Theme Toggle ───────────────────────── */
+    (function initTheme() {
+        const btn = document.getElementById('themeToggle');
+        const icon = document.getElementById('themeIcon');
+        const saved = localStorage.getItem('smartagro_theme');
+
+        function applyTheme(mode) {
+            if (mode === 'light') {
+                document.body.classList.add('light-theme');
+                if (icon) {
+                    icon.classList.remove('fa-moon');
+                    icon.classList.add('fa-sun');
+                }
+            } else {
+                document.body.classList.remove('light-theme');
+                if (icon) {
+                    icon.classList.remove('fa-sun');
+                    icon.classList.add('fa-moon');
+                }
+            }
+            localStorage.setItem('smartagro_theme', mode);
+        }
+
+        // Restore saved preference on load
+        applyTheme(saved === 'light' ? 'light' : 'dark');
+
+        if (btn) {
+            btn.addEventListener('click', () => {
+                const isLight = document.body.classList.contains('light-theme');
+                applyTheme(isLight ? 'dark' : 'light');
+            });
+        }
+    })();
 });
+/* ── PWA Service Worker Registration ───────── */
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/static/service-worker.js')
+            .then(reg => console.log('SmartAgro SW registered:', reg.scope))
+            .catch(err => console.error('SW registration failed:', err));
+    });
+}

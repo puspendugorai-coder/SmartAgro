@@ -9,6 +9,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- PWA -->
+  <link rel="manifest" href="/static/manifest.json"/>
+  <meta name="theme-color" content="#4ade80"/>
+  <meta name="apple-mobile-web-app-capable" content="yes"/>
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+  <meta name="apple-mobile-web-app-title" content="SmartAgro"/>
+  <link rel="apple-touch-icon" href="/static/icons/icon-192.png"/>
 </head>
 <body>
 
@@ -25,6 +32,9 @@
     <a href="/alerts" class="nav-item active" data-translate="nav_alerts"><i class="fas fa-bell"></i><span>Alerts</span></a>
   </div>
   <div class="nav-actions">
+    <button class="theme-toggle" id="themeToggle" title="Toggle day/night theme">
+    <i class="fas fa-moon" id="themeIcon"></i>
+    </button>
     <div class="lang-selector" id="langSelector">
       <button class="lang-btn" id="langBtn">
         <i class="fas fa-globe"></i><span id="currentLang">EN</span><i class="fas fa-chevron-down"></i>
@@ -46,7 +56,7 @@
   </div>
   <div class="page-hero-content">
     <div class="hero-badge pulse-badge"><i class="fas fa-bell"></i> <span data-translate="live_alerts">Live Alerts</span></div>
-    <h1 data-translate="alerts_title">Farm <span class="gradient-text">Alert Center</span></h1>
+    <h1 data-translate="alerts_title"><span class="gradient-text">Farm Alert's Center</span></h1>
     <p data-translate="alerts_subtitle">Real-time weather warnings, pest advisories, and crop safety alerts for your region</p>
   </div>
 
