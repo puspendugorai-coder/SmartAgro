@@ -1,12 +1,8 @@
-/* main.js — shared across all pages */
-
-// Navbar scroll
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
   navbar.classList.toggle('scrolled', window.scrollY > 40);
 }, { passive: true });
 
-// Hamburger
 const hamburger = document.getElementById('hamburger');
 const navLinks  = document.getElementById('navLinks');
 if (hamburger && navLinks) {
@@ -22,7 +18,6 @@ if (hamburger && navLinks) {
   });
 }
 
-// Toast
 let toastTimer = null;
 function showToast(msg, type = 'success', duration = 3500) {
   const toast = document.getElementById('toast');
@@ -33,7 +28,6 @@ function showToast(msg, type = 'success', duration = 3500) {
   toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
 }
 
-// Weather fetch
 async function fetchWeather(lat, lon) {
   try {
     const res  = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
@@ -47,7 +41,6 @@ async function fetchWeather(lat, lon) {
   }
 }
 
-// Weather emoji
 function getWeatherEmoji(iconCode) {
   const map = {
     '01d':'☀️','01n':'🌙','02d':'⛅','02n':'⛅',
@@ -59,7 +52,6 @@ function getWeatherEmoji(iconCode) {
   return map[iconCode] || '🌤️';
 }
 
-// Day name
 function getDayName(dateStr) {
   const days  = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
   const d     = new Date(dateStr);
@@ -75,7 +67,6 @@ function capitalize(str) {
   return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
 }
 
-// Alert badge
 function updateAlertBadge(count) {
   const badge = document.getElementById('alertBadge');
   if (badge) {
@@ -84,7 +75,6 @@ function updateAlertBadge(count) {
   }
 }
 
-// Ripple effect
 document.addEventListener('click', e => {
   const btn = e.target.closest('.btn-primary,.btn-secondary,.btn-analyze,.chart-tab,.alert-tab,.chip');
   if (!btn) return;
@@ -101,7 +91,6 @@ const rippleStyle = document.createElement('style');
 rippleStyle.textContent = `@keyframes ripple{to{transform:scale(2.5);opacity:0}}`;
 document.head.appendChild(rippleStyle);
 
-// Observe animations
 function observeAnimations() {
   const observer = new IntersectionObserver(entries => {
     entries.forEach(e => {
@@ -117,47 +106,37 @@ function observeAnimations() {
   });
 }
 
-// Theme toggle
 function initTheme() {
   const btn   = document.getElementById('themeToggle');
   const icon  = document.getElementById('themeIcon');
   const saved = localStorage.getItem('smartagro_theme') || 'dark';
-
   function applyTheme(mode) {
     if (mode === 'light') {
       document.body.classList.add('light-theme');
-      if (icon) { icon.classList.replace('fa-moon','fa-sun'); }
+      if (icon) { icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); }
     } else {
       document.body.classList.remove('light-theme');
-      if (icon) { icon.classList.replace('fa-sun','fa-moon'); }
+      if (icon) { icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); }
     }
     localStorage.setItem('smartagro_theme', mode);
   }
-
   applyTheme(saved);
-  if (btn) {
-    btn.addEventListener('click', () => {
-      applyTheme(document.body.classList.contains('light-theme') ? 'dark' : 'light');
-    });
-  }
+  if (btn) btn.addEventListener('click', () => {
+    applyTheme(document.body.classList.contains('light-theme') ? 'dark' : 'light');
+  });
 }
 
-// Language dropdown — FIXED: single listener, no conflict
 function initLangDropdown() {
   const btn = document.getElementById('langBtn');
   const sel = document.getElementById('langSelector');
   if (!btn || !sel) return;
-
   btn.addEventListener('click', e => {
     e.stopPropagation();
     sel.classList.toggle('open');
   });
-
-  // Close on outside click — single listener
   document.addEventListener('click', e => {
     if (!sel.contains(e.target)) sel.classList.remove('open');
   });
-
   const searchEl = document.getElementById('langSearch');
   if (searchEl) {
     searchEl.addEventListener('input', e => buildLangList(e.target.value));
@@ -165,7 +144,6 @@ function initLangDropdown() {
   }
 }
 
-// DOMContentLoaded
 document.addEventListener('DOMContentLoaded', () => {
   const saved = sessionStorage.getItem('alert_count');
   if (saved) updateAlertBadge(parseInt(saved));
