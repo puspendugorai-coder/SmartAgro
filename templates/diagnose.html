@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SmartAgro – Diagnose Crop</title>
+  <title>SmartAgro – Fasal Diagnosis</title>
   <link rel="stylesheet" href="/static/css/main.css"/>
   <link rel="stylesheet" href="/static/css/diagnose.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -11,6 +11,7 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
 <nav class="navbar" id="navbar">
   <div class="nav-brand">
     <div class="brand-icon"><i class="fas fa-seedling"></i></div>
@@ -19,7 +20,7 @@
   <div class="nav-links" id="navLinks">
     <a href="/" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
     <a href="/diagnose" class="nav-item active"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
-    <a href="/market" class="nav-item"><i class="fas fa-chart-line"></i><span>Mandi Prices</span></a>
+    <a href="/market" class="nav-item"><i class="fas fa-chart-line"></i><span>Mandi</span></a>
     <a href="/alerts" class="nav-item"><i class="fas fa-bell"></i><span>Alerts</span></a>
   </div>
   <div class="nav-actions">
@@ -27,7 +28,7 @@
     <div class="lang-selector" id="langSelector">
       <button class="lang-btn" id="langBtn"><i class="fas fa-globe"></i><span id="currentLang">HI</span><i class="fas fa-chevron-down"></i></button>
       <div class="lang-dropdown" id="langDropdown">
-        <div class="lang-search"><input type="text" placeholder="Search..." id="langSearch"/></div>
+        <div class="lang-search"><input type="text" placeholder="Search language..." id="langSearch"/></div>
         <div class="lang-list" id="langList"></div>
       </div>
     </div>
@@ -37,24 +38,27 @@
 
 <section class="page-hero diagnose-hero">
   <div class="hero-badge"><i class="fas fa-microscope"></i> AI Diagnosis</div>
-  <h1>Crop Disease Detector</h1>
-  <p>Take a photo of your sick crop — AI tells you what's wrong and how to fix it</p>
+  <h1>Fasal Bimari Detector</h1>
+  <p>Beemar fasal ki photo lo — AI batayega kya bimari hai aur kaise theek karein</p>
 </section>
 
 <section class="section diagnose-section">
   <div class="container">
     <div class="diagnose-layout">
       <div class="upload-panel">
-        <div class="upload-zone" id="uploadZone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+        <div class="upload-zone" id="uploadZone"
+             ondrop="handleDrop(event)"
+             ondragover="handleDragOver(event)"
+             ondragleave="handleDragLeave(event)">
           <div class="upload-icon"><i class="fas fa-image"></i></div>
-          <h3>Drop crop photo here</h3>
+          <h3>Fasal ki photo yahan dalein</h3>
           <p>JPG, PNG, WEBP — max 10 MB</p>
           <div class="upload-btns">
             <label class="upload-label" for="fileInput">
-              <i class="fas fa-upload"></i> Upload Photo
+              <i class="fas fa-upload"></i> Photo Upload
             </label>
             <button class="btn-secondary" onclick="openCamera()">
-              <i class="fas fa-camera"></i> Take Photo
+              <i class="fas fa-camera"></i> Photo Lo
             </button>
           </div>
           <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event)"/>
@@ -65,7 +69,9 @@
           <div class="preview-overlay">
             <button class="btn-icon" onclick="clearImage()"><i class="fas fa-trash"></i></button>
           </div>
-          <div class="preview-label"><i class="fas fa-check-circle" style="color:var(--green)"></i> Ready to analyze</div>
+          <div class="preview-label">
+            <i class="fas fa-check-circle" style="color:var(--green)"></i> Taiyaar hai
+          </div>
         </div>
 
         <div class="camera-modal" id="cameraModal" style="display:none">
@@ -79,17 +85,17 @@
         </div>
 
         <button class="btn-analyze" id="analyzeBtn" onclick="analyzeImage()" style="display:none">
-          <i class="fas fa-wand-magic-sparkles"></i> Analyze Crop
+          <i class="fas fa-wand-magic-sparkles"></i> Fasal Jaanch Karein
           <div class="btn-shine"></div>
         </button>
 
         <div class="tips-card">
-          <div class="tips-header"><i class="fas fa-lightbulb"></i> Tips for Best Results</div>
+          <div class="tips-header"><i class="fas fa-lightbulb"></i> Acchi Photo ke Tips</div>
           <ul class="tips-list">
-            <li>Focus on the most affected leaf or stem</li>
-            <li>Use daylight — avoid dark photos</li>
-            <li>Get close — 30 to 50 cm distance</li>
-            <li>Include both healthy and sick parts</li>
+            <li>Sabse zyada beemar patti ya tana dikhayein</li>
+            <li>Dhoop mein photo lein — andhera nahi</li>
+            <li>Karib se lo — 30-50 cm ki doori</li>
+            <li>Theek aur beemar dono hisse dikhayein</li>
           </ul>
         </div>
       </div>
@@ -97,12 +103,12 @@
       <div class="results-panel" id="resultsPanel">
         <div class="results-placeholder">
           <div class="placeholder-icon"><i class="fas fa-leaf"></i></div>
-          <h3>Upload a photo to start</h3>
-          <p>AI will identify the disease and suggest treatment</p>
+          <h3>Photo upload karein shuru karne ke liye</h3>
+          <p>AI bimari dhundh kar ilaaj batayega</p>
           <div class="placeholder-steps">
-            <div class="ps-item"><span class="ps-num">1</span> Upload or take a photo</div>
-            <div class="ps-item"><span class="ps-num">2</span> Click Analyze Crop</div>
-            <div class="ps-item"><span class="ps-num">3</span> Get your diagnosis</div>
+            <div class="ps-item"><span class="ps-num">1</span> Photo upload ya lo</div>
+            <div class="ps-item"><span class="ps-num">2</span> Fasal Jaanch par click karein</div>
+            <div class="ps-item"><span class="ps-num">3</span> Apna diagnosis paayein</div>
           </div>
         </div>
       </div>
@@ -114,26 +120,26 @@
   <div class="container">
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-circle-info"></i></div>
-      <h2>How It Works</h2>
+      <h2>Kaise Kaam Karta Hai?</h2>
     </div>
     <div class="steps-grid">
       <div class="step-card">
         <div class="step-num">01</div>
         <div class="step-icon"><i class="fas fa-camera"></i></div>
-        <h4>Take a Photo</h4>
-        <p>Click a clear photo of the affected crop leaf, stem or fruit</p>
+        <h4>Photo Lo</h4>
+        <p>Beemar patti, tana ya phal ki saaf photo lo</p>
       </div>
       <div class="step-card">
         <div class="step-num">02</div>
         <div class="step-icon"><i class="fas fa-brain"></i></div>
-        <h4>AI Checks It</h4>
-        <p>Kindwise plant AI finds the exact disease from your photo</p>
+        <h4>AI Jaanch Karta Hai</h4>
+        <p>Kindwise plant AI photo se sahi bimari dhundhta hai</p>
       </div>
       <div class="step-card">
         <div class="step-num">03</div>
         <div class="step-icon"><i class="fas fa-leaf"></i></div>
-        <h4>Get Treatment</h4>
-        <p>Receive organic and chemical treatment options with doses</p>
+        <h4>Ilaaj Paayein</h4>
+        <p>Jaivik aur chemical dono ilaaj dose ke saath milenge</p>
       </div>
     </div>
   </div>
@@ -141,12 +147,24 @@
 
 <footer class="footer">
   <div class="container">
-    <div class="footer-brand"><div class="brand-icon small"><i class="fas fa-seedling"></i></div><span>SmartAgro</span></div>
-    <p class="footer-copy">© 2025 SmartAgro. Made for Indian farmers.</p>
+    <div class="footer-brand">
+      <div class="brand-icon small"><i class="fas fa-seedling"></i></div>
+      <span>SmartAgro</span>
+    </div>
+    <p class="footer-copy">© 2025 SmartAgro. Kisanon ke liye banaya gaya.</p>
   </div>
 </footer>
-<div class="toast" id="toast"></div>
 
+<nav class="bottom-nav">
+  <div class="bottom-nav-grid">
+    <a href="/" class="bottom-nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="/diagnose" class="bottom-nav-item active"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
+    <a href="/market" class="bottom-nav-item"><i class="fas fa-chart-line"></i><span>Mandi</span></a>
+    <a href="/alerts" class="bottom-nav-item"><i class="fas fa-bell"></i><span>Alerts</span></a>
+  </div>
+</nav>
+
+<div class="toast" id="toast"></div>
 <a href="tel:18001801551" class="kisan-helpline">
   <button class="helpline-btn"><i class="fas fa-phone"></i> 1800-180-1551</button>
 </a>
@@ -154,12 +172,12 @@
 <div class="chat-box" id="chatBox">
   <div class="chat-header">
     <div class="chat-header-icon">🌾</div>
-    <div><div class="chat-header-title">Kisan Helper</div><div class="chat-header-sub">Ask in any language</div></div>
-    <button onclick="toggleChat()" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:0.95rem"><i class="fas fa-times"></i></button>
+    <div><div class="chat-header-title">Kisan Helper</div><div class="chat-header-sub">Kisi bhi bhasha mein puchein</div></div>
+    <button onclick="toggleChat()" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:0.92rem"><i class="fas fa-times"></i></button>
   </div>
   <div class="chat-messages" id="chatMessages"></div>
   <div class="chat-input-row">
-    <input type="text" id="chatInput" placeholder="Type or speak..." onkeydown="handleChatKey(event)"/>
+    <input type="text" id="chatInput" placeholder="Likhein ya bolein..." onkeydown="handleChatKey(event)"/>
     <button class="chat-mic-btn" id="micBtn" onclick="startVoice()"><i class="fas fa-microphone"></i></button>
     <button class="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
   </div>
