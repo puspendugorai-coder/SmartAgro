@@ -47,6 +47,12 @@ function getWelcomeMsg() {
     hi: '🌾 नमस्ते किसान भाई! मैं SmartAgro सहायक हूं। आप मुझसे मौसम, फसल, बाजार भाव या सरकारी योजनाओं के बारे में पूछ सकते हैं।',
     bn: '🌾 নমস্কার! আমি SmartAgro সহায়ক। আপনি আমাকে আবহাওয়া, ফসল বা বাজার সম্পর্কে জিজ্ঞাসা করতে পারেন।',
     ta: '🌾 வணக்கம்! நான் SmartAgro உதவியாளர். வானிலை, பயிர் அல்லது சந்தை பற்றி கேளுங்கள்.',
+    te: '🌾 నమస్కారం రైతు సోదరులారా! నేను SmartAgro సహాయకుడిని. వాతావరణం, పంటలు, మార్కెట్ ధరలు లేదా ప్రభుత్వ పథకాల గురించి నన్ను అడగండి.',
+    mr: '🌾 नमस्कार शेतकरी बंधूंनो! मी SmartAgro सहाय्यक आहे. तुम्ही मला हवामान, पिके, बाजारभाव किंवा सरकारी योजनांबद्दल विचारू शकता.',
+    pa: '🌾 ਨਮਸਤੇ ਕਿਸਾਨ ਵੀਰੋ! ਮੈਂ SmartAgro ਸਹਾਇਕ ਹਾਂ। ਤੁਸੀਂ ਮੇਰੇ ਕੋਲੋਂ ਮੌਸਮ, ਫਸਲਾਂ, ਮੰਡੀ ਦੇ ਭਾਅ ਜਾਂ ਸਰਕਾਰੀ ਸਕੀਮਾਂ ਬਾਰੇ ਪੁੱਛ ਸਕਦੇ ਹੋ।',
+    gu: '🌾 નમસ્તે ખેડૂત ભાઈઓ! હું SmartAgro સહાયક છું. તમે મને હવામાન, પાક, બજારના ભાવ અથવા સરકારી યોજનાઓ વિશે પૂછી શકો છો.',
+    kn: '🌾 ನಮಸ್ಕಾರ ರೈತ ಬಾಂಧವರೇ! ನಾನು SmartAgro ಸಹಾಯಕ. ನೀವು ನನ್ನ ಬಳಿ ಹವಾಮಾನ, ಬೆಳೆಗಳು, ಮಾರುಕಟ್ಟೆ ಬೆಲೆ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ಕೇಳಬಹುದು.',
+    ml: '🌾 നമസ്കാരം കർഷക സുഹൃത്തുക്കളെ! ഞാൻ SmartAgro സഹായിയാണ്. കാലാവസ്ഥ, വിളകൾ, വിപണി വിലകൾ അല്ലെങ്കിൽ സർക്കാർ പദ്ധതികളെക്കുറിച്ച് നിങ്ങൾക്ക് എന്നോട് ചോദിക്കാം.',
     en: '🌾 Hello farmer! I am SmartAgro Assistant. Ask me about weather, crops, market prices or government schemes.',
   };
   return msgs[currentLangCode] || msgs.en;
@@ -127,8 +133,9 @@ function startVoice() {
     return;
   }
 
-  // Gemini Style Action: Clicking while active shuts it down instantly
+  // Gemini Style Action: Clicking the mic button while active shuts it down completely
   if (isListening) {
+    isListening = false; // Set to false first so the onend loop knows to stop permanently
     if (recognition) recognition.stop();
     return;
   }
@@ -138,7 +145,7 @@ function startVoice() {
   recognition = new SpeechRecognition();
   recognition.lang = LANG_SPEECH_CODES[currentLangCode] || 'hi-IN';
   
-  // Gemini settings: continuous listening with real-time text streaming
+  // Continuous listening configuration
   recognition.continuous = true; 
   recognition.interimResults = true; 
   recognition.maxAlternatives = 1;
@@ -167,10 +174,11 @@ function startVoice() {
       inputEl.value = currentText;
     }
 
-    // Smart Auto-Submit: Wait for 2 seconds of total silence before firing
+    // Smart Auto-Submit: Wait for 2 seconds of absolute silence before processing
     clearTimeout(speechTimeout);
     speechTimeout = setTimeout(() => {
       if (inputEl && inputEl.value.trim()) {
+        isListening = false; // Stop the reboot loop because we are actively sending
         sendMessage();
         if (recognition) recognition.stop(); 
       }
@@ -178,18 +186,24 @@ function startVoice() {
   };
 
   recognition.onerror = e => {
-    // Ignore minor silence triggers so the layout doesn't crash prematurely
-    if (e.error === 'no-speech') return; 
-    
-    isListening = false;
-    updateMicBtn(false);
-    safeToast('Mic issue or timed out. Please try again.', 'error');
+    // Ignore minor silence and abort triggers so the microphone loop doesn't snap shut
+    if (e.error === 'no-speech' || e.error === 'aborted') return; 
+    console.error("Speech error caught safely: ", e.error);
   };
 
   recognition.onend = () => {
-    isListening = false;
-    updateMicBtn(false);
-    clearTimeout(speechTimeout);
+    // THE CHROME BYPASS LOOP: If the browser force-closes the mic due to a pause, 
+    // but the user didn't explicitly hit stop, instantly fire it back up!
+    if (isListening) {
+      try {
+        recognition.start();
+      } catch (err) {
+        console.log("Mic restarting loop active...");
+      }
+    } else {
+      updateMicBtn(false);
+      clearTimeout(speechTimeout);
+    }
   };
 
   recognition.start();
