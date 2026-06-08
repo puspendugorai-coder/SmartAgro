@@ -131,11 +131,36 @@ button { cursor:pointer; font-family:inherit; border:none; background:none; }
 .section-header p { color:var(--text-2); font-size:0.95rem; }
 .section-tag { display:inline-flex; align-items:center; justify-content:center; width:42px; height:42px; border-radius:50%; background:var(--green-light); border:1px solid var(--border-2); color:var(--green); font-size:1rem; margin-bottom:4px; }
 
+/* ── BASE HERO STYLING (DESKTOP) ── */
+.hero { 
+  display: flex; 
+  align-items: center; 
+  justify-content: space-between; 
+  gap: 40px; 
+  padding: calc(var(--nav-h) + 60px) 20px 60px; 
+  background: var(--green); 
+  min-height: 500px;
+}
+.hero-content { flex: 1; max-width: 600px; }
+.hero-title { font-size: clamp(2.4rem, 5vw, 3.8rem); font-weight: 800; color: #fff; line-height: 1.15; margin-bottom: 16px; }
+.hero-subtitle { color: rgba(255, 255, 255, 0.9); font-size: 1.2rem; margin-bottom: 30px; }
+.hero-badge { display: inline-flex; align-items: center; gap: 6px; padding: 5px 14px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3); border-radius: 50px; font-size: 0.78rem; font-weight: 600; color: #fff; margin-bottom: 12px; }
+.hero-cta { display: flex; gap: 16px; align-items: center; }
+
+/* Hero CTA Specific Buttons */
+.btn-hero-primary { display: inline-flex; align-items: center; gap: 7px; padding: 12px 24px; background: #fff; color: var(--green); font-weight: 700; font-size: 0.95rem; border-radius: var(--radius-sm); transition: var(--trans); }
+.btn-hero-primary:hover { background: var(--bg-2); transform: translateY(-1px); }
+.btn-hero-secondary { display: inline-flex; align-items: center; gap: 7px; padding: 11px 22px; background: transparent; border: 2px solid rgba(255,255,255,0.4); color: #fff; font-weight: 700; font-size: 0.95rem; border-radius: var(--radius-sm); transition: var(--trans); }
+.btn-hero-secondary:hover { border-color: #fff; background: rgba(255,255,255,0.1); }
+
+.hero-visual { flex: 1; display: flex; justify-content: flex-end; }
+.weather-card-hero { background: var(--card); border: 1px solid var(--border-2); border-radius: var(--radius-lg); padding: 24px; width: 100%; max-width: 380px; box-shadow: var(--shadow-lg); color: var(--text); }
+.hwc-loading { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 0; color: var(--text-2); }
+
 /* ── PAGE HERO ── */
 .page-hero { min-height:280px; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:calc(var(--nav-h) + 40px) 20px 40px; text-align:center; position:relative; overflow:hidden; background:var(--green); }
 .page-hero h1 { font-size:clamp(1.8rem,5vw,2.8rem); font-weight:800; color:#fff; margin:10px 0 12px; }
 .page-hero p { color:rgba(255,255,255,0.85); font-size:1rem; max-width:560px; }
-.hero-badge { display:inline-flex; align-items:center; gap:6px; padding:5px 14px; background:rgba(255,255,255,0.2); border:1px solid rgba(255,255,255,0.3); border-radius:50px; font-size:0.78rem; font-weight:600; color:#fff; margin-bottom:12px; }
 .gradient-text { color:#fff; }
 
 /* ── BUTTONS ── */
@@ -161,7 +186,6 @@ button { cursor:pointer; font-family:inherit; border:none; background:none; }
 /* ── LOADING ── */
 .loading-spinner { width:38px; height:38px; border:3px solid var(--border); border-top-color:var(--green); border-radius:50%; animation:spin 0.8s linear infinite; margin:0 auto 14px; }
 @keyframes spin { to { transform:rotate(360deg); } }
-@keyframes fadeInUp { from { opacity:0; transform:translateY(16px); } to { opacity:1; transform:translateY(0); } }
 
 /* ── CHATBOT ── */
 .chat-fab { position:fixed; bottom:24px; right:24px; z-index:9998; width:56px; height:56px; border-radius:50%; background:var(--green); color:#fff; font-size:1.2rem; display:flex; align-items:center; justify-content:center; box-shadow:var(--shadow-lg); transition:var(--trans); cursor:pointer; border:none; }
@@ -170,7 +194,7 @@ button { cursor:pointer; font-family:inherit; border:none; background:none; }
 @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,0.4)} 50%{box-shadow:0 0 0 10px rgba(220,38,38,0)} }
 
 .chat-box { position:fixed; bottom:90px; right:24px; z-index:9997; width:320px; max-height:480px; background:var(--card); border:1px solid var(--border-2); border-radius:var(--radius-lg); display:none; flex-direction:column; overflow:hidden; box-shadow:var(--shadow-lg); transition:all 0.3s ease; transform:scale(0.92); opacity:0; transform-origin:bottom right; }
-.chat-box.open { transform:scale(1); opacity:1; }
+.chat-box.open { display:flex; transform:scale(1); opacity:1; }
 .chat-header { padding:14px 16px; background:var(--green); display:flex; align-items:center; gap:10px; }
 .chat-header-icon { width:34px; height:34px; border-radius:9px; background:rgba(255,255,255,0.2); display:flex; align-items:center; justify-content:center; font-size:1rem; color:#fff; }
 .chat-header-title { font-weight:700; font-size:0.92rem; color:#fff; }
@@ -189,6 +213,24 @@ button { cursor:pointer; font-family:inherit; border:none; background:none; }
 .chat-input-row { padding:10px 12px; border-top:1px solid var(--border); display:flex; gap:6px; align-items:center; }
 .chat-input-row input { flex:1; background:var(--bg-2); border:1px solid var(--border); border-radius:var(--radius-sm); padding:8px 10px; color:var(--text); font-size:0.82rem; font-family:inherit; outline:none; transition:var(--trans); }
 .chat-input-row input:focus { border-color:var(--green); }
+
+/* 🎤 Dynamic Chatbot Mic Active Listening Styles */
+.chat-input-row input.listening-mode {
+  background-color: var(--green-light) !important;
+  border: 1.5px solid var(--green) !important;
+  box-shadow: 0 0 10px rgba(74, 222, 128, 0.4);
+  animation: pulseMicInput 1.5s infinite ease-in-out;
+}
+.chat-input-row input.listening-mode::placeholder {
+  color: var(--green) !important;
+  font-style: italic;
+}
+@keyframes pulseMicInput {
+  0% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.4); }
+  70% { box-shadow: 0 0 0 8px rgba(74, 222, 128, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(74, 222, 128, 0); }
+}
+
 .chat-send-btn,.chat-mic-btn { width:32px; height:32px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:0.82rem; transition:var(--trans); cursor:pointer; border:none; flex-shrink:0; }
 .chat-send-btn { background:var(--green); color:#fff; }
 .chat-send-btn:hover { background:var(--green-2); }
@@ -201,7 +243,7 @@ button { cursor:pointer; font-family:inherit; border:none; background:none; }
 .helpline-btn { display:flex; align-items:center; gap:7px; padding:11px 16px; background:var(--card); color:var(--green); font-weight:700; font-size:0.8rem; border-radius:50px; box-shadow:var(--shadow); transition:var(--trans); border:2px solid var(--green); cursor:pointer; }
 .helpline-btn:hover { background:var(--green); color:#fff; transform:translateY(-2px); }
 
-/* ── MSP colors ── */
+/* ── MSP COLORS ── */
 .above-msp { color:var(--green) !important; font-weight:700; }
 .below-msp { color:var(--red) !important; font-weight:700; }
 .cr-msp { font-size:0.78rem; color:var(--text-3); }
@@ -218,13 +260,101 @@ button { cursor:pointer; font-family:inherit; border:none; background:none; }
 .rain-card.rain-no  .rain-answer { color:var(--amber); }
 .rain-temp { font-size:0.8rem; color:var(--text-3); }
 
-/* ── RESPONSIVE ── */
+/* ── QUICK SECTION GRID MAPPINGS ── */
+.quick-section { padding: 40px 0; }
+.quick-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
+.quick-card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 24px; position: relative; transition: var(--trans); box-shadow: var(--shadow); }
+.quick-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); background: var(--card-hover); }
+.qc-icon { font-size: 2rem; color: var(--green); margin-bottom: 12px; }
+.quick-card h3 { font-size: 1.1rem; font-weight: 700; color: var(--text); margin-bottom: 6px; }
+.quick-card p { font-size: 0.88rem; color: var(--text-2); }
+.qc-arrow { position: absolute; bottom: 20px; right: 20px; color: var(--text-3); font-size: 0.9rem; transition: var(--trans); }
+.quick-card:hover .qc-arrow { color: var(--green); transform: translateX(3px); }
+
+/* ==========================================================================
+   ── RESPONSIVE MEDIA QUERIES LAYER ──
+   ========================================================================== */
+
 @media (max-width:900px) {
   .nav-links { display:none; position:absolute; top:var(--nav-h); left:0; right:0; flex-direction:column; background:var(--card); border-bottom:1px solid var(--border); padding:10px; gap:3px; box-shadow:var(--shadow); }
   .nav-links.open { display:flex; }
   .nav-item { width:100%; }
   .hamburger { display:flex; }
 }
+
+/* Standard Mobile Viewports (Smartphones and Tablets below 768px wide) */
+@media (max-width: 768px) {
+  /* 1. Force Hero Grid Layout to Stack Cleanly Vertically */
+  .hero {
+    flex-direction: column !important;
+    padding: 100px 16px 44px 16px !important;
+    text-align: center !important;
+    gap: 32px !important;
+    height: auto !important;
+    min-height: initial !important;
+  }
+
+  .hero-content {
+    width: 100% !important;
+    max-width: 100% !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+  }
+
+  /* 2. Responsive Typography Fluid Text Rescaling */
+  .hero-title {
+    font-size: 2.15rem !important;
+    line-height: 1.3 !important;
+    letter-spacing: -0.3px !important;
+    margin-bottom: 12px !important;
+  }
+  
+  /* Kill structural breaks so line layouts map inside smaller screen frames */
+  .hero-title br {
+    display: none !important; 
+  }
+
+  .hero-subtitle {
+    font-size: 1.05rem !important;
+    line-height: 1.45 !important;
+    margin-bottom: 24px !important;
+    max-width: 95% !important;
+  }
+
+  /* 3. Re-orient horizontal buttons to full-width stacked blocks */
+  .hero-cta {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    max-width: 320px !important;
+    gap: 12px !important;
+  }
+
+  .hero-cta .btn-hero-primary,
+  .hero-cta .btn-hero-secondary {
+    width: 100% !important;
+    box-sizing: border-box !important;
+    justify-content: center !important;
+    padding: 13px 20px !important;
+    font-size: 0.95rem !important;
+    text-align: center !important;
+  }
+
+  /* 4. Center Align Weather Visual Card elements */
+  .hero-visual {
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    margin-top: 5px;
+  }
+  
+  .weather-card-hero {
+    width: 100% !important;
+    max-width: 340px !important;
+  }
+}
+
 @media (max-width:600px) {
   .navbar { padding:0 14px; }
   .container { padding:0 14px; }
@@ -235,4 +365,41 @@ button { cursor:pointer; font-family:inherit; border:none; background:none; }
   .helpline-btn { padding:9px 12px; font-size:0.75rem; }
   #rainGrid { gap:10px; }
   .lang-btn span { display:none; }
+}
+
+/* Ultra-Small Screen Edge-Case Optimizations (Screens 360px and below) */
+@media (max-width: 360px) {
+  /* 1. Prevent Top Header brand crowding or button overlapping */
+  .navbar {
+    padding: 0 8px !important;
+  }
+  .brand-text {
+    font-size: 1.1rem !important;
+  }
+  .brand-icon {
+    width: 32px !important;
+    height: 32px !important;
+  }
+  .nav-actions {
+    gap: 4px !important;
+  }
+  .theme-toggle, .lang-btn {
+    padding: 6px 8px !important;
+  }
+
+  /* 2. Fluid layout container override to drop pixel bleed */
+  .weather-card-hero {
+    max-width: 100% !important;
+  }
+
+  /* 3. Compress Grid Card margins so description layouts do not spill out */
+  .quick-card {
+    padding: 16px !important;
+  }
+  .quick-card h3 {
+    font-size: 1rem !important;
+  }
+  .quick-card p {
+    font-size: 0.8rem !important;
+  }
 }
