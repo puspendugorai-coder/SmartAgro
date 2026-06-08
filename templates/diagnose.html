@@ -6,7 +6,7 @@
   <title>SmartAgro – Diagnose Crop</title>
   <link rel="stylesheet" href="/static/css/main.css"/>
   <link rel="stylesheet" href="/static/css/diagnose.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
@@ -17,19 +17,17 @@
     <span class="brand-text">Smart<span class="brand-accent">Agro</span></span>
   </div>
   <div class="nav-links" id="navLinks">
-    <a href="/" class="nav-item"><i class="fas fa-th-large"></i><span>Dashboard</span></a>
-    <a href="/diagnose" class="nav-item active"><i class="fas fa-microscope"></i><span>Diagnose Crop</span></a>
-    <a href="/market" class="nav-item"><i class="fas fa-chart-line"></i><span>Market Prices</span></a>
+    <a href="/" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="/diagnose" class="nav-item active"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
+    <a href="/market" class="nav-item"><i class="fas fa-chart-line"></i><span>Mandi Prices</span></a>
     <a href="/alerts" class="nav-item"><i class="fas fa-bell"></i><span>Alerts</span></a>
   </div>
   <div class="nav-actions">
     <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon" id="themeIcon"></i></button>
     <div class="lang-selector" id="langSelector">
-      <button class="lang-btn" id="langBtn">
-        <i class="fas fa-globe"></i><span id="currentLang">EN</span><i class="fas fa-chevron-down"></i>
-      </button>
+      <button class="lang-btn" id="langBtn"><i class="fas fa-globe"></i><span id="currentLang">HI</span><i class="fas fa-chevron-down"></i></button>
       <div class="lang-dropdown" id="langDropdown">
-        <div class="lang-search"><input type="text" placeholder="Search language..." id="langSearch"/></div>
+        <div class="lang-search"><input type="text" placeholder="Search..." id="langSearch"/></div>
         <div class="lang-list" id="langList"></div>
       </div>
     </div>
@@ -38,12 +36,9 @@
 </nav>
 
 <section class="page-hero diagnose-hero">
-  <div class="hero-bg"><div class="hero-orb orb-1"></div><div class="hero-orb orb-2"></div></div>
-  <div class="page-hero-content">
-    <div class="hero-badge"><i class="fas fa-microscope"></i> AI Crop Diagnosis</div>
-    <h1><span class="gradient-text">Crop Disease Detector</span></h1>
-    <p>Take a photo of your sick crop — our AI will tell you what's wrong and how to fix it</p>
-  </div>
+  <div class="hero-badge"><i class="fas fa-microscope"></i> AI Diagnosis</div>
+  <h1>Crop Disease Detector</h1>
+  <p>Take a photo of your sick crop — AI tells you what's wrong and how to fix it</p>
 </section>
 
 <section class="section diagnose-section">
@@ -52,10 +47,10 @@
       <div class="upload-panel">
         <div class="upload-zone" id="uploadZone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
           <div class="upload-icon"><i class="fas fa-image"></i></div>
-          <h3>Drop your crop photo here</h3>
+          <h3>Drop crop photo here</h3>
           <p>JPG, PNG, WEBP — max 10 MB</p>
           <div class="upload-btns">
-            <label class="btn-primary upload-label" for="fileInput">
+            <label class="upload-label" for="fileInput">
               <i class="fas fa-upload"></i> Upload Photo
             </label>
             <button class="btn-secondary" onclick="openCamera()">
@@ -70,14 +65,14 @@
           <div class="preview-overlay">
             <button class="btn-icon" onclick="clearImage()"><i class="fas fa-trash"></i></button>
           </div>
-          <div class="preview-label"><i class="fas fa-check-circle" style="color:var(--green)"></i> Image ready</div>
+          <div class="preview-label"><i class="fas fa-check-circle" style="color:var(--green)"></i> Ready to analyze</div>
         </div>
 
         <div class="camera-modal" id="cameraModal" style="display:none">
           <div class="camera-wrapper">
             <video id="cameraFeed" autoplay playsinline></video>
             <div class="camera-controls">
-              <button class="btn-icon close-cam-btn" onclick="closeCamera()"><i class="fas fa-times"></i></button>
+              <button class="btn-icon" onclick="closeCamera()"><i class="fas fa-times"></i></button>
               <button class="btn-capture" onclick="capturePhoto()"><i class="fas fa-circle"></i></button>
             </div>
           </div>
@@ -91,19 +86,19 @@
         <div class="tips-card">
           <div class="tips-header"><i class="fas fa-lightbulb"></i> Tips for Best Results</div>
           <ul class="tips-list">
-            <li>Focus on the most affected part of the crop</li>
-            <li>Use daylight — avoid dark or blurry photos</li>
-            <li>Get close to the leaf or stem (30–50 cm)</li>
-            <li>Include both healthy and sick parts if possible</li>
+            <li>Focus on the most affected leaf or stem</li>
+            <li>Use daylight — avoid dark photos</li>
+            <li>Get close — 30 to 50 cm distance</li>
+            <li>Include both healthy and sick parts</li>
           </ul>
         </div>
       </div>
 
       <div class="results-panel" id="resultsPanel">
-        <div class="results-placeholder" id="resultsPlaceholder">
+        <div class="results-placeholder">
           <div class="placeholder-icon"><i class="fas fa-leaf"></i></div>
           <h3>Upload a photo to start</h3>
-          <p>Our AI will find the disease and suggest how to treat it</p>
+          <p>AI will identify the disease and suggest treatment</p>
           <div class="placeholder-steps">
             <div class="ps-item"><span class="ps-num">1</span> Upload or take a photo</div>
             <div class="ps-item"><span class="ps-num">2</span> Click Analyze Crop</div>
@@ -132,7 +127,7 @@
         <div class="step-num">02</div>
         <div class="step-icon"><i class="fas fa-brain"></i></div>
         <h4>AI Checks It</h4>
-        <p>Kindwise plant AI identifies the exact disease from your photo</p>
+        <p>Kindwise plant AI finds the exact disease from your photo</p>
       </div>
       <div class="step-card">
         <div class="step-num">03</div>
@@ -146,31 +141,21 @@
 
 <footer class="footer">
   <div class="container">
-    <div class="footer-brand"><div class="brand-icon small"><i class="fas fa-seedling"></i></div><span>Smart<span class="brand-accent">Agro</span></span></div>
+    <div class="footer-brand"><div class="brand-icon small"><i class="fas fa-seedling"></i></div><span>SmartAgro</span></div>
     <p class="footer-copy">© 2025 SmartAgro. Made for Indian farmers.</p>
   </div>
 </footer>
 <div class="toast" id="toast"></div>
-<script src="/static/js/translations.js"></script>
-<script src="/static/js/main.js"></script>
-<script src="/static/js/diagnose.js"></script>
-  <!-- Kisan Helpline Button -->
+
 <a href="tel:18001801551" class="kisan-helpline">
-  <button class="helpline-btn">
-    <i class="fas fa-phone"></i> 1800-180-1551
-  </button>
+  <button class="helpline-btn"><i class="fas fa-phone"></i> 1800-180-1551</button>
 </a>
-
-<!-- Voice Chatbot -->
-<button class="chat-fab" id="chatFab" onclick="toggleChat()">
-  <i class="fas fa-microphone"></i>
-</button>
-
+<button class="chat-fab" id="chatFab" onclick="toggleChat()"><i class="fas fa-microphone"></i></button>
 <div class="chat-box" id="chatBox">
   <div class="chat-header">
     <div class="chat-header-icon">🌾</div>
-    <div><div class="chat-header-title">Kisan Helper</div><div class="chat-header-sub">Ask anything in your language</div></div>
-    <button onclick="toggleChat()" style="margin-left:auto;background:none;border:none;color:var(--text-3);cursor:pointer;font-size:1rem"><i class="fas fa-times"></i></button>
+    <div><div class="chat-header-title">Kisan Helper</div><div class="chat-header-sub">Ask in any language</div></div>
+    <button onclick="toggleChat()" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:0.95rem"><i class="fas fa-times"></i></button>
   </div>
   <div class="chat-messages" id="chatMessages"></div>
   <div class="chat-input-row">
@@ -180,6 +165,9 @@
   </div>
 </div>
 
+<script src="/static/js/translations.js"></script>
+<script src="/static/js/main.js"></script>
+<script src="/static/js/diagnose.js"></script>
 <script src="/static/js/chatbot.js"></script>
 </body>
 </html>
