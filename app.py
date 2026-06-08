@@ -36,6 +36,10 @@ def market():
 def alerts():
     return render_template("alerts.html")
 
+@app.route("/ping")
+def ping():
+    return "OK", 200
+
 # ── Weather ──────────────────────────────────────────────
 @app.route("/api/weather")
 def get_weather():
@@ -44,18 +48,20 @@ def get_weather():
     if not lat or not lon:
         return jsonify({"error": "Location required"}), 400
     try:
-        current_resp  = requests.get(
-            f"https://api.openweathermap.org/data/2.5/weather?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric",
+        cr = requests.get(
+            f"https://api.openweathermap.org/data/2.5/weather"
+            f"?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric",
             timeout=10)
-        forecast_resp = requests.get(
-            f"https://api.openweathermap.org/data/2.5/forecast?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric&cnt=56",
+        fr = requests.get(
+            f"https://api.openweathermap.org/data/2.5/forecast"
+            f"?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric&cnt=56",
             timeout=10)
-        if current_resp.status_code != 200:
+        if cr.status_code != 200:
             return jsonify({"error": "Weather API error"}), 500
-        current_data  = current_resp.json()
-        forecast_data = forecast_resp.json()
+        cd = cr.json()
+        fd = fr.json()
         daily = {}
-        for item in forecast_data.get("list", []):
+        for item in fd.get("list", []):
             day = datetime.fromtimestamp(item["dt"]).strftime("%Y-%m-%d")
             if day not in daily:
                 daily[day] = {
@@ -75,16 +81,16 @@ def get_weather():
                     daily[day]["temp_min"] = item["main"]["temp_min"]
         return jsonify({
             "current": {
-                "city":        current_data.get("name", "Your Location"),
-                "temp":        round(current_data["main"]["temp"]),
-                "feels_like":  round(current_data["main"]["feels_like"]),
-                "humidity":    current_data["main"]["humidity"],
-                "description": current_data["weather"][0]["description"],
-                "icon":        current_data["weather"][0]["icon"],
-                "wind_speed":  current_data["wind"]["speed"],
-                "pressure":    current_data["main"]["pressure"],
-                "visibility":  current_data.get("visibility", 0) / 1000,
-                "rain":        current_data.get("rain", {}).get("1h", 0),
+                "city":        cd.get("name", "Your Location"),
+                "temp":        round(cd["main"]["temp"]),
+                "feels_like":  round(cd["main"]["feels_like"]),
+                "humidity":    cd["main"]["humidity"],
+                "description": cd["weather"][0]["description"],
+                "icon":        cd["weather"][0]["icon"],
+                "wind_speed":  cd["wind"]["speed"],
+                "pressure":    cd["main"]["pressure"],
+                "visibility":  cd.get("visibility", 0) / 1000,
+                "rain":        cd.get("rain", {}).get("1h", 0),
             },
             "forecast": list(daily.values())[:7]
         })
@@ -113,26 +119,26 @@ def get_season(month):
 
 def recommend_crops(temp, humidity, rain, season):
     all_crops = [
-        {"name":"Rice",      "icon":"🌾","temp_range":(20,38),"humidity_range":(70,100),"season":"Kharif (Monsoon)","water":"High",     "yield":"3-5 t/ha",  "profit":"₹45,000-65,000/ha","duration":"90-150 days","description":"Best for high humidity and warm weather","soil":"Clay loam","fertilizer":"NPK 120:60:60 kg/ha"},
-        {"name":"Wheat",     "icon":"🌿","temp_range":(10,25),"humidity_range":(40,65), "season":"Rabi (Winter)",   "water":"Medium",   "yield":"4-6 t/ha",  "profit":"₹50,000-75,000/ha","duration":"100-150 days","description":"Cool dry winters — most popular rabi crop","soil":"Loam","fertilizer":"NPK 120:60:40 kg/ha"},
-        {"name":"Maize",     "icon":"🌽","temp_range":(18,35),"humidity_range":(50,80), "season":"Kharif (Monsoon)","water":"Medium",   "yield":"5-8 t/ha",  "profit":"₹40,000-60,000/ha","duration":"80-110 days","description":"Versatile crop for warm humid weather","soil":"Sandy loam","fertilizer":"NPK 150:75:75 kg/ha"},
-        {"name":"Cotton",    "icon":"☁️","temp_range":(25,40),"humidity_range":(40,70), "season":"Kharif (Monsoon)","water":"Medium",   "yield":"2-3 t/ha",  "profit":"₹60,000-90,000/ha","duration":"150-180 days","description":"Hot dry spells with moderate rain","soil":"Black cotton soil","fertilizer":"NPK 90:45:45 kg/ha"},
-        {"name":"Tomato",    "icon":"🍅","temp_range":(18,30),"humidity_range":(60,80), "season":"Zaid (Summer)",   "water":"Medium",   "yield":"20-40 t/ha","profit":"₹80,000-1,50,000/ha","duration":"60-80 days","description":"High value crop for moderate climates","soil":"Sandy loam","fertilizer":"NPK 100:60:60 kg/ha"},
-        {"name":"Sugarcane", "icon":"🎋","temp_range":(24,38),"humidity_range":(75,90), "season":"Kharif (Monsoon)","water":"Very High","yield":"70-100 t/ha","profit":"₹70,000-1,00,000/ha","duration":"300-360 days","description":"Hot climate and heavy rainfall needed","soil":"Deep loam","fertilizer":"NPK 250:80:100 kg/ha"},
-        {"name":"Soybean",   "icon":"🫘","temp_range":(20,32),"humidity_range":(60,80), "season":"Kharif (Monsoon)","water":"Medium",   "yield":"2-3 t/ha",  "profit":"₹35,000-55,000/ha","duration":"90-120 days","description":"Nitrogen-fixing legume for warm monsoon","soil":"Well-drained loam","fertilizer":"NPK 30:60:40 kg/ha"},
-        {"name":"Mustard",   "icon":"🌻","temp_range":(10,25),"humidity_range":(40,60), "season":"Rabi (Winter)",   "water":"Low",      "yield":"1-2 t/ha",  "profit":"₹25,000-40,000/ha","duration":"90-110 days","description":"Cool weather oil seed crop","soil":"Sandy loam","fertilizer":"NPK 80:40:40 kg/ha"},
-        {"name":"Onion",     "icon":"🧅","temp_range":(13,28),"humidity_range":(50,75), "season":"Rabi (Winter)",   "water":"Medium",   "yield":"15-25 t/ha","profit":"₹50,000-1,00,000/ha","duration":"100-120 days","description":"High demand vegetable with good income","soil":"Sandy loam","fertilizer":"NPK 100:50:50 kg/ha"},
-        {"name":"Potato",    "icon":"🥔","temp_range":(10,22),"humidity_range":(60,80), "season":"Rabi (Winter)",   "water":"Medium",   "yield":"20-30 t/ha","profit":"₹40,000-80,000/ha","duration":"70-90 days","description":"Cool weather staple — high yield","soil":"Sandy loam","fertilizer":"NPK 120:80:100 kg/ha"},
-        {"name":"Chilli",    "icon":"🌶️","temp_range":(20,35),"humidity_range":(60,80), "season":"Zaid (Summer)",   "water":"Medium",   "yield":"6-10 t/ha", "profit":"₹60,000-1,20,000/ha","duration":"90-120 days","description":"Warm climate spice with high market value","soil":"Sandy loam","fertilizer":"NPK 100:50:50 kg/ha"},
-        {"name":"Groundnut", "icon":"🥜","temp_range":(22,36),"humidity_range":(50,75), "season":"Kharif (Monsoon)","water":"Medium",   "yield":"1.5-3 t/ha","profit":"₹30,000-55,000/ha","duration":"90-130 days","description":"Warm season oilseed — good for dry areas","soil":"Sandy loam","fertilizer":"NPK 25:50:25 kg/ha"},
+        {"name":"Rice","icon":"🌾","temp_range":(20,38),"humidity_range":(70,100),"season":"Kharif (Monsoon)","water":"High","yield":"3-5 t/ha","profit":"₹45,000-65,000/ha","duration":"90-150 days","description":"Best for high humidity and warm weather","soil":"Clay loam","fertilizer":"NPK 120:60:60 kg/ha"},
+        {"name":"Wheat","icon":"🌿","temp_range":(10,25),"humidity_range":(40,65),"season":"Rabi (Winter)","water":"Medium","yield":"4-6 t/ha","profit":"₹50,000-75,000/ha","duration":"100-150 days","description":"Cool dry winters — most popular rabi crop","soil":"Loam","fertilizer":"NPK 120:60:40 kg/ha"},
+        {"name":"Maize","icon":"🌽","temp_range":(18,35),"humidity_range":(50,80),"season":"Kharif (Monsoon)","water":"Medium","yield":"5-8 t/ha","profit":"₹40,000-60,000/ha","duration":"80-110 days","description":"Versatile crop for warm humid weather","soil":"Sandy loam","fertilizer":"NPK 150:75:75 kg/ha"},
+        {"name":"Cotton","icon":"☁️","temp_range":(25,40),"humidity_range":(40,70),"season":"Kharif (Monsoon)","water":"Medium","yield":"2-3 t/ha","profit":"₹60,000-90,000/ha","duration":"150-180 days","description":"Hot dry spells with moderate rain","soil":"Black cotton soil","fertilizer":"NPK 90:45:45 kg/ha"},
+        {"name":"Tomato","icon":"🍅","temp_range":(18,30),"humidity_range":(60,80),"season":"Zaid (Summer)","water":"Medium","yield":"20-40 t/ha","profit":"₹80,000-1,50,000/ha","duration":"60-80 days","description":"High value crop for moderate climates","soil":"Sandy loam","fertilizer":"NPK 100:60:60 kg/ha"},
+        {"name":"Sugarcane","icon":"🎋","temp_range":(24,38),"humidity_range":(75,90),"season":"Kharif (Monsoon)","water":"Very High","yield":"70-100 t/ha","profit":"₹70,000-1,00,000/ha","duration":"300-360 days","description":"Hot climate and heavy rainfall needed","soil":"Deep loam","fertilizer":"NPK 250:80:100 kg/ha"},
+        {"name":"Soybean","icon":"🫘","temp_range":(20,32),"humidity_range":(60,80),"season":"Kharif (Monsoon)","water":"Medium","yield":"2-3 t/ha","profit":"₹35,000-55,000/ha","duration":"90-120 days","description":"Nitrogen-fixing legume for warm monsoon","soil":"Well-drained loam","fertilizer":"NPK 30:60:40 kg/ha"},
+        {"name":"Mustard","icon":"🌻","temp_range":(10,25),"humidity_range":(40,60),"season":"Rabi (Winter)","water":"Low","yield":"1-2 t/ha","profit":"₹25,000-40,000/ha","duration":"90-110 days","description":"Cool weather oil seed crop","soil":"Sandy loam","fertilizer":"NPK 80:40:40 kg/ha"},
+        {"name":"Onion","icon":"🧅","temp_range":(13,28),"humidity_range":(50,75),"season":"Rabi (Winter)","water":"Medium","yield":"15-25 t/ha","profit":"₹50,000-1,00,000/ha","duration":"100-120 days","description":"High demand vegetable with good income","soil":"Sandy loam","fertilizer":"NPK 100:50:50 kg/ha"},
+        {"name":"Potato","icon":"🥔","temp_range":(10,22),"humidity_range":(60,80),"season":"Rabi (Winter)","water":"Medium","yield":"20-30 t/ha","profit":"₹40,000-80,000/ha","duration":"70-90 days","description":"Cool weather staple — high yield","soil":"Sandy loam","fertilizer":"NPK 120:80:100 kg/ha"},
+        {"name":"Chilli","icon":"🌶️","temp_range":(20,35),"humidity_range":(60,80),"season":"Zaid (Summer)","water":"Medium","yield":"6-10 t/ha","profit":"₹60,000-1,20,000/ha","duration":"90-120 days","description":"Warm climate spice with high market value","soil":"Sandy loam","fertilizer":"NPK 100:50:50 kg/ha"},
+        {"name":"Groundnut","icon":"🥜","temp_range":(22,36),"humidity_range":(50,75),"season":"Kharif (Monsoon)","water":"Medium","yield":"1.5-3 t/ha","profit":"₹30,000-55,000/ha","duration":"90-130 days","description":"Warm season oilseed crop","soil":"Sandy loam","fertilizer":"NPK 25:50:25 kg/ha"},
     ]
     scored = []
     for crop in all_crops:
         score = 0
-        if crop["temp_range"][0] <= temp <= crop["temp_range"][1]:             score += 40
-        elif abs(temp - sum(crop["temp_range"])/2) < 5:                        score += 20
+        if crop["temp_range"][0] <= temp <= crop["temp_range"][1]: score += 40
+        elif abs(temp - sum(crop["temp_range"])/2) < 5:            score += 20
         if crop["humidity_range"][0] <= humidity <= crop["humidity_range"][1]: score += 30
-        if crop["season"] == season:                                            score += 30
+        if crop["season"] == season: score += 30
         crop["score"] = score
         crop["match"] = f"{min(100, score)}%"
         scored.append(crop)
@@ -148,8 +154,7 @@ def get_pesticide_guide(crops):
         "Maize":    [{"pest":"Fall Armyworm","pesticide":"Spinetoram 11.7 SC","dose":"450 ml/ha","timing":"7-10 days after","eco":False}],
         "Cotton":   [{"pest":"Bollworm","pesticide":"Chlorpyriphos 20 EC","dose":"2.5 ml/L","timing":"At boll formation","eco":False},
                      {"pest":"Whitefly","pesticide":"Neem Oil 5%","dose":"5 ml/L","timing":"Every 7 days","eco":True}],
-        "Tomato":   [{"pest":"Early Blight","pesticide":"Mancozeb 75 WP","dose":"2.5 g/L","timing":"Every 7-10 days","eco":False},
-                     {"pest":"Fruit borer","pesticide":"Neem Oil 5%","dose":"5 ml/L","timing":"At flowering","eco":True}],
+        "Tomato":   [{"pest":"Early Blight","pesticide":"Mancozeb 75 WP","dose":"2.5 g/L","timing":"Every 7-10 days","eco":False}],
         "Onion":    [{"pest":"Thrips","pesticide":"Spinosad 45 SC","dose":"0.5 ml/L","timing":"At 30 & 60 days","eco":False}],
     }
     result = []
@@ -171,9 +176,9 @@ def diagnose_crop():
         resp = requests.post(
             "https://crop.kindwise.com/api/v1/identification",
             headers={"Api-Key": KINDWISE_API_KEY, "Content-Type": "application/json"},
-            json={"images": [f"data:image/jpeg;base64,{image_b64}"], "latitude": 22.5, "longitude": 78.9, "similar_images": True},
-            timeout=30
-        )
+            json={"images": [f"data:image/jpeg;base64,{image_b64}"],
+                  "latitude": 22.5, "longitude": 78.9, "similar_images": True},
+            timeout=30)
         if resp.status_code == 200:
             result = parse_kindwise(resp.json())
             if result:
@@ -186,10 +191,13 @@ def parse_kindwise(kw):
     try:
         suggestions = kw.get("result", {}).get("disease", {}).get("suggestions", [])
         if not suggestions:
-            return {"disease":"Healthy Plant","confidence":95,"severity":"None","affected_part":"N/A",
-                    "cause":"No disease detected. Plant looks healthy.",
-                    "eco_remedies":[{"remedy":"Regular care","method":"Maintain irrigation and fertilization","frequency":"As needed","effectiveness":100}],
-                    "chemical_remedies":[],"prevention":["Maintain proper spacing","Water at base","Monitor regularly"],"recovery_timeline":"Plant is healthy"}
+            return {
+                "disease": "Healthy Plant", "confidence": 95, "severity": "None",
+                "affected_part": "N/A", "cause": "No disease detected. Plant looks healthy.",
+                "eco_remedies": [{"remedy": "Regular care", "method": "Maintain proper irrigation and fertilization", "frequency": "As needed", "effectiveness": 100}],
+                "chemical_remedies": [], "prevention": ["Maintain proper spacing", "Water at base", "Monitor regularly"],
+                "recovery_timeline": "Plant is healthy"
+            }
         top    = suggestions[0]
         conf   = round(top.get("probability", 0) * 100)
         detail = top.get("details", {})
@@ -199,7 +207,7 @@ def parse_kindwise(kw):
         prev   = treat.get("prevention", [])
         eco = [{"remedy": str(r), "method": "Apply on affected area", "frequency": "Every 7 days", "effectiveness": max(60, 85 - i*10)} for i, r in enumerate(bio[:3])]
         if not eco:
-            eco = [{"remedy":"Neem oil spray","method":"5ml per litre water, spray on leaves","frequency":"Every 5-7 days","effectiveness":75}]
+            eco = [{"remedy": "Neem oil spray", "method": "5ml per litre water, spray on leaves", "frequency": "Every 5-7 days", "effectiveness": 75}]
         return {
             "disease":           top.get("name", "Unknown Disease"),
             "confidence":        conf,
@@ -208,7 +216,7 @@ def parse_kindwise(kw):
             "cause":             detail.get("description", "")[:300] or f"{top.get('name')} identified by AI.",
             "eco_remedies":      eco,
             "chemical_remedies": [{"name": str(c), "dose": "As per label", "interval": "10-14 days"} for c in chem[:3]],
-            "prevention":        [str(p) for p in prev[:4]] or ["Proper spacing","Avoid overhead watering","Remove infected parts","Use certified seeds"],
+            "prevention":        [str(p) for p in prev[:4]] or ["Proper spacing", "Avoid overhead watering", "Remove infected parts", "Use certified seeds"],
             "recovery_timeline": "2-4 weeks with proper treatment"
         }
     except Exception as e:
@@ -219,9 +227,9 @@ def diagnose_groq(image_b64):
     if not GROQ_API_KEY:
         return jsonify({"error": "All diagnosis methods failed"}), 500
     prompt = """Look at this crop image carefully. Identify the disease.
-Return ONLY valid JSON no markdown:
+Return ONLY valid JSON, no markdown:
 {"disease":"name","confidence":85,"severity":"Mild/Moderate/Severe","affected_part":"Leaves/Stem/Fruit","cause":"pathogen description","eco_remedies":[{"remedy":"name","method":"how to apply","frequency":"how often","effectiveness":80}],"chemical_remedies":[{"name":"chemical","dose":"dose/L","interval":"days"}],"prevention":["tip1","tip2","tip3"],"recovery_timeline":"2-4 weeks"}"""
-    for model in ["meta-llama/llama-4-scout-17b-16e-instruct","meta-llama/llama-4-maverick-17b-128e-instruct"]:
+    for model in ["meta-llama/llama-4-scout-17b-16e-instruct", "meta-llama/llama-4-maverick-17b-128e-instruct"]:
         try:
             resp = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
@@ -233,8 +241,7 @@ Return ONLY valid JSON no markdown:
                         {"type": "text", "text": prompt}
                     ]}
                 ], "temperature": 0.2, "max_tokens": 1000},
-                timeout=45
-            )
+                timeout=45)
             if resp.status_code != 200: continue
             raw   = resp.json()["choices"][0]["message"]["content"].strip()
             clean = re.sub(r"```(?:json)?", "", raw).replace("```", "").strip()
@@ -256,27 +263,27 @@ def get_alerts():
     description = data.get("description", "").lower()
     alerts_list = []
     if temp > 40:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"🌡️","title":"Extreme Heat","message":"Temperature above 40°C. Crops may wilt.","action":"Irrigate every 4-5 hours. Provide shade netting."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"🌡️","title":"Extreme Heat","message":"Temperature above 40°C. Crops may wilt and soil loses moisture fast.","action":"Irrigate every 4-5 hours. Provide shade netting."})
     if temp < 5:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"❄️","title":"Frost Warning","message":"Very cold. Frost can destroy crops overnight.","action":"Cover crops. Use sprinkler irrigation at night."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"❄️","title":"Frost Warning","message":"Very cold temperature. Frost can destroy crops overnight.","action":"Cover crops with cloth. Use sprinkler irrigation at night."})
     if humidity > 85:
-        alerts_list.append({"type":"warning","category":"Disease","icon":"🍄","title":"Fungal Disease Risk","message":"High humidity — blight and rust risk is high.","action":"Spray Mancozeb 75 WP (2.5 g/L) immediately."})
+        alerts_list.append({"type":"warning","category":"Disease","icon":"🍄","title":"Fungal Disease Risk","message":"Humidity above 85% — blight and rust risk is very high.","action":"Spray Mancozeb 75 WP at 2.5 g/L immediately."})
     if wind_speed > 50:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"💨","title":"Strong Winds","message":"Strong winds can damage tall crops.","action":"Avoid spraying. Support tall crops with stakes."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"💨","title":"Strong Winds","message":"Strong winds can lodge tall crops like maize and wheat.","action":"Avoid spraying. Support tall crops with stakes."})
     if rain > 50:
-        alerts_list.append({"type":"warning","category":"Weather","icon":"🌧️","title":"Heavy Rain","message":"Waterlogging and root rot risk.","action":"Open drainage channels. Stop irrigation."})
+        alerts_list.append({"type":"warning","category":"Weather","icon":"🌧️","title":"Heavy Rainfall","message":"Excess rain may cause waterlogging and root rot.","action":"Open drainage channels. Stop irrigation."})
     if "storm" in description or "thunder" in description:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"⛈️","title":"Thunderstorm","message":"Risk of lightning and hail damage.","action":"Stay indoors. Secure farm equipment."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"⛈️","title":"Thunderstorm","message":"Risk of lightning and hail damage to crops.","action":"Stay indoors. Secure farm equipment."})
     if 25 <= temp <= 35 and humidity > 70:
-        alerts_list.append({"type":"warning","category":"Pest","icon":"🐛","title":"Aphid & Whitefly Risk","message":"Warm humid weather — aphids multiplying fast.","action":"Spray Neem oil (5 ml/L) at dusk."})
+        alerts_list.append({"type":"warning","category":"Pest","icon":"🐛","title":"Aphid & Whitefly Risk","message":"Warm humid conditions — aphids multiplying fast.","action":"Spray Neem oil 5 ml/L at dusk."})
     if temp > 30 and humidity < 50:
-        alerts_list.append({"type":"warning","category":"Pest","icon":"🕷️","title":"Spider Mite Alert","message":"Hot dry conditions — mites spreading fast.","action":"Apply Abamectin 1.8 EC (0.5 ml/L)."})
+        alerts_list.append({"type":"warning","category":"Pest","icon":"🕷️","title":"Spider Mite Alert","message":"Hot dry conditions — mites spreading rapidly.","action":"Apply Abamectin 1.8 EC at 0.5 ml/L."})
     harmful = []
     if temp > 38: harmful.append("Wheat")
     if humidity > 85 and rain > 20: harmful.append("Cotton")
     if temp < 10: harmful.append("Rice")
     if harmful:
-        alerts_list.append({"type":"info","category":"Crop Advisory","icon":"🌾","title":"Crops at Risk","message":f"Avoid growing: {', '.join(harmful)} in current weather.","action":"Consider alternate crops better suited now."})
+        alerts_list.append({"type":"info","category":"Crop Advisory","icon":"🌾","title":"Crops at Risk","message":f"Avoid growing: {', '.join(harmful)} in current weather.","action":"Consider alternate crops better suited to now."})
     return jsonify({"alerts": alerts_list, "total": len(alerts_list)})
 
 # ── Market Prices ────────────────────────────────────────
@@ -315,11 +322,8 @@ def get_market_data():
             change = round(rng.uniform(-4.0, 4.0), 2)
             msp    = MSP_PRICES.get(crop, base)
             crops.append({
-                "crop":   crop,
-                "price":  price,
-                "msp":    msp,
-                "above_msp": price >= msp,
-                "unit":   "quintal",
+                "crop": crop, "price": price, "msp": msp,
+                "above_msp": price >= msp, "unit": "quintal",
                 "change": change,
                 "demand": "Very High" if change > 2 else "High" if change > 0 else "Medium" if change > -2 else "Low"
             })
@@ -336,46 +340,53 @@ def chat():
         return jsonify({"reply": "Groq API key missing."}), 500
     data     = request.json or {}
     message  = data.get("message", "").strip()
-    language = data.get("language", "en")
     weather  = data.get("weather_context", {})
+    history  = data.get("history", [])
     if not message:
         return jsonify({"reply": "Please ask a question."}), 400
 
-    lang_names = {
-        "hi": "Hindi", "bn": "Bengali", "ta": "Tamil",
-        "te": "Telugu", "mr": "Marathi", "pa": "Punjabi",
-        "gu": "Gujarati", "kn": "Kannada", "ml": "Malayalam", "en": "English"
-    }
-    lang_name = lang_names.get(language, "English")
-
-    weather_context = ""
+    weather_ctx = ""
     if weather:
-        weather_context = f"Current weather: {weather.get('temp','?')}°C, {weather.get('humidity','?')}% humidity, {weather.get('description','')}, city: {weather.get('city','India')}."
+        weather_ctx = f"Current weather context: {weather.get('temp','?')}°C, humidity {weather.get('humidity','?')}%, {weather.get('description','')}, location: {weather.get('city','India')}."
 
-    system_prompt = f"""You are SmartAgro Assistant — an AI helper for Indian farmers.
-You MUST reply in {lang_name} language only, regardless of what language the question is in.
-Keep answers SHORT, SIMPLE and PRACTICAL — farmers need easy advice.
-{weather_context}
-You know about: crops, diseases, weather, mandi prices, government schemes, fertilizers, pesticides, irrigation.
-For government schemes mention: PM-KISAN, Fasal Bima Yojana, Kisan Credit Card, Soil Health Card.
-Kisan helpline: 1800-180-1551 (free call).
-Always be helpful and encouraging to farmers."""
+    system_prompt = f"""You are SmartAgro Assistant — an expert AI helper for Indian farmers.
+
+CRITICAL RULE: Detect the language of the user's message and reply in EXACTLY that same language.
+- If user writes/speaks Hindi → reply in Hindi (Devanagari script)
+- If user writes/speaks Bengali → reply in Bengali
+- If user writes/speaks Tamil → reply in Tamil
+- If user writes/speaks English → reply in English
+- For any other Indian language → reply in that language
+- Never mix languages in your reply
+
+{weather_ctx}
+
+Your expertise covers:
+- Crop diseases, pests and treatments
+- Weather and its impact on farming  
+- Mandi prices and when to sell
+- Government schemes: PM-KISAN (₹6000/year), Fasal Bima Yojana, Kisan Credit Card, Soil Health Card, PM Krishi Sinchai Yojana
+- Fertilizers, irrigation, soil health
+- Seasonal crop advice
+
+Rules:
+- Keep answers SHORT and SIMPLE — farmers need practical advice
+- Use simple words, avoid technical jargon
+- Always be encouraging and helpful
+- Kisan helpline: 1800-180-1551 (toll free)
+- If asked about prices, mention MSP and advise checking local mandi"""
+
+    messages = [{"role": "system", "content": system_prompt}]
+    for h in history[-6:]:
+        messages.append({"role": h["role"], "content": h["content"]})
+    messages.append({"role": "user", "content": message})
 
     try:
         resp = requests.post(
             "https://api.groq.com/openai/v1/chat/completions",
             headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
-            json={
-                "model": "llama-3.3-70b-versatile",
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user",   "content": message}
-                ],
-                "temperature": 0.7,
-                "max_tokens":  400
-            },
-            timeout=30
-        )
+            json={"model": "llama-3.3-70b-versatile", "messages": messages, "temperature": 0.7, "max_tokens": 500},
+            timeout=30)
         if resp.status_code == 200:
             reply = resp.json()["choices"][0]["message"]["content"].strip()
             return jsonify({"reply": reply})
@@ -385,4 +396,3 @@ Always be helpful and encouraging to farmers."""
 
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
-    
