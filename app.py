@@ -35,6 +35,10 @@ def market():
 def alerts():
     return render_template("alerts.html")
 
+@app.route('/offline')
+def offline():
+    return render_template('offline.html')
+
 # ─── Weather API ──────────────────────────────────────────────────────────────
 @app.route("/api/weather")
 def get_weather():
