@@ -1,10 +1,11 @@
 // Scope-isolated variables to prevent global collisions
-let chatOpen        = false;
-let recognition     = null;
-let isListening     = false;
-let chatHistory     = [];
-let currentLangCode = localStorage.getItem('agrosmart_lang') || 'hi';
-let speechTimeout   = null; // Manages the Gemini-style silence detection
+let chatOpen         = false;
+let recognition      = null;
+let isListening      = false;
+let userClickedStop  = false; // Tracks if the user explicitly hit the stop button
+let chatHistory      = [];
+let currentLangCode  = localStorage.getItem('agrosmart_lang') || 'hi';
+let speechTimeout    = null; // Manages the Gemini-style silence detection
 
 const LANG_SPEECH_CODES = {
   'hi':'hi-IN','bn':'bn-IN','ta':'ta-IN','te':'te-IN',
@@ -46,12 +47,12 @@ function getWelcomeMsg() {
   const msgs = {
     hi: '🌾 नमस्ते किसान भाई! मैं SmartAgro सहायक हूं। आप मुझसे मौसम, फसल, बाजार भाव या सरकारी योजनाओं के बारे में पूछ सकते हैं।',
     bn: '🌾 নমস্কার! আমি SmartAgro সহায়ক। আপনি আমাকে আবহাওয়া, ফসল বা বাজার সম্পর্কে জিজ্ঞাসা করতে পারেন।',
-    ta: '🌾 வணக்கம்! நான் SmartAgro உதவியாளர். வானிலை, பயிர் அல்லது சந்தை பற்றி கேளுங்கள்.',
+    ta: '🌾 வணக்கம்! நான் SmartAgro உதவியாளர். வானிலை, பயிர் അല്ലെങ്കിൽ சந்தை பற்றி கேளுங்கள்.',
     te: '🌾 నమస్కారం రైతు సోదరులారా! నేను SmartAgro సహాయకుడిని. వాతావరణం, పంటలు, మార్కెట్ ధరలు లేదా ప్రభుత్వ పథకాల గురించి నన్ను అడగండి.',
     mr: '🌾 नमस्कार शेतकरी बंधूंनो! मी SmartAgro सहाय्यक आहे. तुम्ही मला हवामान, पिके, बाजारभाव किंवा सरकारी योजनांबद्दल विचारू शकता.',
     pa: '🌾 ਨਮਸਤੇ ਕਿਸਾਨ ਵੀਰੋ! ਮੈਂ SmartAgro ਸਹਾਇਕ ਹਾਂ। ਤੁਸੀਂ ਮੇਰੇ ਕੋਲੋਂ ਮੌਸਮ, ਫਸਲਾਂ, ਮੰਡੀ ਦੇ ਭਾਅ ਜਾਂ ਸਰਕਾਰੀ ਸਕੀਮਾਂ ਬਾਰੇ ਪੁੱਛ ਸਕਦੇ ਹੋ।',
     gu: '🌾 નમસ્તે ખેડૂત ભાઈઓ! હું SmartAgro સહાયક છું. તમે મને હવામાન, પાક, બજારના ભાવ અથવા સરકારી યોજનાઓ વિશે પૂછી શકો છો.',
-    kn: '🌾 ನಮಸ್ಕಾರ ರೈತ ಬಾಂಧವರೇ! ನಾನು SmartAgro ಸಹಾಯಕ. ನೀವು ನನ್ನ ಬಳಿ ಹವಾಮಾನ, ಬೆಳೆಗಳು, ಮಾರುಕಟ್ಟೆ ಬೆಲೆ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ಕೇಳಬಹುದು.',
+    kn: '🌾 ನಮಸ್ಕಾರ ರೈತ ಬಾಂಧವರೇ! ನಾನು SmartAgro ಸಹಾಯಕ. ನೀವು ನನ್ನ ಬಳಿ ಹವಾಮಾನ, ಬೆಳೆಗಳು, मಾರುಕಟ್ಟೆ ಬೆಲೆ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ಕೇಳಬಹುದು.',
     ml: '🌾 നമസ്കാരം കർഷക സുഹൃത്തുക്കളെ! ഞാൻ SmartAgro സഹായിയാണ്. കാലാവസ്ഥ, വിളകൾ, വിപണി വിലകൾ അല്ലെങ്കിൽ സർക്കാർ പദ്ധതികളെക്കുറിച്ച് നിങ്ങൾക്ക് എന്നോട് ചോദിക്കാം.',
     en: '🌾 Hello farmer! I am SmartAgro Assistant. Ask me about weather, crops, market prices or government schemes.',
   };
@@ -100,7 +101,6 @@ async function sendMessage() {
   addUserMessage(msg);
   const typing = addTypingIndicator();
 
-  // Safeguard against missing global window context variables
   const weather = (window.weatherData && window.weatherData.current) ? window.weatherData.current : {};
 
   try {
@@ -133,19 +133,24 @@ function startVoice() {
     return;
   }
 
-  // Gemini Style Action: Clicking the mic button while active shuts it down completely
+  // FIXED MANUAL STOP: If clicking while it is recording, shut it down for real
   if (isListening) {
-    isListening = false; // Set to false first so the onend loop knows to stop permanently
-    if (recognition) recognition.stop();
+    isListening = false;
+    userClickedStop = true; // Block the background reboot loop from firing
+    clearTimeout(speechTimeout);
+    if (recognition) {
+      recognition.stop();
+    }
+    updateMicBtn(false);
     return;
   }
 
   if (!chatOpen) toggleChat();
 
+  userClickedStop = false; // Reset the flag for a brand new voice session
   recognition = new SpeechRecognition();
   recognition.lang = LANG_SPEECH_CODES[currentLangCode] || 'hi-IN';
   
-  // Continuous listening configuration
   recognition.continuous = true; 
   recognition.interimResults = true; 
   recognition.maxAlternatives = 1;
@@ -174,11 +179,12 @@ function startVoice() {
       inputEl.value = currentText;
     }
 
-    // Smart Auto-Submit: Wait for 2 seconds of absolute silence before processing
+    // Smart Auto-Submit after 2 seconds of silence
     clearTimeout(speechTimeout);
     speechTimeout = setTimeout(() => {
       if (inputEl && inputEl.value.trim()) {
-        isListening = false; // Stop the reboot loop because we are actively sending
+        isListening = false;
+        userClickedStop = true; // Tell the onend event we are done intentionally
         sendMessage();
         if (recognition) recognition.stop(); 
       }
@@ -186,21 +192,20 @@ function startVoice() {
   };
 
   recognition.onerror = e => {
-    // Ignore minor silence and abort triggers so the microphone loop doesn't snap shut
     if (e.error === 'no-speech' || e.error === 'aborted') return; 
     console.error("Speech error caught safely: ", e.error);
   };
 
   recognition.onend = () => {
-    // THE CHROME BYPASS LOOP: If the browser force-closes the mic due to a pause, 
-    // but the user didn't explicitly hit stop, instantly fire it back up!
-    if (isListening) {
+    // THE SMART BYPASS: Restart only if Chrome auto-closed it AND the user didn't hit stop
+    if (isListening && !userClickedStop) {
       try {
         recognition.start();
       } catch (err) {
         console.log("Mic restarting loop active...");
       }
     } else {
+      isListening = false;
       updateMicBtn(false);
       clearTimeout(speechTimeout);
     }
@@ -224,12 +229,10 @@ function updateMicBtn(listening) {
   }
 }
 
-// Safely listen to DOM content events
 document.addEventListener('DOMContentLoaded', () => {
   currentLangCode = localStorage.getItem('agrosmart_lang') || 'hi';
 });
 
-// Avoid overwriting window methods unsafely
 const origSetLang = window.setLanguage;
 window.setLanguage = function(code) {
   currentLangCode = code;
