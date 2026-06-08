@@ -4,7 +4,7 @@ let recognition      = null;
 let isListening      = false;
 let userClickedStop  = false; // Tracks if the user explicitly hit the stop button
 let chatHistory      = [];
-let currentLangCode  = localStorage.getItem('agrosmart_lang') || 'hi';
+let currentLangCode  = (localStorage.getItem('agrosmart_lang') || 'hi').toLowerCase();
 let speechTimeout    = null; // Manages the Gemini-style silence detection
 
 const LANG_SPEECH_CODES = {
@@ -47,12 +47,12 @@ function getWelcomeMsg() {
   const msgs = {
     hi: '🌾 नमस्ते किसान भाई! मैं SmartAgro सहायक हूं। आप मुझसे मौसम, फसल, बाजार भाव या सरकारी योजनाओं के बारे में पूछ सकते हैं।',
     bn: '🌾 নমস্কার! আমি SmartAgro সহায়ক। আপনি আমাকে আবহাওয়া, ফসল বা বাজার সম্পর্কে জিজ্ঞাসা করতে পারেন।',
-    ta: '🌾 வணக்கம்! நான் SmartAgro உதவியாளர். வானிலை, பயிர் അല്ലെങ്കിൽ சந்தை பற்றி கேளுங்கள்.',
-    te: '🌾 నమస్కారం రైతు సోదరులారా! నేను SmartAgro సహాయకుడిని. వాతావరణం, పంటలు, మార్కెట్ ధరలు లేదా ప్రభుత్వ పథకాల గురించి నన్ను అడగండి.',
+    ta: '🌾 வணக்கம்! நான் SmartAgro உதவியாளர். வானிலை, பயிர் அல்லது சந்தை பற்றி கேளுங்கள்.',
+    te: '🌾 నమస్కారం రైతు సోదరులారా! నేను SmartAgro సహాయకుడిని. వాతావరణం, పంటలు, మార్కెట్ ధరలు లేదా ప్రభుత్వ పథకాల గురించి నన్ను അడగండి.',
     mr: '🌾 नमस्कार शेतकरी बंधूंनो! मी SmartAgro सहाय्यक आहे. तुम्ही मला हवामान, पिके, बाजारभाव किंवा सरकारी योजनांबद्दल विचारू शकता.',
     pa: '🌾 ਨਮਸਤੇ ਕਿਸਾਨ ਵੀਰੋ! ਮੈਂ SmartAgro ਸਹਾਇਕ ਹਾਂ। ਤੁਸੀਂ ਮੇਰੇ ਕੋਲੋਂ ਮੌਸਮ, ਫਸਲਾਂ, ਮੰਡੀ ਦੇ ਭਾਅ ਜਾਂ ਸਰਕਾਰੀ ਸਕੀਮਾਂ ਬਾਰੇ ਪੁੱਛ ਸਕਦੇ ਹੋ।',
     gu: '🌾 નમસ્તે ખેડૂત ભાઈઓ! હું SmartAgro સહાયક છું. તમે મને હવામાન, પાક, બજારના ભાવ અથવા સરકારી યોજનાઓ વિશે પૂછી શકો છો.',
-    kn: '🌾 ನಮಸ್ಕಾರ ರೈತ ಬಾಂಧವರೇ! ನಾನು SmartAgro ಸಹಾಯಕ. ನೀವು ನನ್ನ ಬಳಿ ಹವಾಮಾನ, ಬೆಳೆಗಳು, मಾರುಕಟ್ಟೆ ಬೆಲೆ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ಕೇಳಬಹುದು.',
+    kn: '🌾 ನಮಸ್ಕಾರ ರೈತ ಬಾಂಧವರೇ! ನಾನು SmartAgro ಸಹಾಯಕ. ನೀವು ನನ್ನ ಬಳಿ ಹವಾಮಾನ, ಬೆಳೆಗಳು, ಮಾರುಕಟ್ಟೆ ಬೆಲೆ ಅಥವಾ ಸರ್ಕಾರಿ ಯೋಜನೆಗಳ ಬಗ್ಗೆ ಕೇಳಬಹುದು.',
     ml: '🌾 നമസ്കാരം കർഷക സുഹൃത്തുക്കളെ! ഞാൻ SmartAgro സഹായിയാണ്. കാലാവസ്ഥ, വിളകൾ, വിപണി വിലകൾ അല്ലെങ്കിൽ സർക്കാർ പദ്ധതികളെക്കുറിച്ച് നിങ്ങൾക്ക് എന്നോട് ചോദിക്കാം.',
     en: '🌾 Hello farmer! I am SmartAgro Assistant. Ask me about weather, crops, market prices or government schemes.',
   };
@@ -108,14 +108,16 @@ async function sendMessage() {
       method:  'POST',
       headers: {'Content-Type':'application/json'},
       body:    JSON.stringify({
-        message:        msg,
-        language:       currentLangCode,
+        message:         msg,
+        language:        currentLangCode.toUpperCase(), // Normalize to UPPERCASE ("HI", "BN") so app.py safely catches it
         weather_context: weather
       })
     });
     const data = await res.json();
     if (typing) typing.remove();
-    addBotMessage(data.reply || 'Sorry, try again.');
+    
+    // Fallback handler safely maps BOTH data.reply or data.response structures smoothly
+    addBotMessage(data.reply || data.response || 'Sorry, try again.');
   } catch (err) {
     if (typing) typing.remove();
     addBotMessage('Connection error. Please try again.');
@@ -133,10 +135,11 @@ function startVoice() {
     return;
   }
 
-  // FIXED MANUAL STOP: If clicking while it is recording, shut it down for real
+  const inputEl = document.getElementById('chatInput');
+
   if (isListening) {
     isListening = false;
-    userClickedStop = true; // Block the background reboot loop from firing
+    userClickedStop = true; 
     clearTimeout(speechTimeout);
     if (recognition) {
       recognition.stop();
@@ -147,7 +150,7 @@ function startVoice() {
 
   if (!chatOpen) toggleChat();
 
-  userClickedStop = false; // Reset the flag for a brand new voice session
+  userClickedStop = false; 
   recognition = new SpeechRecognition();
   recognition.lang = LANG_SPEECH_CODES[currentLangCode] || 'hi-IN';
   
@@ -158,6 +161,10 @@ function startVoice() {
   recognition.onstart = () => {
     isListening = true;
     updateMicBtn(true);
+    if (inputEl) {
+      inputEl.classList.add('listening-mode');
+      inputEl.placeholder = "Listening... बोलिए / बोलुन...";
+    }
     safeToast('🎤 Listening... speak freely', 'success');
   };
 
@@ -174,7 +181,6 @@ function startVoice() {
     }
 
     const currentText = finalTranscript || interimTranscript;
-    const inputEl = document.getElementById('chatInput');
     if (inputEl && currentText) {
       inputEl.value = currentText;
     }
@@ -184,7 +190,7 @@ function startVoice() {
     speechTimeout = setTimeout(() => {
       if (inputEl && inputEl.value.trim()) {
         isListening = false;
-        userClickedStop = true; // Tell the onend event we are done intentionally
+        userClickedStop = true; 
         sendMessage();
         if (recognition) recognition.stop(); 
       }
@@ -197,7 +203,6 @@ function startVoice() {
   };
 
   recognition.onend = () => {
-    // THE SMART BYPASS: Restart only if Chrome auto-closed it AND the user didn't hit stop
     if (isListening && !userClickedStop) {
       try {
         recognition.start();
@@ -207,6 +212,10 @@ function startVoice() {
     } else {
       isListening = false;
       updateMicBtn(false);
+      if (inputEl) {
+        inputEl.classList.remove('listening-mode');
+        inputEl.placeholder = "Type or speak...";
+      }
       clearTimeout(speechTimeout);
     }
   };
@@ -230,11 +239,11 @@ function updateMicBtn(listening) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  currentLangCode = localStorage.getItem('agrosmart_lang') || 'hi';
+  currentLangCode = (localStorage.getItem('agrosmart_lang') || 'hi').toLowerCase();
 });
 
 const origSetLang = window.setLanguage;
 window.setLanguage = function(code) {
-  currentLangCode = code;
+  if(code) currentLangCode = code.toLowerCase();
   if (typeof origSetLang === 'function') origSetLang(code);
 };
