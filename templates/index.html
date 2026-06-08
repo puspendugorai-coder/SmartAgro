@@ -2,38 +2,47 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <title>SmartAgro – Smart Farming</title>
   <link rel="stylesheet" href="/static/css/main.css"/>
   <link rel="stylesheet" href="/static/css/dashboard.css"/>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
+
 <nav class="navbar" id="navbar">
   <div class="nav-brand">
     <div class="brand-icon"><i class="fas fa-seedling"></i></div>
     <span class="brand-text">Smart<span class="brand-accent">Agro</span></span>
   </div>
+  
   <div class="nav-links" id="navLinks">
     <a href="/" class="nav-item active"><i class="fas fa-home"></i><span>Home</span></a>
     <a href="/diagnose" class="nav-item"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
     <a href="/market" class="nav-item"><i class="fas fa-chart-line"></i><span>Mandi Prices</span></a>
     <a href="/alerts" class="nav-item"><i class="fas fa-bell"></i><span>Alerts</span><span class="alert-badge" id="alertBadge" style="display:none">0</span></a>
   </div>
+  
   <div class="nav-actions">
-    <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon" id="themeIcon"></i></button>
+    <button class="theme-toggle" id="themeToggle" aria-label="Toggle Theme">
+      <i class="fas fa-moon" id="themeIcon"></i>
+    </button>
+    
     <div class="lang-selector" id="langSelector">
       <button class="lang-btn" id="langBtn">
         <i class="fas fa-globe"></i><span id="currentLang">HI</span><i class="fas fa-chevron-down"></i>
       </button>
       <div class="lang-dropdown" id="langDropdown">
-        <div class="lang-search"><input type="text" placeholder="Search..." id="langSearch"/></div>
+        <div class="lang-search"><input type="text" placeholder="Search language..." id="langSearch"/></div>
         <div class="lang-list" id="langList"></div>
       </div>
     </div>
-    <button class="hamburger" id="hamburger"><span></span><span></span><span></span></button>
+    
+    <button class="hamburger" id="hamburger" aria-label="Toggle Menu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </nav>
 
@@ -51,11 +60,12 @@
       </a>
     </div>
   </div>
+  
   <div class="hero-visual">
     <div class="weather-card-hero" id="heroWeatherCard">
       <div class="hwc-loading">
         <i class="fas fa-location-dot fa-pulse"></i>
-        <span style="font-size:0.85rem;margin-top:4px">Waiting for location...</span>
+        <span style="font-size:0.85rem; margin-top:8px; font-weight:500;">Waiting for location...</span>
       </div>
     </div>
   </div>
@@ -64,19 +74,19 @@
 <section class="quick-section">
   <div class="container">
     <div class="quick-grid">
-      <a href="/diagnose" class="quick-card card-diagnose">
+      <a href="/diagnose" class="quick-card">
         <div class="qc-icon"><i class="fas fa-microscope"></i></div>
         <h3>Diagnose Crop Disease</h3>
         <p>Take a photo — AI identifies disease instantly</p>
         <div class="qc-arrow"><i class="fas fa-arrow-right"></i></div>
       </a>
-      <a href="/market" class="quick-card card-market">
+      <a href="/market" class="quick-card">
         <div class="qc-icon"><i class="fas fa-chart-bar"></i></div>
         <h3>Today's Mandi Prices</h3>
         <p>Live prices for 15 crops across 20 cities</p>
         <div class="qc-arrow"><i class="fas fa-arrow-right"></i></div>
       </a>
-      <a href="/alerts" class="quick-card card-alerts">
+      <a href="/alerts" class="quick-card">
         <div class="qc-icon"><i class="fas fa-triangle-exclamation"></i></div>
         <h3>Weather Alerts</h3>
         <p>Pest and weather warnings for your area</p>
@@ -157,20 +167,28 @@
 
 <div class="toast" id="toast"></div>
 
-<a href="tel:18001801551" class="kisan-helpline">
+<a href="tel:18001801551" class="kisan-helpline" title="Call Kisan Helpline">
   <button class="helpline-btn"><i class="fas fa-phone"></i> 1800-180-1551</button>
 </a>
 
-<button class="chat-fab" id="chatFab" onclick="toggleChat()">
+<button class="chat-fab" id="chatFab" onclick="toggleChat()" aria-label="Open Chat Helper">
   <i class="fas fa-microphone"></i>
 </button>
+
 <div class="chat-box" id="chatBox">
   <div class="chat-header">
     <div class="chat-header-icon">🌾</div>
-    <div><div class="chat-header-title">Kisan Helper</div><div class="chat-header-sub">Ask in any language</div></div>
-    <button onclick="toggleChat()" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:0.95rem"><i class="fas fa-times"></i></button>
+    <div>
+      <div class="chat-header-title">Kisan Helper</div>
+      <div class="chat-header-sub">Ask in any language</div>
+    </div>
+    <button onclick="toggleChat()" style="margin-left:auto; background:none; border:none; color:rgba(255,255,255,0.7); cursor:pointer; font-size:0.95rem;">
+      <i class="fas fa-times"></i>
+    </button>
   </div>
+  
   <div class="chat-messages" id="chatMessages"></div>
+  
   <div class="chat-input-row">
     <input type="text" id="chatInput" placeholder="Type or speak..." onkeydown="handleChatKey(event)"/>
     <button class="chat-mic-btn" id="micBtn" onclick="startVoice()"><i class="fas fa-microphone"></i></button>
