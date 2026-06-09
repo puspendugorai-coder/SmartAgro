@@ -603,8 +603,107 @@ h1,h2,h3,h4 { font-family: 'Syne', sans-serif; line-height: 1.2; }
   /* prevent lang dropdown from overflowing off screen */
   .lang-dropdown { right: 0; left: auto; width: min(280px, 90vw); }
   .btn-primary, .btn-secondary { font-size: 0.85rem; padding: 10px 18px; }
-<<<<<<< HEAD
+
+/* ═══════════════════════════════════════
+   BOTTOM NAVBAR — Mobile only
+═══════════════════════════════════════ */
+@media (max-width: 768px) {
+
+  /* Hide nav links from top navbar on mobile */
+  .nav-links {
+    display: none !important;
+  }
+
+  /* Bottom fixed bar */
+  .nav-links.bottom-nav {
+    display: flex !important;
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    height: 62px;
+    background: var(--card, #111a12);
+    border-top: 1px solid rgba(74,222,128,0.15);
+    z-index: 9990;
+    justify-content: space-around;
+    align-items: center;
+    padding: 0;
+    box-shadow: 0 -4px 24px rgba(0,0,0,0.35);
+    backdrop-filter: blur(12px);
+  }
+
+  .nav-links.bottom-nav .nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 4px;
+    font-size: 0.6rem;
+    font-weight: 600;
+    color: var(--text-3, #6b8c6d);
+    text-decoration: none;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    transition: color 0.2s;
+    position: relative;
+  }
+
+  .nav-links.bottom-nav .nav-item i {
+    font-size: 1.2rem;
+    margin: 0;
+  }
+
+  .nav-links.bottom-nav .nav-item span {
+    display: block;
+    font-size: 0.58rem;
+  }
+
+  .nav-links.bottom-nav .nav-item.active {
+    color: var(--green, #4ade80);
+  }
+
+  .nav-links.bottom-nav .nav-item.active i {
+    filter: drop-shadow(0 0 6px rgba(74,222,128,0.5));
+  }
+
+  .nav-links.bottom-nav .nav-item:hover {
+    color: var(--green, #4ade80);
+  }
+
+  /* Active indicator dot */
+  .nav-links.bottom-nav .nav-item.active::after {
+    content: '';
+    position: absolute;
+    bottom: 2px;
+    width: 4px; height: 4px;
+    background: var(--green, #4ade80);
+    border-radius: 50%;
+  }
+
+  /* Light theme */
+  body.light-theme .nav-links.bottom-nav {
+    background: #fff;
+    border-top-color: rgba(22,101,52,0.12);
+  }
+
+  /* Push page content up so bottom nav doesn't cover it */
+  body {
+    padding-bottom: 62px;
+  }
+
+  /* Push helpline and chatbot button above bottom nav */
+  #kisanHelpline {
+    bottom: 74px !important;
+  }
+  #kisanToggleBtn {
+    bottom: 74px !important;
+  }
+  #kisanPanel {
+    bottom: 140px !important;
+  }
+
+  /* Hide hamburger on mobile since we have bottom nav */
+  .hamburger {
+    display: none !important;
+  }
 }
-=======
-}
->>>>>>> f844ae5f2e8e565f5e4731c0622fb0b6af199e56
