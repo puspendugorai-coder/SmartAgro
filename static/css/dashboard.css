@@ -532,8 +532,3 @@
   .weather-primary-card { flex-direction: column; align-items: flex-start; gap: 12px; padding: 20px; }
   .stats-bar .container { gap: 14px; }
   .stat-item { min-width: 100px; }
-<<<<<<< HEAD
-}
-=======
-}
->>>>>>> f844ae5f2e8e565f5e4731c0622fb0b6af199e56
