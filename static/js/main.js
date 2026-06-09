@@ -1,10 +1,8 @@
-// Navbar scroll
 const navbar = document.getElementById('navbar');
 window.addEventListener('scroll', () => {
   if (navbar) navbar.classList.toggle('scrolled', window.scrollY > 40);
 }, {passive: true});
 
-// Hamburger
 const hamburger = document.getElementById('hamburger');
 const navLinks  = document.getElementById('navLinks');
 if (hamburger && navLinks) {
@@ -20,7 +18,6 @@ if (hamburger && navLinks) {
   });
 }
 
-// Toast
 let toastTimer = null;
 function showToast(msg, type = 'success', duration = 3500) {
   const toast = document.getElementById('toast');
@@ -31,7 +28,6 @@ function showToast(msg, type = 'success', duration = 3500) {
   toastTimer = setTimeout(() => toast.classList.remove('show'), duration);
 }
 
-// Fetch weather
 async function fetchWeather(lat, lon) {
   try {
     const res  = await fetch(`/api/weather?lat=${lat}&lon=${lon}`);
@@ -45,7 +41,6 @@ async function fetchWeather(lat, lon) {
   }
 }
 
-// Weather emoji
 function getWeatherEmoji(code) {
   const map = {
     '01d':'☀️','01n':'🌙','02d':'⛅','02n':'⛅',
@@ -73,7 +68,10 @@ function capitalize(str) {
 
 function updateAlertBadge(count) {
   const b = document.getElementById('alertBadge');
-  if (b) { b.textContent = count; b.style.display = count > 0 ? 'inline-flex' : 'none'; }
+  if (b) {
+    b.textContent    = count;
+    b.style.display  = count > 0 ? 'inline-flex' : 'none';
+  }
 }
 
 // Ripple
@@ -89,9 +87,8 @@ document.addEventListener('click', e => {
   btn.appendChild(r);
   setTimeout(() => r.remove(), 550);
 });
-document.head.insertAdjacentHTML('beforeend', '<style>@keyframes ripple{to{transform:scale(2.5);opacity:0}}</style>');
+document.head.insertAdjacentHTML('beforeend','<style>@keyframes ripple{to{transform:scale(2.5);opacity:0}}</style>');
 
-// Intersection observer
 function observeAnimations() {
   const obs = new IntersectionObserver(entries => {
     entries.forEach(e => {
@@ -128,18 +125,30 @@ function initTheme() {
   });
 }
 
-// Language dropdown — fixed single listener
+// Language dropdown — fixed
 function initLangDropdown() {
-  const btn = document.getElementById('langBtn');
   const sel = document.getElementById('langSelector');
-  if (!btn || !sel) return;
-  btn.addEventListener('click', e => {
+  if (!sel) return;
+
+  const btn = document.getElementById('langBtn');
+  if (!btn) return;
+
+  // Clone to remove any duplicate listeners
+  const newBtn = btn.cloneNode(true);
+  btn.parentNode.replaceChild(newBtn, btn);
+
+  newBtn.addEventListener('click', function(e) {
+    e.preventDefault();
     e.stopPropagation();
     sel.classList.toggle('open');
   });
-  document.addEventListener('click', e => {
-    if (!sel.contains(e.target)) sel.classList.remove('open');
+
+  document.addEventListener('click', function(e) {
+    if (!sel.contains(e.target)) {
+      sel.classList.remove('open');
+    }
   });
+
   const s = document.getElementById('langSearch');
   if (s) {
     s.addEventListener('input', e => buildLangList(e.target.value));
@@ -147,12 +156,12 @@ function initLangDropdown() {
   }
 }
 
-// Bottom nav active state for mobile
 function setBottomNavActive() {
   const path = window.location.pathname;
   document.querySelectorAll('.bottom-nav-item').forEach(item => {
     const href = item.getAttribute('href');
-    item.classList.toggle('active', href === path || (path === '/' && href === '/'));
+    item.classList.toggle('active',
+      href === path || (path === '/' && href === '/'));
   });
 }
 
