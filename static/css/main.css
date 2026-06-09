@@ -604,106 +604,91 @@ h1,h2,h3,h4 { font-family: 'Syne', sans-serif; line-height: 1.2; }
   .lang-dropdown { right: 0; left: auto; width: min(280px, 90vw); }
   .btn-primary, .btn-secondary { font-size: 0.85rem; padding: 10px 18px; }
 
-/* ═══════════════════════════════════════
-   BOTTOM NAVBAR — Mobile only
-═══════════════════════════════════════ */
+/* ═══════════════════════════════════
+   MOBILE BOTTOM NAVIGATION BAR
+═══════════════════════════════════ */
 @media (max-width: 768px) {
 
-  /* Hide nav links from top navbar on mobile */
+  /* Hide nav links from top bar */
   .nav-links {
     display: none !important;
   }
 
-  /* Bottom fixed bar */
-  .nav-links.bottom-nav {
-    display: flex !important;
+  /* Hide hamburger — not needed */
+  .hamburger {
+    display: none !important;
+  }
+
+  /* Create bottom nav bar */
+  .nav-links::after { display: none; }
+
+  /* Fixed bottom bar */
+  #mobileBottomNav {
+    display: flex;
     position: fixed;
     bottom: 0; left: 0; right: 0;
-    height: 62px;
+    height: 60px;
     background: var(--card, #111a12);
     border-top: 1px solid rgba(74,222,128,0.15);
     z-index: 9990;
     justify-content: space-around;
     align-items: center;
-    padding: 0;
-    box-shadow: 0 -4px 24px rgba(0,0,0,0.35);
-    backdrop-filter: blur(12px);
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
   }
 
-  .nav-links.bottom-nav .nav-item {
+  #mobileBottomNav a {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 4px;
-    padding: 8px 4px;
-    font-size: 0.6rem;
-    font-weight: 600;
-    color: var(--text-3, #6b8c6d);
+    gap: 3px;
     text-decoration: none;
-    letter-spacing: 0.3px;
+    color: var(--text-3, #6b8c6d);
+    font-size: 0.55rem;
+    font-weight: 600;
     text-transform: uppercase;
+    letter-spacing: 0.4px;
+    padding: 6px 0;
     transition: color 0.2s;
     position: relative;
   }
 
-  .nav-links.bottom-nav .nav-item i {
+  #mobileBottomNav a i {
     font-size: 1.2rem;
-    margin: 0;
   }
 
-  .nav-links.bottom-nav .nav-item span {
-    display: block;
-    font-size: 0.58rem;
-  }
-
-  .nav-links.bottom-nav .nav-item.active {
+  #mobileBottomNav a.active {
     color: var(--green, #4ade80);
   }
 
-  .nav-links.bottom-nav .nav-item.active i {
-    filter: drop-shadow(0 0 6px rgba(74,222,128,0.5));
+  #mobileBottomNav a.active i {
+    filter: drop-shadow(0 0 5px rgba(74,222,128,0.6));
   }
 
-  .nav-links.bottom-nav .nav-item:hover {
-    color: var(--green, #4ade80);
-  }
-
-  /* Active indicator dot */
-  .nav-links.bottom-nav .nav-item.active::after {
+  #mobileBottomNav a.active::before {
     content: '';
     position: absolute;
-    bottom: 2px;
-    width: 4px; height: 4px;
+    top: 0; left: 20%; right: 20%;
+    height: 2px;
     background: var(--green, #4ade80);
-    border-radius: 50%;
+    border-radius: 0 0 4px 4px;
   }
 
-  /* Light theme */
-  body.light-theme .nav-links.bottom-nav {
+  body.light-theme #mobileBottomNav {
     background: #fff;
-    border-top-color: rgba(22,101,52,0.12);
+    border-top-color: rgba(22,101,52,0.15);
   }
 
-  /* Push page content up so bottom nav doesn't cover it */
-  body {
-    padding-bottom: 62px;
-  }
+  /* Push content above bottom nav */
+  body { padding-bottom: 60px; }
 
-  /* Push helpline and chatbot button above bottom nav */
-  #kisanHelpline {
-    bottom: 74px !important;
-  }
-  #kisanToggleBtn {
-    bottom: 74px !important;
-  }
-  #kisanPanel {
-    bottom: 140px !important;
-  }
+  /* Push helpline and chatbot above bottom nav */
+  #kisanHelpline  { bottom: 72px !important; }
+  #kisanToggleBtn { bottom: 72px !important; }
+  #kisanPanel     { bottom: 138px !important; }
+}
 
-  /* Hide hamburger on mobile since we have bottom nav */
-  .hamburger {
-    display: none !important;
-  }
+@media (min-width: 769px) {
+  #mobileBottomNav { display: none !important; }
 }
