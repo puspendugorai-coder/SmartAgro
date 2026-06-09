@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SmartAgro – Smart Farming</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>SmartAgro</title>
   <link rel="stylesheet" href="/static/css/main.css"/>
   <link rel="stylesheet" href="/static/css/dashboard.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -18,16 +18,16 @@
     <span class="brand-text">Smart<span class="brand-accent">Agro</span></span>
   </div>
   <div class="nav-links" id="navLinks">
-    <a href="/" class="nav-item active"><i class="fas fa-home"></i><span>Home</span></a>
-    <a href="/diagnose" class="nav-item"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
-    <a href="/market" class="nav-item"><i class="fas fa-chart-line"></i><span>Mandi</span></a>
-    <a href="/alerts" class="nav-item"><i class="fas fa-bell"></i><span>Alerts</span><span class="alert-badge" id="alertBadge" style="display:none">0</span></a>
+    <a href="/" class="nav-item active" data-translate="nav_home"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="/diagnose" class="nav-item" data-translate="nav_diagnose"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
+    <a href="/market" class="nav-item" data-translate="nav_market"><i class="fas fa-chart-line"></i><span>Mandi</span></a>
+    <a href="/alerts" class="nav-item" data-translate="nav_alerts"><i class="fas fa-bell"></i><span>Alerts</span><span class="alert-badge" id="alertBadge" style="display:none">0</span></a>
   </div>
   <div class="nav-actions">
     <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon" id="themeIcon"></i></button>
     <div class="lang-selector" id="langSelector">
       <button class="lang-btn" id="langBtn">
-        <i class="fas fa-globe"></i><span id="currentLang">HI</span><i class="fas fa-chevron-down"></i>
+        <i class="fas fa-globe"></i><span id="currentLang">EN</span><i class="fas fa-chevron-down"></i>
       </button>
       <div class="lang-dropdown" id="langDropdown">
         <div class="lang-search"><input type="text" placeholder="Search language..." id="langSearch"/></div>
@@ -40,15 +40,17 @@
 
 <section class="hero">
   <div class="hero-content">
-    <div class="hero-badge"><i class="fas fa-robot"></i> AI Powered Farming</div>
-    <h1 class="hero-title">Smart Farming<br/>Intelligence</h1>
-    <p class="hero-subtitle">मौसम · फसल · रोग · मंडी भाव — एक जगह पर</p>
+    <div class="hero-badge" data-translate="hero_badge"><i class="fas fa-robot"></i> AI Powered Farming</div>
+    <h1 class="hero-title" data-translate="hero_title">Smart Farming Intelligence</h1>
+    <p class="hero-subtitle" data-translate="hero_sub">Weather · Crops · Disease · Market Prices</p>
     <div class="hero-cta">
       <button class="btn-hero-primary" onclick="requestLocation()" id="locationBtn">
-        <i class="fas fa-location-crosshairs"></i> Get My Location
+        <i class="fas fa-location-crosshairs"></i>
+        <span data-translate="btn_location">Get My Location</span>
       </button>
       <a href="/diagnose" class="btn-hero-secondary">
-        <i class="fas fa-camera"></i> Diagnose Crop
+        <i class="fas fa-camera"></i>
+        <span data-translate="btn_diagnose">Diagnose Crop</span>
       </a>
     </div>
   </div>
@@ -67,20 +69,26 @@
     <div class="quick-grid">
       <a href="/diagnose" class="quick-card card-diagnose">
         <div class="qc-icon"><i class="fas fa-microscope"></i></div>
-        <h3>Diagnose Crop Disease</h3>
-        <p>Photo lein aur AI turant bata dega kya bimari hai</p>
+        <div class="qc-text">
+          <h3 data-translate="quick_diagnose_title">Diagnose Crop Disease</h3>
+          <p data-translate="quick_diagnose_sub">Take a photo — AI finds disease instantly</p>
+        </div>
         <div class="qc-arrow"><i class="fas fa-arrow-right"></i></div>
       </a>
       <a href="/market" class="quick-card card-market">
         <div class="qc-icon"><i class="fas fa-chart-bar"></i></div>
-        <h3>Aaj ke Mandi Bhav</h3>
-        <p>15 fasal ke bhav, 20 shehar mein, MSP ke saath</p>
+        <div class="qc-text">
+          <h3 data-translate="quick_market_title">Today's Mandi Prices</h3>
+          <p data-translate="quick_market_sub">15 crops across 20 cities with MSP</p>
+        </div>
         <div class="qc-arrow"><i class="fas fa-arrow-right"></i></div>
       </a>
       <a href="/alerts" class="quick-card card-alerts">
         <div class="qc-icon"><i class="fas fa-triangle-exclamation"></i></div>
-        <h3>Mausam Alerts</h3>
-        <p>Keede aur mausam ki chethavni aapke ilake ke liye</p>
+        <div class="qc-text">
+          <h3 data-translate="quick_alerts_title">Weather Alerts</h3>
+          <p data-translate="quick_alerts_sub">Pest and weather warnings for your area</p>
+        </div>
         <div class="qc-arrow"><i class="fas fa-arrow-right"></i></div>
       </a>
     </div>
@@ -91,12 +99,12 @@
   <div class="container">
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-cloud-sun-rain"></i></div>
-      <h2>Abhi ka Mausam</h2>
-      <p>Aapki jagah ka live mausam</p>
+      <h2 data-translate="weather_title">Current Weather</h2>
+      <p data-translate="weather_sub">Live data from your location</p>
     </div>
     <div class="weather-main" id="weatherMain"></div>
     <div class="forecast-section">
-      <h3>Agle 6 Din ka Mausam</h3>
+      <h3 data-translate="forecast_title">6-Day Forecast</h3>
       <div class="forecast-grid" id="forecastGrid"></div>
     </div>
   </div>
@@ -104,11 +112,26 @@
 
 <section class="stats-bar" id="statsBar" style="display:none">
   <div class="container">
-    <div class="stat-item"><i class="fas fa-temperature-half"></i><div><span class="stat-val" id="statTemp">--</span><span class="stat-label">Tapman</span></div></div>
-    <div class="stat-item"><i class="fas fa-droplets"></i><div><span class="stat-val" id="statHumidity">--</span><span class="stat-label">Aardrata</span></div></div>
-    <div class="stat-item"><i class="fas fa-wind"></i><div><span class="stat-val" id="statWind">--</span><span class="stat-label">Hawa</span></div></div>
-    <div class="stat-item"><i class="fas fa-eye"></i><div><span class="stat-val" id="statVisibility">--</span><span class="stat-label">Visibility</span></div></div>
-    <div class="stat-item"><i class="fas fa-gauge-high"></i><div><span class="stat-val" id="statPressure">--</span><span class="stat-label">Dabaav</span></div></div>
+    <div class="stat-item">
+      <i class="fas fa-temperature-half"></i>
+      <div><span class="stat-val" id="statTemp">--</span><span class="stat-label" data-translate="stat_temp">Temperature</span></div>
+    </div>
+    <div class="stat-item">
+      <i class="fas fa-droplets"></i>
+      <div><span class="stat-val" id="statHumidity">--</span><span class="stat-label" data-translate="stat_humidity">Humidity</span></div>
+    </div>
+    <div class="stat-item">
+      <i class="fas fa-wind"></i>
+      <div><span class="stat-val" id="statWind">--</span><span class="stat-label" data-translate="stat_wind">Wind</span></div>
+    </div>
+    <div class="stat-item">
+      <i class="fas fa-eye"></i>
+      <div><span class="stat-val" id="statVisibility">--</span><span class="stat-label" data-translate="stat_visibility">Visibility</span></div>
+    </div>
+    <div class="stat-item">
+      <i class="fas fa-gauge-high"></i>
+      <div><span class="stat-val" id="statPressure">--</span><span class="stat-label" data-translate="stat_pressure">Pressure</span></div>
+    </div>
   </div>
 </section>
 
@@ -116,8 +139,8 @@
   <div class="container">
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-cloud-rain"></i></div>
-      <h2>🌧️ Kya Aaj Baarish Hogi?</h2>
-      <p>Aaj aur kal ka simple baarish forecast</p>
+      <h2 data-translate="rain_title">Will It Rain Today?</h2>
+      <p data-translate="rain_sub">Simple rain forecast for today and tomorrow</p>
     </div>
     <div id="rainGrid"></div>
   </div>
@@ -127,8 +150,8 @@
   <div class="container">
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-seedling"></i></div>
-      <h2>Aapke Liye Best Fasal</h2>
-      <p id="seasonLabel">Aapke mausam ke hisaab se</p>
+      <h2 data-translate="crops_title">Best Crops for You</h2>
+      <p id="seasonLabel">Based on your weather</p>
     </div>
     <div class="crops-grid" id="cropsGrid"></div>
   </div>
@@ -138,8 +161,8 @@
   <div class="container">
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-bug"></i></div>
-      <h2>Keede Maakod se Bachao</h2>
-      <p>Safe aur effective fasal suraksha</p>
+      <h2 data-translate="pest_title">Pest Control Guide</h2>
+      <p data-translate="pest_sub">Safe and effective crop protection</p>
     </div>
     <div class="pest-cards" id="pestCards"></div>
   </div>
@@ -151,24 +174,27 @@
       <div class="brand-icon small"><i class="fas fa-seedling"></i></div>
       <span>Smart<span style="color:rgba(255,255,255,0.65)">Agro</span></span>
     </div>
-    <p>India ke kisanon ki AI se madad</p>
-    <p class="footer-copy">© 2025 SmartAgro. Kisanon ke liye banaya gaya.</p>
+    <p data-translate="footer_text">Helping India's farmers with AI</p>
+    <p class="footer-copy" data-translate="footer_copy">© 2025 SmartAgro. Made for Indian farmers.</p>
   </div>
 </footer>
 
 <nav class="bottom-nav">
   <div class="bottom-nav-grid">
-    <a href="/" class="bottom-nav-item active"><i class="fas fa-home"></i><span>Home</span></a>
-    <a href="/diagnose" class="bottom-nav-item"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
-    <a href="/market" class="bottom-nav-item"><i class="fas fa-chart-line"></i><span>Mandi</span></a>
-    <a href="/alerts" class="bottom-nav-item"><i class="fas fa-bell"></i><span>Alerts</span></a>
+    <a href="/" class="bottom-nav-item active" data-translate="nav_home"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="/diagnose" class="bottom-nav-item" data-translate="nav_diagnose"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
+    <a href="/market" class="bottom-nav-item" data-translate="nav_market"><i class="fas fa-chart-line"></i><span>Mandi</span></a>
+    <a href="/alerts" class="bottom-nav-item" data-translate="nav_alerts"><i class="fas fa-bell"></i><span>Alerts</span></a>
   </div>
 </nav>
 
 <div class="toast" id="toast"></div>
 
 <a href="tel:18001801551" class="kisan-helpline">
-  <button class="helpline-btn"><i class="fas fa-phone"></i> 1800-180-1551</button>
+  <button class="helpline-btn">
+    <i class="fas fa-phone"></i>
+    <span data-translate="helpline">Kisan Helpline</span>
+  </button>
 </a>
 
 <button class="chat-fab" id="chatFab" onclick="toggleChat()">
@@ -178,14 +204,14 @@
   <div class="chat-header">
     <div class="chat-header-icon">🌾</div>
     <div>
-      <div class="chat-header-title">Kisan Helper</div>
-      <div class="chat-header-sub">Kisi bhi bhasha mein puchein</div>
+      <div class="chat-header-title" data-translate="chatbot_title">Kisan Helper</div>
+      <div class="chat-header-sub" data-translate="chatbot_sub">Ask in any language</div>
     </div>
-    <button onclick="toggleChat()" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:0.92rem"><i class="fas fa-times"></i></button>
+    <button onclick="toggleChat()" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:0.92rem;padding:4px"><i class="fas fa-times"></i></button>
   </div>
   <div class="chat-messages" id="chatMessages"></div>
   <div class="chat-input-row">
-    <input type="text" id="chatInput" placeholder="Likhein ya bolein..." onkeydown="handleChatKey(event)"/>
+    <input type="text" id="chatInput" data-translate="chat_placeholder" placeholder="Type or speak..." onkeydown="handleChatKey(event)"/>
     <button class="chat-mic-btn" id="micBtn" onclick="startVoice()"><i class="fas fa-microphone"></i></button>
     <button class="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
   </div>
