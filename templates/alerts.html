@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <title>SmartAgro – Alerts</title>
   <link rel="stylesheet" href="/static/css/main.css"/>
   <link rel="stylesheet" href="/static/css/alerts.css"/>
@@ -17,15 +17,15 @@
     <span class="brand-text">Smart<span class="brand-accent">Agro</span></span>
   </div>
   <div class="nav-links" id="navLinks">
-    <a href="/" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
-    <a href="/diagnose" class="nav-item"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
-    <a href="/market" class="nav-item"><i class="fas fa-chart-line"></i><span>Mandi</span></a>
-    <a href="/alerts" class="nav-item active"><i class="fas fa-bell"></i><span>Alerts</span></a>
+    <a href="/" class="nav-item" data-translate="nav_home"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="/diagnose" class="nav-item" data-translate="nav_diagnose"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
+    <a href="/market" class="nav-item" data-translate="nav_market"><i class="fas fa-chart-line"></i><span>Mandi</span></a>
+    <a href="/alerts" class="nav-item active" data-translate="nav_alerts"><i class="fas fa-bell"></i><span>Alerts</span></a>
   </div>
   <div class="nav-actions">
     <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon" id="themeIcon"></i></button>
     <div class="lang-selector" id="langSelector">
-      <button class="lang-btn" id="langBtn"><i class="fas fa-globe"></i><span id="currentLang">HI</span><i class="fas fa-chevron-down"></i></button>
+      <button class="lang-btn" id="langBtn"><i class="fas fa-globe"></i><span id="currentLang">EN</span><i class="fas fa-chevron-down"></i></button>
       <div class="lang-dropdown" id="langDropdown">
         <div class="lang-search"><input type="text" placeholder="Search language..." id="langSearch"/></div>
         <div class="lang-list" id="langList"></div>
@@ -37,24 +37,24 @@
 
 <section class="page-hero alerts-hero" style="padding-bottom:80px">
   <div class="hero-badge pulse-badge"><i class="fas fa-bell"></i> Live Alerts</div>
-  <h1>Farm Alert Center</h1>
-  <p>Mausam ki chethavni, keede alert aur fasal suraksha</p>
+  <h1 data-translate="alerts_hero_title">Farm Alert Center</h1>
+  <p data-translate="alerts_hero_sub">Weather warnings, pest alerts and crop safety</p>
   <div class="alert-summary-bar" id="alertSummaryBar">
     <div class="summary-card card-danger">
       <i class="fas fa-circle-exclamation"></i>
-      <div><span class="summary-count" id="dangerCount">0</span><span>Khatre</span></div>
+      <div><span class="summary-count" id="dangerCount">0</span><span data-translate="filter_danger">Critical</span></div>
     </div>
     <div class="summary-card card-warning">
       <i class="fas fa-triangle-exclamation"></i>
-      <div><span class="summary-count" id="warningCount">0</span><span>Chetavni</span></div>
+      <div><span class="summary-count" id="warningCount">0</span><span data-translate="filter_warning">Warnings</span></div>
     </div>
     <div class="summary-card card-info">
       <i class="fas fa-circle-info"></i>
-      <div><span class="summary-count" id="infoCount">0</span><span>Salah</span></div>
+      <div><span class="summary-count" id="infoCount">0</span><span data-translate="filter_advisory">Advisory</span></div>
     </div>
     <div class="summary-card card-total">
       <i class="fas fa-bell"></i>
-      <div><span class="summary-count" id="totalCount">0</span><span>Kul</span></div>
+      <div><span class="summary-count" id="totalCount">0</span><span>Total</span></div>
     </div>
   </div>
 </section>
@@ -63,10 +63,11 @@
   <div class="container">
     <div class="location-prompt">
       <div class="location-icon"><i class="fas fa-location-crosshairs"></i></div>
-      <h3>Alerts ke liye Location Chahiye</h3>
-      <p>Hum aapke ilake ke mausam aur keede alerts dikhane ke liye aapki location chahte hain</p>
+      <h3 data-translate="location_title">Allow Location for Alerts</h3>
+      <p data-translate="location_sub">We need your location to show alerts for your area</p>
       <button class="btn-primary" onclick="requestAlertsLocation()" id="alertLocationBtn">
-        <i class="fas fa-map-pin"></i> Location Dein
+        <i class="fas fa-map-pin"></i>
+        <span data-translate="btn_location_enable">Enable Location</span>
       </button>
     </div>
   </div>
@@ -75,23 +76,23 @@
 <section class="section alerts-section" id="alertsSection" style="display:none">
   <div class="container">
     <div class="alert-filters">
-      <button class="alert-tab active" onclick="filterAlerts('all')">Sab</button>
-      <button class="alert-tab" onclick="filterAlerts('danger')">Khatre</button>
-      <button class="alert-tab" onclick="filterAlerts('warning')">Chetavni</button>
-      <button class="alert-tab" onclick="filterAlerts('info')">Salah</button>
-      <button class="alert-tab" onclick="filterAlerts('Weather')">Mausam</button>
-      <button class="alert-tab" onclick="filterAlerts('Pest')">Keede</button>
+      <button class="alert-tab active" onclick="filterAlerts('all')" data-translate="filter_all_alerts">All</button>
+      <button class="alert-tab" onclick="filterAlerts('danger')" data-translate="filter_danger">Critical</button>
+      <button class="alert-tab" onclick="filterAlerts('warning')" data-translate="filter_warning">Warnings</button>
+      <button class="alert-tab" onclick="filterAlerts('info')" data-translate="filter_advisory">Advisory</button>
+      <button class="alert-tab" onclick="filterAlerts('Weather')" data-translate="filter_weather">Weather</button>
+      <button class="alert-tab" onclick="filterAlerts('Pest')" data-translate="filter_pest">Pest</button>
     </div>
     <div class="alerts-list" id="alertsList">
       <div class="alerts-loading">
         <div class="loading-spinner"></div>
-        <p>Mausam aur keede data check ho raha hai...</p>
+        <p>Checking weather data...</p>
       </div>
     </div>
     <div class="no-alerts" id="noAlerts" style="display:none">
       <div class="no-alerts-icon"><i class="fas fa-check-circle"></i></div>
-      <h3>Sab Theek Hai! Koi Alert Nahi</h3>
-      <p>Aapke ilake mein kheti ke liye mausam accha hai</p>
+      <h3 data-translate="no_alerts_title">All Clear! No Active Alerts</h3>
+      <p data-translate="no_alerts_sub">Weather is good for farming in your area</p>
     </div>
   </div>
 </section>
@@ -100,8 +101,8 @@
   <div class="container">
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-bug"></i></div>
-      <h2>Mausami Keede Calendar</h2>
-      <p>Is season mein kaunse keede active hain</p>
+      <h2 data-translate="pest_calendar_title">Seasonal Pest Calendar</h2>
+      <p data-translate="pest_calendar_sub">Pests active this season</p>
     </div>
     <div class="pest-calendar-grid" id="pestCalendarGrid"></div>
   </div>
@@ -111,16 +112,16 @@
   <div class="container">
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-skull-crossbones"></i></div>
-      <h2>Abhi Jokhim Wali Fasal</h2>
-      <p>Abhi ke mausam mein ye fasal mat ugayein</p>
+      <h2 data-translate="harmful_title">Risky Crops Right Now</h2>
+      <p data-translate="harmful_sub">Avoid growing these in current weather</p>
     </div>
     <div class="harmful-grid" id="harmfulGrid"></div>
     <div class="section-header" style="margin-top:2.5rem">
       <div class="section-tag" style="background:var(--green-light);color:var(--green)">
         <i class="fas fa-shield-halved"></i>
       </div>
-      <h2>Abhi Ugane Ke Liye Safe Fasal</h2>
-      <p>Ye fasal aapke mausam ke liye theek hain</p>
+      <h2 data-translate="safe_title">Safe to Grow Now</h2>
+      <p data-translate="safe_sub">These crops suit current weather</p>
     </div>
     <div class="safe-grid" id="safeGrid"></div>
   </div>
@@ -128,37 +129,37 @@
 
 <footer class="footer">
   <div class="container">
-    <div class="footer-brand">
-      <div class="brand-icon small"><i class="fas fa-seedling"></i></div>
-      <span>SmartAgro</span>
-    </div>
-    <p class="footer-copy">© 2025 SmartAgro. Kisanon ke liye banaya gaya.</p>
+    <div class="footer-brand"><div class="brand-icon small"><i class="fas fa-seedling"></i></div><span>SmartAgro</span></div>
+    <p class="footer-copy" data-translate="footer_copy">© 2025 SmartAgro. Made for Indian farmers.</p>
   </div>
 </footer>
 
 <nav class="bottom-nav">
   <div class="bottom-nav-grid">
-    <a href="/" class="bottom-nav-item"><i class="fas fa-home"></i><span>Home</span></a>
-    <a href="/diagnose" class="bottom-nav-item"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
-    <a href="/market" class="bottom-nav-item"><i class="fas fa-chart-line"></i><span>Mandi</span></a>
-    <a href="/alerts" class="bottom-nav-item active"><i class="fas fa-bell"></i><span>Alerts</span></a>
+    <a href="/" class="bottom-nav-item" data-translate="nav_home"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="/diagnose" class="bottom-nav-item" data-translate="nav_diagnose"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
+    <a href="/market" class="bottom-nav-item" data-translate="nav_market"><i class="fas fa-chart-line"></i><span>Mandi</span></a>
+    <a href="/alerts" class="bottom-nav-item active" data-translate="nav_alerts"><i class="fas fa-bell"></i><span>Alerts</span></a>
   </div>
 </nav>
 
 <div class="toast" id="toast"></div>
 <a href="tel:18001801551" class="kisan-helpline">
-  <button class="helpline-btn"><i class="fas fa-phone"></i> 1800-180-1551</button>
+  <button class="helpline-btn"><i class="fas fa-phone"></i> <span data-translate="helpline">Kisan Helpline</span></button>
 </a>
 <button class="chat-fab" id="chatFab" onclick="toggleChat()"><i class="fas fa-microphone"></i></button>
 <div class="chat-box" id="chatBox">
   <div class="chat-header">
     <div class="chat-header-icon">🌾</div>
-    <div><div class="chat-header-title">Kisan Helper</div><div class="chat-header-sub">Kisi bhi bhasha mein puchein</div></div>
-    <button onclick="toggleChat()" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:0.92rem"><i class="fas fa-times"></i></button>
+    <div>
+      <div class="chat-header-title" data-translate="chatbot_title">Kisan Helper</div>
+      <div class="chat-header-sub" data-translate="chatbot_sub">Ask in any language</div>
+    </div>
+    <button onclick="toggleChat()" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:0.92rem;padding:4px"><i class="fas fa-times"></i></button>
   </div>
   <div class="chat-messages" id="chatMessages"></div>
   <div class="chat-input-row">
-    <input type="text" id="chatInput" placeholder="Likhein ya bolein..." onkeydown="handleChatKey(event)"/>
+    <input type="text" id="chatInput" data-translate="chat_placeholder" placeholder="Type or speak..." onkeydown="handleChatKey(event)"/>
     <button class="chat-mic-btn" id="micBtn" onclick="startVoice()"><i class="fas fa-microphone"></i></button>
     <button class="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
   </div>
