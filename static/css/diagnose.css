@@ -96,6 +96,9 @@
 .tips-list li { font-size:0.74rem; color:var(--text-2); padding-left:12px; position:relative; }
 .tips-list li::before { content:'→'; position:absolute; left:0; color:var(--teal); font-size:0.7rem; }
 
+/* Add this to dashboard.css */
+.qc-text { flex:1; min-width:0; display:flex; flex-direction:column; gap:4px; }
+
 .results-panel {
   background:var(--card); border:1.5px solid var(--border);
   border-radius:var(--radius-lg); min-height:480px; overflow:hidden;
