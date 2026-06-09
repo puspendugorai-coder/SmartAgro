@@ -10,7 +10,6 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
 </head>
 <body>
-
 <nav class="navbar" id="navbar">
   <div class="nav-brand">
     <div class="brand-icon"><i class="fas fa-seedling"></i></div>
@@ -35,27 +34,15 @@
   </div>
 </nav>
 
-<section class="page-hero alerts-hero" style="padding-bottom:80px">
+<section class="page-hero alerts-hero">
   <div class="hero-badge pulse-badge"><i class="fas fa-bell"></i> Live Alerts</div>
   <h1 data-translate="alerts_hero_title">Farm Alert Center</h1>
   <p data-translate="alerts_hero_sub">Weather warnings, pest alerts and crop safety</p>
   <div class="alert-summary-bar" id="alertSummaryBar">
-    <div class="summary-card card-danger">
-      <i class="fas fa-circle-exclamation"></i>
-      <div><span class="summary-count" id="dangerCount">0</span><span data-translate="filter_danger">Critical</span></div>
-    </div>
-    <div class="summary-card card-warning">
-      <i class="fas fa-triangle-exclamation"></i>
-      <div><span class="summary-count" id="warningCount">0</span><span data-translate="filter_warning">Warnings</span></div>
-    </div>
-    <div class="summary-card card-info">
-      <i class="fas fa-circle-info"></i>
-      <div><span class="summary-count" id="infoCount">0</span><span data-translate="filter_advisory">Advisory</span></div>
-    </div>
-    <div class="summary-card card-total">
-      <i class="fas fa-bell"></i>
-      <div><span class="summary-count" id="totalCount">0</span><span>Total</span></div>
-    </div>
+    <div class="summary-card card-danger"><i class="fas fa-circle-exclamation"></i><div><span class="summary-count" id="dangerCount">0</span><span data-translate="filter_danger">Critical</span></div></div>
+    <div class="summary-card card-warning"><i class="fas fa-triangle-exclamation"></i><div><span class="summary-count" id="warningCount">0</span><span data-translate="filter_warning">Warnings</span></div></div>
+    <div class="summary-card card-info"><i class="fas fa-circle-info"></i><div><span class="summary-count" id="infoCount">0</span><span data-translate="filter_advisory">Advisory</span></div></div>
+    <div class="summary-card card-total"><i class="fas fa-bell"></i><div><span class="summary-count" id="totalCount">0</span><span>Total</span></div></div>
   </div>
 </section>
 
@@ -84,10 +71,7 @@
       <button class="alert-tab" onclick="filterAlerts('Pest')" data-translate="filter_pest">Pest</button>
     </div>
     <div class="alerts-list" id="alertsList">
-      <div class="alerts-loading">
-        <div class="loading-spinner"></div>
-        <p>Checking weather data...</p>
-      </div>
+      <div class="alerts-loading"><div class="loading-spinner"></div><p>Checking weather data...</p></div>
     </div>
     <div class="no-alerts" id="noAlerts" style="display:none">
       <div class="no-alerts-icon"><i class="fas fa-check-circle"></i></div>
@@ -117,9 +101,7 @@
     </div>
     <div class="harmful-grid" id="harmfulGrid"></div>
     <div class="section-header" style="margin-top:2.5rem">
-      <div class="section-tag" style="background:var(--green-light);color:var(--green)">
-        <i class="fas fa-shield-halved"></i>
-      </div>
+      <div class="section-tag" style="background:var(--green-light);color:var(--green)"><i class="fas fa-shield-halved"></i></div>
       <h2 data-translate="safe_title">Safe to Grow Now</h2>
       <p data-translate="safe_sub">These crops suit current weather</p>
     </div>
@@ -148,26 +130,35 @@
   <button class="helpline-btn"><i class="fas fa-phone"></i> <span data-translate="helpline">Kisan Helpline</span></button>
 </a>
 <button class="chat-fab" id="chatFab" onclick="toggleChat()"><i class="fas fa-microphone"></i></button>
-<div class="chat-box" id="chatBox">
-  <div class="chat-header">
-    <div class="chat-header-icon">🌾</div>
-    <div>
-      <div class="chat-header-title" data-translate="chatbot_title">Kisan Helper</div>
-      <div class="chat-header-sub" data-translate="chatbot_sub">Ask in any language</div>
+<div class="chat-overlay" id="chatOverlay" onclick="handleOverlayClick(event)">
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header-full">
+      <div class="chat-header-icon-lg">🌾</div>
+      <div class="chat-header-info">
+        <h3 data-translate="chatbot_title">Kisan Helper</h3>
+        <p data-translate="chatbot_sub">Ask in any language</p>
+      </div>
+      <div class="chat-header-actions">
+        <button class="chat-action-btn" onclick="clearChat()" title="Clear"><i class="fas fa-rotate-left"></i></button>
+        <button class="chat-action-btn" id="micBtn" onclick="startVoice()" title="Voice"><i class="fas fa-microphone"></i></button>
+        <button class="chat-action-btn" onclick="closeChat()" title="Close"><i class="fas fa-times"></i></button>
+      </div>
     </div>
-    <button onclick="toggleChat()" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:0.92rem;padding:4px"><i class="fas fa-times"></i></button>
-  </div>
-  <div class="chat-messages" id="chatMessages"></div>
-  <div class="chat-input-row">
-    <input type="text" id="chatInput" data-translate="chat_placeholder" placeholder="Type or speak..." onkeydown="handleChatKey(event)"/>
-    <button class="chat-mic-btn" id="micBtn" onclick="startVoice()"><i class="fas fa-microphone"></i></button>
-    <button class="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" data-translate="chat_placeholder" placeholder="Type or speak..." onkeydown="handleChatKey(event)"/>
+        <button class="chat-mic-btn" onclick="startVoice()"><i class="fas fa-microphone"></i></button>
+        <button class="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+      <p class="chat-hint">Powered by Groq AI · Supports all Indian languages</p>
+    </div>
   </div>
 </div>
-
 <script src="/static/js/translations.js"></script>
 <script src="/static/js/main.js"></script>
 <script src="/static/js/alerts.js"></script>
 <script src="/static/js/chatbot.js"></script>
+<script>function handleOverlayClick(e){if(e.target===document.getElementById('chatOverlay'))closeChat();}</script>
 </body>
 </html>
