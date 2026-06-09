@@ -11,7 +11,6 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-
 <nav class="navbar" id="navbar">
   <div class="nav-brand">
     <div class="brand-icon"><i class="fas fa-seedling"></i></div>
@@ -46,36 +45,25 @@
   <div class="container">
     <div class="diagnose-layout">
       <div class="upload-panel">
-        <div class="upload-zone" id="uploadZone"
-             ondrop="handleDrop(event)"
-             ondragover="handleDragOver(event)"
-             ondragleave="handleDragLeave(event)">
+        <div class="upload-zone" id="uploadZone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
           <div class="upload-icon"><i class="fas fa-image"></i></div>
           <h3 data-translate="upload_title">Drop crop photo here</h3>
           <p data-translate="upload_sub">JPG, PNG, WEBP — max 10 MB</p>
           <div class="upload-btns">
             <label class="upload-label" for="fileInput">
-              <i class="fas fa-upload"></i>
-              <span data-translate="btn_upload">Upload Photo</span>
+              <i class="fas fa-upload"></i><span data-translate="btn_upload">Upload Photo</span>
             </label>
             <button class="btn-secondary" onclick="openCamera()">
-              <i class="fas fa-camera"></i>
-              <span data-translate="btn_camera">Take Photo</span>
+              <i class="fas fa-camera"></i><span data-translate="btn_camera">Take Photo</span>
             </button>
           </div>
           <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event)"/>
         </div>
-
         <div class="image-preview" id="imagePreview" style="display:none">
           <img id="previewImg" alt="Crop preview"/>
-          <div class="preview-overlay">
-            <button class="btn-icon" onclick="clearImage()"><i class="fas fa-trash"></i></button>
-          </div>
-          <div class="preview-label">
-            <i class="fas fa-check-circle" style="color:var(--green)"></i> Ready to analyze
-          </div>
+          <div class="preview-overlay"><button class="btn-icon" onclick="clearImage()"><i class="fas fa-trash"></i></button></div>
+          <div class="preview-label"><i class="fas fa-check-circle" style="color:var(--green)"></i> Ready to analyze</div>
         </div>
-
         <div class="camera-modal" id="cameraModal" style="display:none">
           <div class="camera-wrapper">
             <video id="cameraFeed" autoplay playsinline></video>
@@ -85,13 +73,11 @@
             </div>
           </div>
         </div>
-
         <button class="btn-analyze" id="analyzeBtn" onclick="analyzeImage()" style="display:none">
           <i class="fas fa-wand-magic-sparkles"></i>
           <span data-translate="btn_analyze">Analyze Crop</span>
           <div class="btn-shine"></div>
         </button>
-
         <div class="tips-card">
           <div class="tips-header"><i class="fas fa-lightbulb"></i> <span data-translate="tips_title">Tips for Best Results</span></div>
           <ul class="tips-list">
@@ -102,7 +88,6 @@
           </ul>
         </div>
       </div>
-
       <div class="results-panel" id="resultsPanel">
         <div class="results-placeholder">
           <div class="placeholder-icon"><i class="fas fa-leaf"></i></div>
@@ -111,7 +96,7 @@
           <div class="placeholder-steps">
             <div class="ps-item"><span class="ps-num">1</span> <span data-translate="btn_upload">Upload Photo</span></div>
             <div class="ps-item"><span class="ps-num">2</span> <span data-translate="btn_analyze">Analyze Crop</span></div>
-            <div class="ps-item"><span class="ps-num">3</span> Get Diagnosis</div>
+            <div class="ps-item"><span class="ps-num">3</span> Get your diagnosis</div>
           </div>
         </div>
       </div>
@@ -169,26 +154,35 @@
   <button class="helpline-btn"><i class="fas fa-phone"></i> <span data-translate="helpline">Kisan Helpline</span></button>
 </a>
 <button class="chat-fab" id="chatFab" onclick="toggleChat()"><i class="fas fa-microphone"></i></button>
-<div class="chat-box" id="chatBox">
-  <div class="chat-header">
-    <div class="chat-header-icon">🌾</div>
-    <div>
-      <div class="chat-header-title" data-translate="chatbot_title">Kisan Helper</div>
-      <div class="chat-header-sub" data-translate="chatbot_sub">Ask in any language</div>
+<div class="chat-overlay" id="chatOverlay" onclick="handleOverlayClick(event)">
+  <div class="chat-window" id="chatWindow">
+    <div class="chat-header-full">
+      <div class="chat-header-icon-lg">🌾</div>
+      <div class="chat-header-info">
+        <h3 data-translate="chatbot_title">Kisan Helper</h3>
+        <p data-translate="chatbot_sub">Ask in any language</p>
+      </div>
+      <div class="chat-header-actions">
+        <button class="chat-action-btn" onclick="clearChat()" title="Clear"><i class="fas fa-rotate-left"></i></button>
+        <button class="chat-action-btn" id="micBtn" onclick="startVoice()" title="Voice"><i class="fas fa-microphone"></i></button>
+        <button class="chat-action-btn" onclick="closeChat()" title="Close"><i class="fas fa-times"></i></button>
+      </div>
     </div>
-    <button onclick="toggleChat()" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:0.92rem;padding:4px"><i class="fas fa-times"></i></button>
-  </div>
-  <div class="chat-messages" id="chatMessages"></div>
-  <div class="chat-input-row">
-    <input type="text" id="chatInput" data-translate="chat_placeholder" placeholder="Type or speak..." onkeydown="handleChatKey(event)"/>
-    <button class="chat-mic-btn" id="micBtn" onclick="startVoice()"><i class="fas fa-microphone"></i></button>
-    <button class="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+    <div class="chat-messages" id="chatMessages"></div>
+    <div class="chat-input-area">
+      <div class="chat-input-row">
+        <input type="text" id="chatInput" data-translate="chat_placeholder" placeholder="Type or speak..." onkeydown="handleChatKey(event)"/>
+        <button class="chat-mic-btn" onclick="startVoice()"><i class="fas fa-microphone"></i></button>
+        <button class="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
+      </div>
+      <p class="chat-hint">Powered by Groq AI · Supports all Indian languages</p>
+    </div>
   </div>
 </div>
-
 <script src="/static/js/translations.js"></script>
 <script src="/static/js/main.js"></script>
 <script src="/static/js/diagnose.js"></script>
 <script src="/static/js/chatbot.js"></script>
+<script>function handleOverlayClick(e){if(e.target===document.getElementById('chatOverlay'))closeChat();}</script>
 </body>
 </html>
