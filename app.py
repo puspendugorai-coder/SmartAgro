@@ -35,6 +35,8 @@ def market():
 def alerts():
     return render_template("alerts.html")
 
+# ─── Kisan Helper Chatbot ────────────────────────────────────────────────────
+    
 @app.route('/offline')
 def offline():
     return render_template('offline.html')
@@ -450,7 +452,57 @@ def debug_ninja():
         headers={"X-Api-Key": key}
     )
     return jsonify(resp.json())  # see exact field names
+# ─── Kisan Helper Chatbot ─────────────────────────────────────────────────────
+@app.route("/api/chat", methods=["POST"])
+def kisan_chat():
+    data = request.json or {}
+    messages = data.get("messages", [])
+    lang = data.get("lang", "en")
+    if not messages:
+        return jsonify({"error": "No messages"}), 400
 
+    lang_names = {
+        "en":"English","hi":"Hindi","bn":"Bengali","te":"Telugu",
+        "mr":"Marathi","ta":"Tamil","gu":"Gujarati","kn":"Kannada",
+        "ml":"Malayalam","pa":"Punjabi","or":"Odia","as":"Assamese",
+        "ur":"Urdu","mai":"Maithili","sat":"Santali","ks":"Kashmiri",
+        "ne":"Nepali","sd":"Sindhi","kok":"Konkani","mni":"Manipuri",
+        "bodo":"Bodo","doi":"Dogri","sa":"Sanskrit"
+    }
+    lang_name = lang_names.get(lang, "English")
+
+    system_prompt = f"""You are Kisan Helper, a friendly AI agricultural assistant for Indian farmers built into SmartAgro app.
+You MUST always reply in {lang_name} language only, regardless of what language the user writes in.
+You help farmers with: crop diseases, weather advice, pesticide usage, market prices, government schemes (PM-KISAN, Fasal Bima Yojana, Kisan Credit Card), soil health, irrigation, seasonal crop recommendations.
+Keep answers practical, simple, and farmer-friendly. Use bullet points for lists.
+Always be warm and address the farmer respectfully. Never use markdown headers. Keep responses under 200 words."""
+
+    headers = {
+        "Authorization": f"Bearer {GROQ_API_KEY}",
+        "Content-Type": "application/json"
+    }
+    body = {
+        "model": "llama-3.3-70b-versatile",
+        "messages": [{"role": "system", "content": system_prompt}] + messages,
+        "temperature": 0.7,
+        "max_tokens": 400,
+        "stream": False
+    }
+    try:
+        resp = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers=headers, json=body, timeout=30
+        )
+        print(f"[Chat] Groq status: {resp.status_code}")
+        if resp.status_code != 200:
+            print(f"[Chat] Error: {resp.text[:300]}")
+            return jsonify({"error": "AI unavailable"}), 500
+        reply = resp.json()["choices"][0]["message"]["content"].strip()
+        return jsonify({"reply": reply})
+    except Exception as e:
+        print(f"[Chat] Exception: {e}")
+        return jsonify({"error": str(e)}), 500
+    
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
 
