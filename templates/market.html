@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>SmartAgro – Mandi Bhav</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <title>SmartAgro – Mandi Prices</title>
   <link rel="stylesheet" href="/static/css/main.css"/>
   <link rel="stylesheet" href="/static/css/market.css"/>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -18,15 +18,15 @@
     <span class="brand-text">Smart<span class="brand-accent">Agro</span></span>
   </div>
   <div class="nav-links" id="navLinks">
-    <a href="/" class="nav-item"><i class="fas fa-home"></i><span>Home</span></a>
-    <a href="/diagnose" class="nav-item"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
-    <a href="/market" class="nav-item active"><i class="fas fa-chart-line"></i><span>Mandi</span></a>
-    <a href="/alerts" class="nav-item"><i class="fas fa-bell"></i><span>Alerts</span></a>
+    <a href="/" class="nav-item" data-translate="nav_home"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="/diagnose" class="nav-item" data-translate="nav_diagnose"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
+    <a href="/market" class="nav-item active" data-translate="nav_market"><i class="fas fa-chart-line"></i><span>Mandi</span></a>
+    <a href="/alerts" class="nav-item" data-translate="nav_alerts"><i class="fas fa-bell"></i><span>Alerts</span></a>
   </div>
   <div class="nav-actions">
     <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon" id="themeIcon"></i></button>
     <div class="lang-selector" id="langSelector">
-      <button class="lang-btn" id="langBtn"><i class="fas fa-globe"></i><span id="currentLang">HI</span><i class="fas fa-chevron-down"></i></button>
+      <button class="lang-btn" id="langBtn"><i class="fas fa-globe"></i><span id="currentLang">EN</span><i class="fas fa-chevron-down"></i></button>
       <div class="lang-dropdown" id="langDropdown">
         <div class="lang-search"><input type="text" placeholder="Search language..." id="langSearch"/></div>
         <div class="lang-list" id="langList"></div>
@@ -37,9 +37,9 @@
 </nav>
 
 <section class="page-hero market-hero" style="position:relative;padding-bottom:60px">
-  <div class="hero-badge"><i class="fas fa-chart-line"></i> Live Bhav</div>
-  <h1>Aaj ke Mandi Bhav</h1>
-  <p>15 fasal ke bhav, 20 Indian shehar mein — MSP se comparison ke saath</p>
+  <div class="hero-badge"><i class="fas fa-chart-line"></i> Live Prices</div>
+  <h1 data-translate="market_hero_title">Mandi Prices Today</h1>
+  <p data-translate="market_hero_sub">15 crops across 20 Indian cities with MSP comparison</p>
   <div class="price-ticker">
     <div class="ticker-label"><i class="fas fa-satellite-dish"></i> LIVE</div>
     <div class="ticker-track"><div class="ticker-content" id="tickerContent">Loading...</div></div>
@@ -51,15 +51,15 @@
     <div class="search-filter-bar">
       <div class="search-box">
         <i class="fas fa-search"></i>
-        <input type="text" id="locationSearch" placeholder="Shehar khojein (Delhi, Patna, Mumbai...)"/>
-        <button class="search-btn" onclick="searchLocation()">Khojein</button>
+        <input type="text" id="locationSearch" data-translate="search_placeholder" placeholder="Search city..."/>
+        <button class="search-btn" onclick="searchLocation()" data-translate="btn_search">Search</button>
         <button class="clear-btn" id="clearSearchBtn" onclick="clearSearch()" style="display:none"><i class="fas fa-times"></i></button>
       </div>
       <div class="filter-chips">
-        <button class="chip active" onclick="filterDemand('all',this)">Sab</button>
-        <button class="chip chip-high" onclick="filterDemand('Very High',this)">Zyada Maang</button>
-        <button class="chip chip-rising" onclick="filterDemand('rising',this)">Bhav Badh Raha</button>
-        <button class="chip chip-falling" onclick="filterDemand('falling',this)">Bhav Gir Raha</button>
+        <button class="chip active" onclick="filterDemand('all',this)" data-translate="filter_all">All</button>
+        <button class="chip chip-high" onclick="filterDemand('Very High',this)" data-translate="filter_high">High Demand</button>
+        <button class="chip chip-rising" onclick="filterDemand('rising',this)" data-translate="filter_rising">Rising</button>
+        <button class="chip chip-falling" onclick="filterDemand('falling',this)" data-translate="filter_falling">Falling</button>
       </div>
     </div>
   </div>
@@ -69,19 +69,19 @@
   <div class="container">
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-store"></i></div>
-      <h2>Shehar ke Hisaab se Bhav</h2>
-      <p id="marketSubtitle">Sabhi bade Indian mandion ke bhav</p>
+      <h2 data-translate="market_title">Prices by City</h2>
+      <p id="marketSubtitle" data-translate="market_sub">All major Indian markets</p>
     </div>
     <div class="market-loading" id="marketLoading">
       <div class="loading-spinner"></div>
-      <p>Mandi bhav load ho rahe hain...</p>
+      <p>Loading mandi prices...</p>
     </div>
     <div class="market-cities-grid" id="marketCitiesGrid" style="display:none"></div>
     <div class="no-results" id="noResults" style="display:none">
       <i class="fas fa-store-slash"></i>
-      <h3>Koi mandi nahi mili</h3>
-      <p>Try karein: Delhi, Mumbai, Patna, Kolkata...</p>
-      <button class="btn-secondary" id="showAllMarketsBtn" onclick="clearSearch()">Sab Dikhayein</button>
+      <h3>No markets found</h3>
+      <p>Try: Delhi, Mumbai, Patna, Kolkata...</p>
+      <button class="btn-secondary" id="showAllMarketsBtn" onclick="clearSearch()">Show All</button>
     </div>
   </div>
 </section>
@@ -90,15 +90,15 @@
   <div class="container">
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-chart-area"></i></div>
-      <h2>Bhav ka Graph</h2>
-      <p>30 din ka price movement</p>
+      <h2 data-translate="chart_title">Price Trend</h2>
+      <p data-translate="chart_sub">30-day price movement</p>
     </div>
     <div class="chart-wrapper">
       <div class="chart-controls">
         <div class="chart-tabs">
           <button class="chart-tab active" onclick="switchChart('line')">Trend</button>
           <button class="chart-tab" onclick="switchChart('bar')">Compare</button>
-          <button class="chart-tab" onclick="switchChart('radar')">Maang</button>
+          <button class="chart-tab" onclick="switchChart('radar')">Demand</button>
         </div>
         <div class="chart-city-select">
           <select id="chartCitySelect" onchange="updateChart()">
@@ -118,14 +118,14 @@
   <div class="container">
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-table"></i></div>
-      <h2>Bhav Tulna Table</h2>
-      <p>₹/quintal — alag-alag shehar mein</p>
+      <h2 data-translate="table_title">Price Comparison</h2>
+      <p data-translate="table_sub">₹/quintal across cities</p>
     </div>
     <div class="table-wrapper">
       <table class="price-table" id="priceTable">
         <thead>
           <tr>
-            <th>Fasal</th><th>Delhi</th><th>Mumbai</th><th>Kolkata</th>
+            <th>Crop</th><th>Delhi</th><th>Mumbai</th><th>Kolkata</th>
             <th>Patna</th><th>Lucknow</th><th>Jaipur</th><th>Bhopal</th>
             <th>Indore</th><th>Amritsar</th><th>Hyderabad</th>
           </tr>
@@ -138,37 +138,37 @@
 
 <footer class="footer">
   <div class="container">
-    <div class="footer-brand">
-      <div class="brand-icon small"><i class="fas fa-seedling"></i></div>
-      <span>SmartAgro</span>
-    </div>
-    <p class="footer-copy">© 2025 SmartAgro. Kisanon ke liye banaya gaya.</p>
+    <div class="footer-brand"><div class="brand-icon small"><i class="fas fa-seedling"></i></div><span>SmartAgro</span></div>
+    <p class="footer-copy" data-translate="footer_copy">© 2025 SmartAgro. Made for Indian farmers.</p>
   </div>
 </footer>
 
 <nav class="bottom-nav">
   <div class="bottom-nav-grid">
-    <a href="/" class="bottom-nav-item"><i class="fas fa-home"></i><span>Home</span></a>
-    <a href="/diagnose" class="bottom-nav-item"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
-    <a href="/market" class="bottom-nav-item active"><i class="fas fa-chart-line"></i><span>Mandi</span></a>
-    <a href="/alerts" class="bottom-nav-item"><i class="fas fa-bell"></i><span>Alerts</span></a>
+    <a href="/" class="bottom-nav-item" data-translate="nav_home"><i class="fas fa-home"></i><span>Home</span></a>
+    <a href="/diagnose" class="bottom-nav-item" data-translate="nav_diagnose"><i class="fas fa-microscope"></i><span>Diagnose</span></a>
+    <a href="/market" class="bottom-nav-item active" data-translate="nav_market"><i class="fas fa-chart-line"></i><span>Mandi</span></a>
+    <a href="/alerts" class="bottom-nav-item" data-translate="nav_alerts"><i class="fas fa-bell"></i><span>Alerts</span></a>
   </div>
 </nav>
 
 <div class="toast" id="toast"></div>
 <a href="tel:18001801551" class="kisan-helpline">
-  <button class="helpline-btn"><i class="fas fa-phone"></i> 1800-180-1551</button>
+  <button class="helpline-btn"><i class="fas fa-phone"></i> <span data-translate="helpline">Kisan Helpline</span></button>
 </a>
 <button class="chat-fab" id="chatFab" onclick="toggleChat()"><i class="fas fa-microphone"></i></button>
 <div class="chat-box" id="chatBox">
   <div class="chat-header">
     <div class="chat-header-icon">🌾</div>
-    <div><div class="chat-header-title">Kisan Helper</div><div class="chat-header-sub">Kisi bhi bhasha mein puchein</div></div>
-    <button onclick="toggleChat()" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:0.92rem"><i class="fas fa-times"></i></button>
+    <div>
+      <div class="chat-header-title" data-translate="chatbot_title">Kisan Helper</div>
+      <div class="chat-header-sub" data-translate="chatbot_sub">Ask in any language</div>
+    </div>
+    <button onclick="toggleChat()" style="margin-left:auto;background:none;border:none;color:rgba(255,255,255,0.7);cursor:pointer;font-size:0.92rem;padding:4px"><i class="fas fa-times"></i></button>
   </div>
   <div class="chat-messages" id="chatMessages"></div>
   <div class="chat-input-row">
-    <input type="text" id="chatInput" placeholder="Likhein ya bolein..." onkeydown="handleChatKey(event)"/>
+    <input type="text" id="chatInput" data-translate="chat_placeholder" placeholder="Type or speak..." onkeydown="handleChatKey(event)"/>
     <button class="chat-mic-btn" id="micBtn" onclick="startVoice()"><i class="fas fa-microphone"></i></button>
     <button class="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
   </div>
