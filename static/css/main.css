@@ -449,3 +449,134 @@ h1,h2,h3,h4 { line-height:1.25; }
   .lang-btn span { display:none; }
   #rainGrid { gap:10px; }
 }
+/* ══════════════════════════════════════
+   CRITICAL MOBILE FIXES
+══════════════════════════════════════ */
+html, body { overflow-x:hidden; width:100%; }
+*, *::before, *::after { box-sizing:border-box; }
+
+/* Fix hero cut on left */
+@media (max-width:768px) {
+  .hero {
+    min-height:auto !important;
+    height:auto !important;
+    padding:calc(var(--nav-h) + 18px) 18px 36px !important;
+    flex-direction:column !important;
+    align-items:flex-start !important;
+    gap:20px !important;
+  }
+  .hero-visual { display:none !important; }
+  .hero-content { max-width:100% !important; width:100% !important; }
+  .hero-title { font-size:clamp(1.6rem,7vw,2.2rem) !important; word-break:break-word; }
+  .hero-subtitle { font-size:0.88rem !important; }
+  .hero-cta { flex-direction:column !important; width:100% !important; gap:10px !important; }
+  .btn-hero-primary,
+  .btn-hero-secondary { width:100% !important; justify-content:center !important; padding:13px !important; font-size:0.9rem !important; }
+
+  /* Fix quick cards */
+  .quick-grid { grid-template-columns:1fr !important; gap:10px !important; }
+  .quick-card { flex-direction:row !important; align-items:center !important; padding:14px 16px !important; gap:12px !important; }
+  .quick-card p { display:none !important; }
+  .qc-arrow { display:none !important; }
+  .quick-card h3 { font-size:0.9rem !important; margin:0 !important; }
+  .qc-icon { width:40px !important; height:40px !important; flex-shrink:0 !important; }
+  .qc-text { flex:1; min-width:0; }
+
+  /* Fix chatbot not cut */
+  .chat-box {
+    left:10px !important;
+    right:10px !important;
+    width:auto !important;
+    bottom:72px !important;
+    max-height:420px !important;
+  }
+  .chat-input-row {
+    display:flex !important;
+    gap:5px !important;
+    padding:8px 10px !important;
+    align-items:center !important;
+  }
+  .chat-input-row input {
+    min-width:0 !important;
+    flex:1 !important;
+    font-size:0.8rem !important;
+  }
+  .chat-send-btn,
+  .chat-mic-btn {
+    flex-shrink:0 !important;
+    width:34px !important;
+    height:34px !important;
+  }
+
+  /* Fix search bar cut */
+  .search-box { padding:6px 10px !important; overflow:hidden; }
+  .search-btn { flex-shrink:0 !important; padding:6px 10px !important; font-size:0.74rem !important; white-space:nowrap !important; }
+  .search-box input { min-width:0 !important; font-size:0.82rem !important; }
+  .clear-btn { flex-shrink:0 !important; }
+
+  /* Fix positions */
+  .chat-fab { bottom:72px !important; right:14px !important; }
+  .kisan-helpline { bottom:72px !important; left:14px !important; }
+  .toast { bottom:72px !important; left:10px !important; right:10px !important; max-width:none !important; }
+
+  /* Alerts summary bar */
+  .alert-summary-bar {
+    position:static !important;
+    transform:none !important;
+    flex-wrap:wrap !important;
+    width:auto !important;
+    margin-top:16px !important;
+    gap:8px !important;
+  }
+  .summary-card { padding:10px 12px !important; gap:7px !important; }
+  .summary-count { font-size:1.2rem !important; }
+  .alerts-hero { padding-bottom:30px !important; }
+  .location-section { padding-top:28px !important; }
+}
+
+/* Weather grid */
+@media (max-width:900px) {
+  .weather-main { grid-template-columns:1fr 1fr !important; gap:10px !important; }
+  .weather-primary-card { grid-column:1 / -1 !important; }
+}
+@media (max-width:500px) {
+  .weather-main { grid-template-columns:1fr !important; }
+  .wpc-temp { font-size:3rem !important; }
+  .weather-stat-card { flex-direction:row !important; align-items:center !important; gap:10px !important; padding:14px !important; }
+}
+
+/* Forecast */
+@media (max-width:768px) {
+  .forecast-grid { grid-template-columns:repeat(3,1fr) !important; gap:7px !important; }
+  .fc-desc { display:none !important; }
+}
+@media (max-width:400px) {
+  .forecast-grid { grid-template-columns:repeat(2,1fr) !important; }
+}
+
+/* Stats bar */
+@media (max-width:600px) {
+  .stats-bar .container { display:grid !important; grid-template-columns:repeat(3,1fr) !important; gap:10px !important; justify-items:start !important; }
+  .stat-val { font-size:1rem !important; }
+}
+
+/* Rain grid */
+@media (max-width:400px) {
+  #rainGrid { grid-template-columns:1fr !important; }
+}
+
+/* Crops */
+@media (max-width:500px) {
+  .crops-grid { grid-template-columns:1fr !important; gap:10px !important; }
+  .crop-card { padding:15px !important; }
+}
+
+/* Navbar */
+@media (max-width:768px) {
+  .nav-actions { gap:6px !important; }
+  .navbar { padding:0 12px !important; }
+}
+
+/* Lang dropdown fix */
+.lang-dropdown { display:none !important; }
+.lang-selector.open .lang-dropdown { display:block !important; }
