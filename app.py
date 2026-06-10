@@ -1,9 +1,5 @@
 from flask import Flask, render_template, request, jsonify
-import requests
-import os
-import json
-import re
-import random
+import requests, os, json, re, random
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 
@@ -21,24 +17,19 @@ print(f"[SmartAgro] Groq    : {'OK' if GROQ_API_KEY else 'MISSING'}")
 print(f"[SmartAgro] Kindwise: {'OK' if KINDWISE_API_KEY else 'MISSING'}")
 
 @app.route("/")
-def index():
-    return render_template("index.html")
+def index(): return render_template("index.html")
 
 @app.route("/diagnose")
-def diagnose():
-    return render_template("diagnose.html")
+def diagnose(): return render_template("diagnose.html")
 
 @app.route("/market")
-def market():
-    return render_template("market.html")
+def market(): return render_template("market.html")
 
 @app.route("/alerts")
-def alerts():
-    return render_template("alerts.html")
+def alerts(): return render_template("alerts.html")
 
 @app.route("/ping")
-def ping():
-    return "OK", 200
+def ping(): return "OK", 200
 
 # ── Weather ──────────────────────────────────────────────
 @app.route("/api/weather")
@@ -50,12 +41,10 @@ def get_weather():
     try:
         cr = requests.get(
             f"https://api.openweathermap.org/data/2.5/weather"
-            f"?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric",
-            timeout=10)
+            f"?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric", timeout=10)
         fr = requests.get(
             f"https://api.openweathermap.org/data/2.5/forecast"
-            f"?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric&cnt=56",
-            timeout=10)
+            f"?lat={lat}&lon={lon}&appid={OPENWEATHER_API_KEY}&units=metric&cnt=56", timeout=10)
         if cr.status_code != 200:
             return jsonify({"error": "Weather API error"}), 500
         cd = cr.json()
@@ -109,7 +98,8 @@ def crop_recommendations():
     return jsonify({
         "season":     season,
         "crops":      crops,
-        "pesticides": get_pesticide_guide(crops[:3])
+        "pesticides": get_pesticide_guide(crops[:3]),
+        "soil_tips":  get_soil_tips(season, temp, humidity)
     })
 
 def get_season(month):
@@ -162,6 +152,32 @@ def get_pesticide_guide(crops):
         if crop["name"] in guides:
             result.append({"crop": crop["name"], "guides": guides[crop["name"]]})
     return result
+
+def get_soil_tips(season, temp, humidity):
+    tips = []
+    if season == "Kharif (Monsoon)":
+        tips = [
+            {"icon":"💧","title":"Drainage Important","tip":"Ensure field drainage channels are open to prevent waterlogging during heavy rains."},
+            {"icon":"🌱","title":"Green Manure","tip":"Grow Dhaincha or Sunhemp as green manure before main crop to improve soil nitrogen."},
+            {"icon":"🧪","title":"Soil Testing","tip":"Test soil pH before sowing. Most crops need pH 6.0-7.5. Apply lime if acidic."},
+        ]
+    elif season == "Rabi (Winter)":
+        tips = [
+            {"icon":"🌡️","title":"Deep Ploughing","tip":"Do deep ploughing (20-25 cm) to expose soil to winter cold, killing pests and weeds."},
+            {"icon":"💊","title":"Phosphorus Application","tip":"Apply DAP at sowing time for strong root development in cool weather."},
+            {"icon":"🌾","title":"Residue Management","tip":"Incorporate crop residues from kharif into soil to improve organic matter."},
+        ]
+    else:
+        tips = [
+            {"icon":"💦","title":"Mulching Essential","tip":"Apply mulch around plants to retain soil moisture in summer heat."},
+            {"icon":"🌅","title":"Early Morning Irrigation","tip":"Irrigate in early morning or evening to reduce evaporation losses."},
+            {"icon":"🧬","title":"Micronutrients","tip":"Apply zinc sulphate 25 kg/ha for summer crops — deficiency common in hot weather."},
+        ]
+    if humidity > 80:
+        tips.append({"icon":"🍄","title":"Fungal Disease Alert","tip":"High humidity — apply preventive fungicide spray on susceptible crops."})
+    if temp > 38:
+        tips.append({"icon":"🌡️","title":"Heat Stress Warning","tip":"Temperature above 38°C — increase irrigation frequency and apply shade nets."})
+    return tips
 
 # ── Kindwise Diagnosis ───────────────────────────────────
 @app.route("/api/diagnose", methods=["POST"])
@@ -227,29 +243,27 @@ def diagnose_groq(image_b64):
     if not GROQ_API_KEY:
         return jsonify({"error": "All diagnosis methods failed"}), 500
     prompt = """Look at this crop image carefully. Identify the disease.
-Return ONLY valid JSON, no markdown:
-{"disease":"name","confidence":85,"severity":"Mild/Moderate/Severe","affected_part":"Leaves/Stem/Fruit","cause":"pathogen description","eco_remedies":[{"remedy":"name","method":"how to apply","frequency":"how often","effectiveness":80}],"chemical_remedies":[{"name":"chemical","dose":"dose/L","interval":"days"}],"prevention":["tip1","tip2","tip3"],"recovery_timeline":"2-4 weeks"}"""
+Return ONLY valid JSON no markdown:
+{"disease":"name","confidence":85,"severity":"Mild/Moderate/Severe","affected_part":"Leaves/Stem/Fruit","cause":"description","eco_remedies":[{"remedy":"name","method":"how","frequency":"when","effectiveness":80}],"chemical_remedies":[{"name":"chem","dose":"dose","interval":"days"}],"prevention":["tip1","tip2"],"recovery_timeline":"2-4 weeks"}"""
     for model in ["meta-llama/llama-4-scout-17b-16e-instruct", "meta-llama/llama-4-maverick-17b-128e-instruct"]:
         try:
             resp = requests.post(
                 "https://api.groq.com/openai/v1/chat/completions",
                 headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
                 json={"model": model, "messages": [
-                    {"role": "system", "content": "You are a plant pathologist. Return ONLY valid JSON."},
+                    {"role": "system", "content": "Return ONLY valid JSON."},
                     {"role": "user", "content": [
                         {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_b64}"}},
                         {"type": "text", "text": prompt}
                     ]}
-                ], "temperature": 0.2, "max_tokens": 1000},
-                timeout=45)
+                ], "temperature": 0.2, "max_tokens": 1000}, timeout=45)
             if resp.status_code != 200: continue
             raw   = resp.json()["choices"][0]["message"]["content"].strip()
             clean = re.sub(r"```(?:json)?", "", raw).replace("```", "").strip()
             match = re.search(r"\{.*\}", clean, re.DOTALL)
             if match:
                 return jsonify(json.loads(match.group()))
-        except:
-            continue
+        except: continue
     return jsonify({"error": "Diagnosis failed. Try again."}), 500
 
 # ── Alerts ───────────────────────────────────────────────
@@ -265,25 +279,25 @@ def get_alerts():
     if temp > 40:
         alerts_list.append({"type":"danger","category":"Weather","icon":"🌡️","title":"Extreme Heat","message":"Temperature above 40°C. Crops may wilt and soil loses moisture fast.","action":"Irrigate every 4-5 hours. Provide shade netting."})
     if temp < 5:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"❄️","title":"Frost Warning","message":"Very cold temperature. Frost can destroy crops overnight.","action":"Cover crops with cloth. Use sprinkler irrigation at night."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"❄️","title":"Frost Warning","message":"Very cold. Frost can destroy crops overnight.","action":"Cover crops. Use sprinkler irrigation at night."})
     if humidity > 85:
-        alerts_list.append({"type":"warning","category":"Disease","icon":"🍄","title":"Fungal Disease Risk","message":"Humidity above 85% — blight and rust risk is very high.","action":"Spray Mancozeb 75 WP at 2.5 g/L immediately."})
+        alerts_list.append({"type":"warning","category":"Disease","icon":"🍄","title":"Fungal Disease Risk","message":"Humidity above 85% — blight and rust risk very high.","action":"Spray Mancozeb 75 WP at 2.5 g/L immediately."})
     if wind_speed > 50:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"💨","title":"Strong Winds","message":"Strong winds can lodge tall crops like maize and wheat.","action":"Avoid spraying. Support tall crops with stakes."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"💨","title":"Strong Winds","message":"Strong winds can lodge tall crops.","action":"Avoid spraying. Support tall crops."})
     if rain > 50:
-        alerts_list.append({"type":"warning","category":"Weather","icon":"🌧️","title":"Heavy Rainfall","message":"Excess rain may cause waterlogging and root rot.","action":"Open drainage channels. Stop irrigation."})
+        alerts_list.append({"type":"warning","category":"Weather","icon":"🌧️","title":"Heavy Rainfall","message":"Waterlogging and root rot risk.","action":"Open drainage channels. Stop irrigation."})
     if "storm" in description or "thunder" in description:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"⛈️","title":"Thunderstorm","message":"Risk of lightning and hail damage to crops.","action":"Stay indoors. Secure farm equipment."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"⛈️","title":"Thunderstorm","message":"Risk of lightning and hail damage.","action":"Stay indoors. Secure farm equipment."})
     if 25 <= temp <= 35 and humidity > 70:
-        alerts_list.append({"type":"warning","category":"Pest","icon":"🐛","title":"Aphid & Whitefly Risk","message":"Warm humid conditions — aphids multiplying fast.","action":"Spray Neem oil 5 ml/L at dusk."})
+        alerts_list.append({"type":"warning","category":"Pest","icon":"🐛","title":"Aphid & Whitefly Risk","message":"Warm humid — aphids multiplying fast.","action":"Spray Neem oil 5 ml/L at dusk."})
     if temp > 30 and humidity < 50:
-        alerts_list.append({"type":"warning","category":"Pest","icon":"🕷️","title":"Spider Mite Alert","message":"Hot dry conditions — mites spreading rapidly.","action":"Apply Abamectin 1.8 EC at 0.5 ml/L."})
+        alerts_list.append({"type":"warning","category":"Pest","icon":"🕷️","title":"Spider Mite Alert","message":"Hot dry conditions — mites spreading fast.","action":"Apply Abamectin 1.8 EC at 0.5 ml/L."})
     harmful = []
     if temp > 38: harmful.append("Wheat")
     if humidity > 85 and rain > 20: harmful.append("Cotton")
     if temp < 10: harmful.append("Rice")
     if harmful:
-        alerts_list.append({"type":"info","category":"Crop Advisory","icon":"🌾","title":"Crops at Risk","message":f"Avoid growing: {', '.join(harmful)} in current weather.","action":"Consider alternate crops better suited to now."})
+        alerts_list.append({"type":"info","category":"Crop Advisory","icon":"🌾","title":"Crops at Risk","message":f"Avoid: {', '.join(harmful)} in current weather.","action":"Consider alternate crops."})
     return jsonify({"alerts": alerts_list, "total": len(alerts_list)})
 
 # ── Market Prices ────────────────────────────────────────
@@ -321,10 +335,14 @@ def get_market_data():
             price  = int(base * factor * rng.uniform(0.94, 1.06))
             change = round(rng.uniform(-4.0, 4.0), 2)
             msp    = MSP_PRICES.get(crop, base)
+            # Weekly change for trend
+            rng2   = random.Random(seed - 7)
+            last_price = int(base * factor * rng2.uniform(0.94, 1.06))
+            weekly_change = round(((price - last_price) / last_price) * 100, 1)
             crops.append({
                 "crop": crop, "price": price, "msp": msp,
                 "above_msp": price >= msp, "unit": "quintal",
-                "change": change,
+                "change": change, "weekly_change": weekly_change,
                 "demand": "Very High" if change > 2 else "High" if change > 0 else "Medium" if change > -2 else "Low"
             })
         markets[city] = crops
@@ -338,43 +356,34 @@ def get_market_data():
 def chat():
     if not GROQ_API_KEY:
         return jsonify({"reply": "Groq API key missing."}), 500
-    data     = request.json or {}
-    message  = data.get("message", "").strip()
-    weather  = data.get("weather_context", {})
-    history  = data.get("history", [])
+    data    = request.json or {}
+    message = data.get("message", "").strip()
+    weather = data.get("weather_context", {})
+    history = data.get("history", [])
     if not message:
         return jsonify({"reply": "Please ask a question."}), 400
 
     weather_ctx = ""
     if weather:
-        weather_ctx = f"Current weather context: {weather.get('temp','?')}°C, humidity {weather.get('humidity','?')}%, {weather.get('description','')}, location: {weather.get('city','India')}."
+        weather_ctx = f"Current weather: {weather.get('temp','?')}°C, {weather.get('humidity','?')}% humidity, {weather.get('description','')}, location: {weather.get('city','India')}."
 
-    system_prompt = f"""You are SmartAgro Assistant — an expert AI helper for Indian farmers.
+    system_prompt = f"""You are SmartAgro Assistant — expert AI for Indian farmers.
 
-CRITICAL RULE: Detect the language of the user's message and reply in EXACTLY that same language.
-- If user writes/speaks Hindi → reply in Hindi (Devanagari script)
-- If user writes/speaks Bengali → reply in Bengali
-- If user writes/speaks Tamil → reply in Tamil
-- If user writes/speaks English → reply in English
-- For any other Indian language → reply in that language
-- Never mix languages in your reply
+CRITICAL: Detect the language of the user's message and reply in EXACTLY that same language.
+- Hindi message → reply in Hindi (Devanagari)
+- Bengali message → reply in Bengali (Bengali script)
+- Tamil → Tamil script, Telugu → Telugu script, etc.
+- English → English
+- Never mix languages
 
 {weather_ctx}
 
-Your expertise covers:
-- Crop diseases, pests and treatments
-- Weather and its impact on farming  
-- Mandi prices and when to sell
-- Government schemes: PM-KISAN (₹6000/year), Fasal Bima Yojana, Kisan Credit Card, Soil Health Card, PM Krishi Sinchai Yojana
-- Fertilizers, irrigation, soil health
-- Seasonal crop advice
+You know about: crop diseases, weather, mandi prices, government schemes, fertilizers, pesticides, irrigation, soil health.
 
-Rules:
-- Keep answers SHORT and SIMPLE — farmers need practical advice
-- Use simple words, avoid technical jargon
-- Always be encouraging and helpful
-- Kisan helpline: 1800-180-1551 (toll free)
-- If asked about prices, mention MSP and advise checking local mandi"""
+Government schemes to mention: PM-KISAN (₹6000/year), Fasal Bima Yojana, Kisan Credit Card, Soil Health Card, PM Krishi Sinchai Yojana.
+Kisan helpline: 1800-180-1551 (toll free).
+
+Keep answers SHORT and PRACTICAL. Use simple words. Be encouraging."""
 
     messages = [{"role": "system", "content": system_prompt}]
     for h in history[-6:]:
