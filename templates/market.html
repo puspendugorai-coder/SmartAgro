@@ -131,23 +131,68 @@
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-table"></i></div>
       <h2 data-translate="table_title">Price Comparison</h2>
-      <p data-translate="table_sub">₹/quintal across cities</p>
+      <p data-translate="table_sub">₹/quintal across major cities</p>
     </div>
+    
+    <!-- City Selector -->
+    <div class="table-controls">
+      <label>Select Cities:</label>
+      <div class="table-city-selector" id="citySelectorContainer">
+        <div class="city-checkbox">
+          <input type="checkbox" id="delhi-check" value="Delhi" checked onchange="updatePriceTable()">
+          <label for="delhi-check">Delhi</label>
+        </div>
+        <div class="city-checkbox">
+          <input type="checkbox" id="mumbai-check" value="Mumbai" checked onchange="updatePriceTable()">
+          <label for="mumbai-check">Mumbai</label>
+        </div>
+        <div class="city-checkbox">
+          <input type="checkbox" id="kolkata-check" value="Kolkata" checked onchange="updatePriceTable()">
+          <label for="kolkata-check">Kolkata</label>
+        </div>
+        <div class="city-checkbox">
+          <input type="checkbox" id="patna-check" value="Patna" checked onchange="updatePriceTable()">
+          <label for="patna-check">Patna</label>
+        </div>
+        <div class="city-checkbox">
+          <input type="checkbox" id="lucknow-check" value="Lucknow" checked onchange="updatePriceTable()">
+          <label for="lucknow-check">Lucknow</label>
+        </div>
+        <div class="city-checkbox">
+          <input type="checkbox" id="hyderabad-check" value="Hyderabad" checked onchange="updatePriceTable()">
+          <label for="hyderabad-check">Hyderabad</label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="table-legend">
+      <div class="legend-item">
+        <div class="legend-icon legend-up">📈</div>
+        <span>Price Up</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-icon legend-down">📉</div>
+        <span>Price Down</span>
+      </div>
+      <div class="legend-item">
+        <div class="legend-icon legend-na">—</div>
+        <span>No Data</span>
+      </div>
+    </div>
+
+    <!-- Table -->
     <div class="table-wrapper">
       <table class="price-table" id="priceTable">
-        <thead>
+        <thead id="priceTableHead">
           <tr>
             <th>Crop</th>
-            <th>Delhi</th>
-            <th>Mumbai</th>
-            <th>Kolkata</th>
-            <th>Patna</th>
-            <th>Lucknow</th>
-            <th>Jaipur</th>
-            <th>Bhopal</th>
-            <th>Indore</th>
-            <th>Amritsar</th>
-            <th>Hyderabad</th>
+            <th class="city-col" data-city="Delhi">Delhi</th>
+            <th class="city-col" data-city="Mumbai">Mumbai</th>
+            <th class="city-col" data-city="Kolkata">Kolkata</th>
+            <th class="city-col" data-city="Patna">Patna</th>
+            <th class="city-col" data-city="Lucknow">Lucknow</th>
+            <th class="city-col" data-city="Hyderabad">Hyderabad</th>
           </tr>
         </thead>
         <tbody id="priceTableBody"></tbody>
@@ -211,6 +256,31 @@
   document.getElementById('chatOverlay').addEventListener('click', function(e){
     if(e.target === this) closeChat();
   });
+
+  // Function to update price table based on selected cities
+  function updatePriceTable() {
+    const selectedCities = [];
+    document.querySelectorAll('.city-checkbox input:checked').forEach(checkbox => {
+      selectedCities.push(checkbox.value);
+    });
+
+    // Hide/Show table headers based on selected cities
+    document.querySelectorAll('.price-table th.city-col').forEach(header => {
+      const city = header.getAttribute('data-city');
+      header.style.display = selectedCities.includes(city) ? '' : 'none';
+    });
+
+    // Hide/Show table cells based on selected cities
+    document.querySelectorAll('.price-table tbody tr').forEach(row => {
+      row.querySelectorAll('td').forEach((cell, index) => {
+        if (index === 0) return; // Skip first column (crop name)
+        const city = row.getAttribute('data-city-' + index);
+        if (city) {
+          cell.style.display = selectedCities.some((c, idx) => idx === index - 1) ? '' : 'none';
+        }
+      });
+    });
+  }
 </script>
 </body>
 </html>
