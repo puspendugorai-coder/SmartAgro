@@ -256,6 +256,12 @@
         let typingAborted = false;
         let currentSpeakBtn = null; // tracks which message's speaker btn is active
         let speechPaused = false; // tracks pause/play state
+        let mobileSpeechText = '';   // full text currently being spoken (mobile)
+        let mobileSpeechOffset = 0;  // character offset for mobile resume
+
+        /* ── Mobile detection ───────────────────────── */
+        const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent)
+                      || ('ontouchstart' in window && navigator.maxTouchPoints > 1);
 
         /* ── Lang data ───────────────────────────── */
         const LANG_NAMES = {
@@ -562,36 +568,60 @@ window.stopKisanTyping = function () {
     speakBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
     speakBtn.setAttribute('aria-label', 'Play / Pause voice');
 
-    speakBtn.addEventListener('click', function(e) {
+    speakBtn.addEventListener('click', handleSpeakBtnAction);
+    speakBtn.addEventListener('touchstart', function(e) {
+      e.preventDefault(); // prevent ghost click on mobile
+      handleSpeakBtnAction(e);
+    }, { passive: false });
+
+    function handleSpeakBtnAction(e) {
     e.stopPropagation();
     const synth = window.speechSynthesis;
     if (!synth) return;
 
-    // This button is the active one and currently speaking → pause
-    if (currentSpeakBtn === speakBtn && synth.speaking && !synth.paused && !speechPaused) {
+    // ── This button is active and speaking → PAUSE ──────────────────
+    if (currentSpeakBtn === speakBtn && !speechPaused) {
+      if (isMobile) {
+        // Mobile: cancel is the only reliable way to "pause"
+        // offset is already tracked via onboundary
+        synth.cancel();
+        speechPaused = true;
+        speakBtn.classList.remove('speaking');
+        speakBtn.classList.add('paused');
+        speakBtn.innerHTML = '<i class="fas fa-play"></i>';
+        speakBtn.title = 'Resume';
+      } else {
         synth.pause();
         speechPaused = true;
         speakBtn.classList.remove('speaking');
         speakBtn.classList.add('paused');
         speakBtn.innerHTML = '<i class="fas fa-play"></i>';
         speakBtn.title = 'Resume';
-        return;
+      }
+      return;
     }
 
-    // This button is the active one and paused → resume
-    if (currentSpeakBtn === speakBtn && (synth.paused || speechPaused)) {
+    // ── This button is active and paused → RESUME ───────────────────
+    if (currentSpeakBtn === speakBtn && speechPaused) {
+      if (isMobile) {
+        // Mobile: re-fire from saved offset
+        synth.cancel();
+        const lang = getAppLang();
+        _fireUtterance(mobileSpeechText, lang, speakBtn, mobileSpeechOffset);
+      } else {
         synth.resume();
         speechPaused = false;
         speakBtn.classList.remove('paused');
         speakBtn.classList.add('speaking');
         speakBtn.innerHTML = '<i class="fas fa-pause"></i>';
         speakBtn.title = 'Pause';
-        return;
+      }
+      return;
     }
 
-    // New message — cancel previous, start fresh
+    // ── Different / new message → start fresh ───────────────────────
     speakText(el.textContent, getAppLang(), speakBtn);
-});
+  }
 
     footer.appendChild(speakBtn);
     wrapper.appendChild(el);
@@ -660,111 +690,130 @@ function typeWriter(el, text, i, onComplete) {
   }
 
   /* ── Text-to-Speech ──────────────────────────── */
+
+  /* Shared voice-finder (desktop + mobile) */
+  function findBestVoice(voices, langCode) {
+    const ttsLang = TTS_LANGS[langCode] || langCode;
+    const baseLang = ttsLang.split('-')[0];
+    let v = voices.find(v =>
+      v.lang === ttsLang &&
+      (v.name.includes('India') || v.name.includes('IN') ||
+       v.name.toLowerCase().includes('bengali') || v.name.toLowerCase().includes('bangla'))
+    );
+    if (!v) v = voices.find(v => v.lang === ttsLang);
+    if (!v) v = voices.find(v => {
+      if (!v.lang.startsWith(baseLang + '-')) return false;
+      if (baseLang === 'bn' && (v.lang === 'as-IN' || v.name.toLowerCase().includes('assamese'))) return false;
+      return true;
+    });
+    if (!v) v = voices.find(v => {
+      if (!v.lang.startsWith(baseLang)) return false;
+      if (baseLang === 'bn' && (v.lang === 'as-IN' || v.name.toLowerCase().includes('assamese'))) return false;
+      return true;
+    });
+    if (!v) v = voices.find(v => v.lang === 'hi-IN' || v.lang === 'hi');
+    if (!v && voices.length > 0) v = voices[0];
+    return v;
+  }
+
+  /* Clean text before TTS */
+  function cleanForTTS(text) {
+    return text
+      .replace(/[\u{1F300}-\u{1FFFF}]/gu, '')
+      .replace(/[⚠️✓•→]/g, '')
+      .replace(/\*/g, '')
+      .trim();
+  }
+
+  /* Build and fire a SpeechSynthesisUtterance from a given char offset */
+  function _fireUtterance(cleaned, lang, speakBtn, startOffset) {
+    const synth = window.speechSynthesis;
+    const slice = cleaned.slice(startOffset);
+    if (!slice) return;
+
+    const utter = new SpeechSynthesisUtterance(slice);
+    utter.lang   = TTS_LANGS[lang] || 'hi-IN';
+    utter.rate   = 0.88;
+    utter.pitch  = 1.0;
+    utter.volume = 1.0;
+
+    // Track progress so mobile can resume from roughly the right place
+    utter.onboundary = (e) => {
+      if (e.name === 'word') mobileSpeechOffset = startOffset + (e.charIndex || 0);
+    };
+
+    const toggleBtn = document.getElementById('kisanToggleBtn');
+    const onDone = () => {
+      mobileSpeechOffset = 0;
+      mobileSpeechText   = '';
+      if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
+      resetSpeakBtnUI();
+    };
+    utter.onend   = onDone;
+    utter.onerror = (e) => { if (e.error !== 'interrupted') onDone(); };
+
+    if (speakBtn) {
+      currentSpeakBtn = speakBtn;
+      speechPaused    = false;
+      speakBtn.classList.remove('paused');
+      speakBtn.classList.add('speaking');
+      speakBtn.innerHTML = '<i class="fas fa-pause"></i>';
+      speakBtn.title = 'Pause';
+    }
+    if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-volume-up" style="color:#fff;font-size:1.3rem"></i><span class="kw-pulse"></span>';
+
+    function doSpeak() {
+      const voices = synth.getVoices();
+      const best = findBestVoice(voices, lang);
+      if (best) utter.voice = best;
+      // iOS requires a tiny delay after cancel before speaking
+      setTimeout(() => synth.speak(utter), isMobile ? 120 : 0);
+    }
+
+    const voices = synth.getVoices();
+    if (voices.length === 0) {
+      synth.onvoiceschanged = () => { synth.onvoiceschanged = null; doSpeak(); };
+    } else {
+      doSpeak();
+    }
+  }
+
   function speakText(text, lang, speakBtn) {
     if (!window.speechSynthesis) return;
 
     window.speechSynthesis.cancel();
     resetSpeakBtnUI();
 
-    const cleaned = text
-        .replace(/[\u{1F300}-\u{1FFFF}]/gu, '')
-        .replace(/[⚠️✓•→]/g, '')
-        .replace(/\*/g, '')
-        .trim();
-
+    const cleaned = cleanForTTS(text);
     if (!cleaned) return;
 
-    const utter = new SpeechSynthesisUtterance(cleaned);
-    // Robust lang fallback
-    utter.lang = TTS_LANGS[lang] || 'hi-IN';
-    utter.rate  = 0.88;
-    utter.pitch = 1.0;
-    utter.volume = 1.0;
+    mobileSpeechText   = cleaned;
+    mobileSpeechOffset = 0;
 
-    // Update button immediately
-    if (speakBtn) {
-        currentSpeakBtn = speakBtn;
-        speechPaused = false;
-        speakBtn.classList.add('speaking');
-        speakBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        speakBtn.title = 'Pause';
-    }
-
-    const toggleBtn = document.getElementById('kisanToggleBtn');
-    if (toggleBtn) {
-        toggleBtn.innerHTML = '<i class="fas fa-volume-up" style="color:#fff;font-size:1.3rem"></i><span class="kw-pulse"></span>';
-    }
-
-    const onDone = () => {
-        if (toggleBtn) {
-            toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
-        }
-        resetSpeakBtnUI();
-    };
-    utter.onend   = onDone;
-    utter.onerror = onDone;
-
-    function findBestVoice(voices, langCode) {
-    const ttsLang = TTS_LANGS[langCode] || langCode;
-    const baseLang = ttsLang.split('-')[0]; // e.g. "bn" from "bn-IN"
-
-    // Priority 1: exact lang match + Indian/preferred accent
-    let v = voices.find(v =>
-        v.lang === ttsLang &&
-        (v.name.includes('India') || v.name.includes('IN') || v.name.toLowerCase().includes('bengali') || v.name.toLowerCase().includes('bangla'))
-    );
-    // Priority 2: exact lang match, any voice
-    if (!v) v = voices.find(v => v.lang === ttsLang);
-    // Priority 3: same base language, avoid wrong scripts
-    //   For Bengali (bn), explicitly block Assamese (as-IN) fallback
-    if (!v) {
-        v = voices.find(v => {
-            if (!v.lang.startsWith(baseLang + '-')) return false;
-            // Block Assamese from being used for Bengali
-            if (baseLang === 'bn' && (v.lang === 'as-IN' || v.name.toLowerCase().includes('assamese'))) return false;
-            return true;
-        });
-    }
-    // Priority 4: base lang loose match (still block Assamese for Bengali)
-    if (!v) {
-        v = voices.find(v => {
-            if (!v.lang.startsWith(baseLang)) return false;
-            if (baseLang === 'bn' && (v.lang === 'as-IN' || v.name.toLowerCase().includes('assamese'))) return false;
-            return true;
-        });
-    }
-    // Priority 5: Hindi fallback for unsupported Indian languages
-    if (!v) v = voices.find(v => v.lang === 'hi-IN' || v.lang === 'hi');
-    // Priority 6: any available voice
-    if (!v && voices.length > 0) v = voices[0];
-    return v;
-}
-
-    function doSpeak() {
-        const voices = window.speechSynthesis.getVoices();
-        const best = findBestVoice(voices, lang);
-        if (best) utter.voice = best;
-        window.speechSynthesis.speak(utter);
-    }
-
-    const voices = window.speechSynthesis.getVoices();
-    if (voices.length === 0) {
-        window.speechSynthesis.onvoiceschanged = () => {
-            window.speechSynthesis.onvoiceschanged = null;
-            doSpeak();
-        };
-    } else {
-        doSpeak();
-    }
-}
+    _fireUtterance(cleaned, lang, speakBtn, 0);
+  }
 
   function stopSpeaking() {
     if (window.speechSynthesis) window.speechSynthesis.cancel();
+    mobileSpeechText   = '';
+    mobileSpeechOffset = 0;
     resetSpeakBtnUI();
     const toggleBtn = document.getElementById('kisanToggleBtn');
     if (toggleBtn) {
       toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
     }
+  }
+
+  /* ── iOS requires speechSynthesis to be "unlocked" by a user gesture ── */
+  if (isMobile) {
+    document.addEventListener('touchstart', function _iosUnlock() {
+      if (window.speechSynthesis) {
+        const u = new SpeechSynthesisUtterance('');
+        window.speechSynthesis.speak(u);
+        window.speechSynthesis.cancel();
+      }
+      document.removeEventListener('touchstart', _iosUnlock);
+    }, { once: true, passive: true });
   }
 
   /* ── Voice input ─────────────────────────── */
