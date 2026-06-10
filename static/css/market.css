@@ -1,10 +1,11 @@
 /* 
    ============================================
-   GLOBAL VARIABLES (Keep your existing ones)
+   ROOT VARIABLES & THEME
    ============================================
 */
 
 :root {
+  /* Colors - Light Mode */
   --bg-1: #f8fafc;
   --bg-2: #f1f5f9;
   --bg-3: #e2e8f0;
@@ -14,21 +15,32 @@
   --text: #0f172a;
   --text-2: #334155;
   --text-3: #64748b;
+  
+  /* Accent Colors */
   --amber: #d97706;
   --amber-light: #fef3c7;
   --green: #16a34a;
   --green-light: #dcfce7;
   --red: #dc2626;
   --red-light: #fee2e2;
+  
+  /* Layout */
   --nav-h: 60px;
   --radius: 8px;
   --radius-lg: 12px;
   --radius-sm: 6px;
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 12px;
+  --spacing-lg: 16px;
+  --spacing-xl: 18px;
+  
+  /* Transitions & Effects */
   --trans: all 0.2s ease;
-  --shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
 
-/* Dark Mode Support */
+/* Dark Mode */
 body.dark {
   --bg-1: #0f172a;
   --bg-2: #1e293b;
@@ -45,15 +57,61 @@ body.dark {
   --green-light: #14532d;
   --red: #ef4444;
   --red-light: #450a0a;
-  --shadow: 0 4px 6px -1px rgba(0,0,0,0.5);
+  --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
 }
 
 /* ============================================
-   MARKET HERO & TICKER
-============================================ */
+   BASE STYLES
+   ============================================
+*/
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: inherit;
+  background: var(--bg-1);
+  color: var(--text);
+  transition: var(--trans);
+}
+
+/* ============================================
+   ANIMATIONS
+   ============================================
+*/
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes tickerScroll {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* ============================================
+   HERO & PRICE TICKER
+   ============================================
+*/
+
 .market-hero {
   background: linear-gradient(135deg, #7c3f00, #b45309, #d97706, #b45309);
   padding-bottom: 60px;
+  position: relative;
 }
 
 .price-ticker {
@@ -61,7 +119,7 @@ body.dark {
   bottom: 0;
   left: 0;
   right: 0;
-  height: 45px; /* Increased height */
+  height: 45px;
   background: rgba(0, 0, 0, 0.25);
   border-top: 1px solid rgba(255, 255, 255, 0.14);
   display: flex;
@@ -71,15 +129,15 @@ body.dark {
 }
 
 .ticker-label {
-  padding: 0 13px;
+  padding: 0 var(--spacing-lg);
   background: rgba(0, 0, 0, 0.3);
   color: #fff;
   font-weight: 800;
-  font-size: 0.7rem; /* Increased size */
+  font-size: 0.7rem;
   height: 100%;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: var(--spacing-xs);
   flex-shrink: 0;
   letter-spacing: 0.7px;
 }
@@ -94,25 +152,22 @@ body.dark {
 
 .ticker-content {
   white-space: nowrap;
-  font-size: 0.78rem; /* Increased size */
+  font-size: 0.78rem;
   color: rgba(255, 255, 255, 0.88);
   font-weight: 500;
   animation: tickerScroll 120s linear infinite;
   padding-left: 100%;
 }
 
-@keyframes tickerScroll {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-
 /* ============================================
-   SEARCH BAR
-============================================ */
+   SEARCH BAR & FILTERS
+   ============================================
+*/
+
 .search-bar-section {
   background: var(--card);
   border-bottom: 1px solid var(--border);
-  padding: 18px 0;
+  padding: var(--spacing-xl) 0;
   position: sticky;
   top: var(--nav-h);
   z-index: 100;
@@ -122,28 +177,29 @@ body.dark {
 .search-filter-bar {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: var(--spacing-md);
 }
 
 .search-box {
   display: flex;
   align-items: center;
-  gap: 7px;
+  gap: var(--spacing-sm);
   background: var(--bg-2);
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
-  padding: 10px 14px; /* Increased padding */
+  padding: var(--spacing-md) var(--spacing-lg);
   transition: var(--trans);
   min-width: 0;
 }
 
 .search-box:focus-within {
   border-color: var(--amber);
+  box-shadow: 0 0 0 3px rgba(217, 119, 6, 0.1);
 }
 
 .search-box i {
   color: var(--text-3);
-  font-size: 0.9rem; /* Increased size */
+  font-size: 0.9rem;
   flex-shrink: 0;
 }
 
@@ -154,7 +210,7 @@ body.dark {
   border: none;
   outline: none;
   color: var(--text);
-  font-size: 0.9rem; /* Increased size */
+  font-size: 0.9rem;
   font-family: inherit;
 }
 
@@ -164,20 +220,21 @@ body.dark {
 
 .search-btn {
   flex-shrink: 0;
-  padding: 8px 16px; /* Increased padding */
+  padding: var(--spacing-sm) var(--spacing-lg);
   background: var(--amber);
   color: #fff;
   font-weight: 700;
-  font-size: 0.8rem; /* Increased size */
+  font-size: 0.8rem;
   border-radius: var(--radius-sm);
-  transition: var(--trans);
   border: none;
   cursor: pointer;
   white-space: nowrap;
+  transition: var(--trans);
 }
 
 .search-btn:hover {
   opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 .clear-btn {
@@ -201,19 +258,17 @@ body.dark {
   color: #fff;
 }
 
-/* ============================================
-   FILTER CHIPS
-============================================ */
+/* Filter Chips */
 .filter-chips {
   display: flex;
-  gap: 6px;
+  gap: var(--spacing-sm);
   flex-wrap: wrap;
 }
 
 .chip {
-  padding: 6px 14px; /* Increased padding */
+  padding: var(--spacing-xs) var(--spacing-lg);
   border-radius: 50px;
-  font-size: 0.78rem; /* Increased size */
+  font-size: 0.78rem;
   font-weight: 600;
   border: 1.5px solid var(--border);
   color: var(--text-2);
@@ -222,7 +277,12 @@ body.dark {
   transition: var(--trans);
 }
 
-.chip:hover,
+.chip:hover {
+  background: var(--green-light);
+  border-color: var(--green);
+  color: var(--green);
+}
+
 .chip.active {
   background: var(--green-light);
   border-color: var(--green);
@@ -252,22 +312,28 @@ body.dark {
 
 /* ============================================
    MARKET CITIES GRID
-============================================ */
-.market-loading {
+   ============================================
+*/
+
+.market-loading,
+.no-results {
   text-align: center;
   padding: 65px 0;
 }
 
-.market-loading p {
+.market-loading p,
+.no-results p {
   color: var(--text-2);
-  margin-top: 7px;
+  margin: var(--spacing-sm) 0 0 0;
 }
 
 .market-cities-grid {
   display: grid;
-  /* FIXED: Use 100% to prevent cutting off on small phones */
-  grid-template-columns: repeat(auto-fill, minmax(min(100%, 350px), 1fr));
-  gap: 18px;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(min(100%, 350px), 1fr)
+  );
+  gap: var(--spacing-xl);
 }
 
 .city-card {
@@ -283,13 +349,14 @@ body.dark {
 .city-card:hover {
   border-color: var(--border-2);
   box-shadow: var(--shadow);
+  transform: translateY(-2px);
 }
 
 .city-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 14px 16px;
+  padding: var(--spacing-md) var(--spacing-lg);
   background: var(--amber-light);
   border-bottom: 1px solid rgba(232, 93, 4, 0.2);
 }
@@ -301,8 +368,8 @@ body.dark .city-card-header {
 .city-name {
   display: flex;
   align-items: center;
-  gap: 6px;
-  font-size: 1rem; /* Increased size */
+  gap: var(--spacing-sm);
+  font-size: 1rem;
   font-weight: 700;
   color: var(--amber);
 }
@@ -317,17 +384,19 @@ body.dark .city-card-header {
 }
 
 /* ============================================
-   CROP ROWS (THE MAIN FIX)
-============================================ */
+   CROP ROWS (MAIN CONTENT)
+   ============================================
+*/
+
 .crop-rows {
-  padding: 4px 0;
+  padding: var(--spacing-xs) 0;
 }
 
 .crop-row-header {
   display: grid;
   grid-template-columns: 1.6fr 1fr 1fr 68px;
-  padding: 10px 14px;
-  font-size: 0.68rem; /* Slightly larger */
+  padding: var(--spacing-md) var(--spacing-lg);
+  font-size: 0.68rem;
   color: var(--text-3);
   font-weight: 700;
   text-transform: uppercase;
@@ -339,10 +408,10 @@ body.dark .city-card-header {
   display: grid;
   grid-template-columns: 1.6fr 1fr 1fr 68px;
   align-items: center;
-  padding: 12px 14px; /* Increased padding */
+  padding: var(--spacing-md) var(--spacing-lg);
   border-bottom: 1px solid var(--border);
   transition: var(--trans);
-  gap: 6px;
+  gap: var(--spacing-sm);
 }
 
 .crop-row:last-child {
@@ -353,32 +422,33 @@ body.dark .city-card-header {
   background: var(--bg-2);
 }
 
-/* FIX: Main text fix to prevent cutting off */
+/* Crop Row Content */
 .cr-name {
-  font-size: 0.88rem; /* Increased */
+  font-size: 0.88rem;
   font-weight: 600;
   color: var(--text);
-  white-space: normal; /* Allows wrapping */
-  word-break: break-word; /* Breaks long words */
+  white-space: normal;
+  word-break: break-word;
   overflow: visible;
   line-height: 1.4;
+  min-width: 0;
 }
 
 .cr-price {
-  font-size: 0.95rem; /* Increased */
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--text);
 }
 
 .cr-unit {
-  font-size: 0.7rem; /* Increased */
+  font-size: 0.7rem;
   color: var(--text-3);
   display: block;
   margin-top: 2px;
 }
 
 .cr-msp {
-  font-size: 0.82rem; /* Increased */
+  font-size: 0.82rem;
   color: var(--text-3);
 }
 
@@ -405,30 +475,31 @@ body.dark .city-card-header {
 }
 
 /* ============================================
-   NO RESULTS & CHART
-============================================ */
-.no-results {
-  text-align: center;
-  padding: 65px 0;
-  color: var(--text-3);
-}
+   NO RESULTS
+   ============================================
+*/
 
 .no-results i {
   font-size: 2.6rem;
-  margin-bottom: 13px;
+  margin-bottom: var(--spacing-lg);
 }
 
 .no-results h3 {
   font-size: 1.05rem;
   font-weight: 700;
   color: var(--text-2);
-  margin-bottom: 6px;
+  margin-bottom: var(--spacing-sm);
 }
 
 .no-results p {
   font-size: 0.85rem;
-  margin-bottom: 18px;
+  margin-bottom: var(--spacing-lg);
 }
+
+/* ============================================
+   CHARTS
+   ============================================
+*/
 
 .chart-section {
   background: var(--bg-2);
@@ -445,10 +516,10 @@ body.dark .city-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 16px;
+  padding: var(--spacing-md) var(--spacing-lg);
   border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
-  gap: 9px;
+  gap: var(--spacing-md);
 }
 
 .chart-tabs {
@@ -457,7 +528,7 @@ body.dark .city-card-header {
 }
 
 .chart-tab {
-  padding: 6px 12px;
+  padding: var(--spacing-xs) var(--spacing-md);
   border-radius: var(--radius-sm);
   font-size: 0.78rem;
   font-weight: 600;
@@ -476,7 +547,7 @@ body.dark .city-card-header {
 }
 
 .chart-city-select select {
-  padding: 6px 10px;
+  padding: var(--spacing-xs) var(--spacing-sm);
   background: var(--bg-2);
   border: 1px solid var(--border-2);
   border-radius: var(--radius-sm);
@@ -485,17 +556,24 @@ body.dark .city-card-header {
   font-family: inherit;
   outline: none;
   cursor: pointer;
+  transition: var(--trans);
+}
+
+.chart-city-select select:hover {
+  border-color: var(--amber);
 }
 
 .chart-canvas-wrap {
-  padding: 18px;
+  padding: var(--spacing-xl);
   height: 320px;
   position: relative;
 }
 
 /* ============================================
    PRICE TABLE
-============================================ */
+   ============================================
+*/
+
 .table-wrapper {
   overflow-x: auto;
   border-radius: var(--radius);
@@ -505,12 +583,12 @@ body.dark .city-card-header {
 .price-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8rem; /* Increased */
+  font-size: 0.8rem;
   min-width: 820px;
 }
 
 .price-table th {
-  padding: 10px 13px;
+  padding: var(--spacing-md) var(--spacing-lg);
   background: var(--amber-light);
   color: var(--amber);
   font-weight: 700;
@@ -529,7 +607,7 @@ body.dark .price-table th {
 }
 
 .price-table td {
-  padding: 9px 13px;
+  padding: var(--spacing-sm) var(--spacing-lg);
   border-bottom: 1px solid var(--border);
   text-align: right;
   color: var(--text);
@@ -554,29 +632,32 @@ body.dark .price-table th {
 }
 
 /* ============================================
-   RESPONSIVE (MOBILE FIXES)
-============================================ */
+   RESPONSIVE DESIGN (TABLET)
+   ============================================
+*/
+
 @media (max-width: 768px) {
+  :root {
+    --spacing-xl: 14px;
+    --spacing-lg: 12px;
+  }
+
   .market-cities-grid {
     grid-template-columns: 1fr;
-    gap: 14px;
+    gap: var(--spacing-lg);
   }
 
-  /* City Card Fix for Mobile */
   .city-card {
-    margin: 0 10px; /* Add margin instead of cutting off */
-    border-radius: 10px;
+    margin: 0 var(--spacing-lg);
   }
 
-  /* Crop Rows - 3 Columns (Name, Price, Change) */
   .crop-row-header,
   .crop-row {
     grid-template-columns: 1.4fr 1fr 60px;
-    padding-left: 12px;
-    padding-right: 12px;
+    padding-left: var(--spacing-md);
+    padding-right: var(--spacing-md);
   }
 
-  /* Hide MSP on Tablet/Mobile */
   .crop-row .cr-msp,
   .crop-row-header .col-msp {
     display: none !important;
@@ -595,25 +676,66 @@ body.dark .price-table th {
     font-size: 0.9rem;
   }
 
-  /* Ticker adjustments */
   .ticker-label {
-    padding: 0 10px;
+    padding: 0 var(--spacing-md);
     font-size: 0.65rem;
   }
 
   .ticker-content {
     font-size: 0.74rem;
   }
+
+  .chart-canvas-wrap {
+    height: 280px;
+  }
 }
 
+/* ============================================
+   RESPONSIVE DESIGN (MOBILE LANDSCAPE)
+   ============================================
+*/
+
+@media (max-width: 600px) {
+  .search-bar-section {
+    padding: var(--spacing-md) 0;
+  }
+
+  .search-btn {
+    padding: var(--spacing-sm) var(--spacing-md);
+    font-size: 0.78rem;
+  }
+
+  .ticker-label {
+    padding: 0 var(--spacing-md);
+    font-size: 0.62rem;
+  }
+
+  .ticker-content {
+    font-size: 0.72rem;
+  }
+
+  .chart-canvas-wrap {
+    padding: var(--spacing-md);
+    height: 250px;
+  }
+}
+
+/* ============================================
+   RESPONSIVE DESIGN (MOBILE PORTRAIT)
+   ============================================
+*/
+
 @media (max-width: 480px) {
-  /* Crop Rows - 2 Columns Only (Name, Price) on very small phones */
+  :root {
+    --spacing-lg: 10px;
+    --spacing-md: 10px;
+  }
+
   .crop-row-header,
   .crop-row {
     grid-template-columns: 1.5fr 1fr !important;
   }
 
-  /* Hide Change on very small screens */
   .crop-row .cr-change,
   .crop-row-header .col-change {
     display: none !important;
@@ -627,34 +749,17 @@ body.dark .price-table th {
     font-size: 0.82rem;
   }
 
-  /* Chart adjustments */
   .chart-canvas-wrap {
-    padding: 10px;
-    height: 250px;
+    padding: var(--spacing-md);
+    height: 240px;
   }
 
   .search-bar-section {
-    padding: 12px 0;
+    padding: var(--spacing-md) 0;
   }
 
   .search-btn {
-    padding: 8px 12px;
-    font-size: 0.78rem;
-  }
-}
-
-@media (max-width: 600px) {
-  .chart-canvas-wrap {
-    padding: 10px;
-    height: 250px;
-  }
-
-  .ticker-label {
-    padding: 0 10px;
-    font-size: 0.62rem;
-  }
-
-  .ticker-content {
-    font-size: 0.72rem;
+    padding: var(--spacing-xs) var(--spacing-md);
+    font-size: 0.75rem;
   }
 }
