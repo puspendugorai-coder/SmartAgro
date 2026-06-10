@@ -275,6 +275,32 @@
             ur: 'ur-PK',
             ne: 'ne-NP',
         };
+        // TTS language codes — Indian accent preferred
+        const TTS_LANGS = {
+            en: 'en-IN',
+            hi: 'hi-IN',
+            bn: 'bn-BD',
+            te: 'te-IN',
+            mr: 'mr-IN',
+            ta: 'ta-IN',
+            gu: 'gu-IN',
+            kn: 'kn-IN',
+            ml: 'ml-IN',
+            pa: 'pa-IN',
+            or: 'or-IN',
+            as: 'as-IN',
+            ur: 'ur-PK',
+            mai: 'hi-IN',
+            ne: 'ne-NP',
+            sat: 'hi-IN',
+            ks: 'ur-PK',
+            sd: 'ur-PK',
+            kok: 'mr-IN',
+            mni: 'bn-BD',
+            bodo: 'hi-IN',
+            doi: 'hi-IN',
+            sa: 'hi-IN',
+        };
 
         /* ── Helpers ─────────────────────────────── */
         function getMsgs() { return document.getElementById('kisanMessages'); }
@@ -305,6 +331,7 @@
             const panel = document.getElementById('kisanPanel');
             isOpen = !isOpen;
             panel.classList.toggle('kp-hidden', !isOpen);
+            if (!isOpen) stopSpeaking();
             if (isOpen) {
                 if (chatHistory.length === 0 && !langChosen) showLangPicker();
                 setTimeout(() => { const i = getInput(); if (i) i.focus(); }, 300);
@@ -352,6 +379,7 @@
 
   /* ── New Chat ────────────────────────────── */
   window.newKisanChat = function () {
+    stopSpeaking();
     chatHistory   = [];
     langChosen    = false;
     chosenLang    = null;
@@ -371,6 +399,7 @@
     typingAborted = true;
     isBusy        = false;
     hideStopBtn();
+    stopSpeaking();
   };
 
   /* ── Send message ────────────────────────── */
@@ -462,6 +491,8 @@
       typingAborted = false;
       showStopBtn();
       typeWriter(el, text, 0);
+      // Speak after short delay so typewriter starts first
+      setTimeout(() => speakText(text, getAppLang()), 400);
     } else {
       el.textContent = text;
       scrollBot();
@@ -499,6 +530,76 @@
   function removeTyping(id) {
     const el = document.getElementById(id);
     if (el) el.remove();
+  }
+  /* ── Text-to-Speech ──────────────────────── */
+  function speakText(text, lang) {
+    if (!window.speechSynthesis) return;
+
+    // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
+
+    // Clean text — remove emojis and special chars for cleaner speech
+    const cleaned = text
+      .replace(/[\u{1F300}-\u{1FFFF}]/gu, '')
+      .replace(/[⚠️✓•→]/g, '')
+      .replace(/\*/g, '')
+      .trim();
+
+    if (!cleaned) return;
+
+    const utter = new SpeechSynthesisUtterance(cleaned);
+    utter.lang  = TTS_LANGS[lang] || 'hi-IN';
+    utter.rate  = 0.92;   // slightly slower — easier to understand
+    utter.pitch = 1.0;
+    utter.volume = 1.0;
+
+    // Try to find an Indian voice for the language
+    const voices = window.speechSynthesis.getVoices();
+    const preferred = voices.find(v =>
+      v.lang === utter.lang && (v.name.includes('India') || v.name.includes('IN'))
+    ) || voices.find(v =>
+      v.lang.startsWith(utter.lang.split('-')[0])
+    );
+    if (preferred) utter.voice = preferred;
+
+    // Show speaker icon on toggle button while speaking
+    const toggleBtn = document.getElementById('kisanToggleBtn');
+    if (toggleBtn) {
+      toggleBtn.innerHTML = '<i class="fas fa-volume-up" style="color:#fff;font-size:1.3rem"></i><span class="kw-pulse"></span>';
+    }
+
+    utter.onend = () => {
+      if (toggleBtn) {
+        toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
+      }
+    };
+    utter.onerror = () => {
+      if (toggleBtn) {
+        toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
+      }
+    };
+
+    // Voices may not be loaded yet on first call
+    if (voices.length === 0) {
+      window.speechSynthesis.onvoiceschanged = () => {
+        const v2 = window.speechSynthesis.getVoices();
+        const p2 = v2.find(v =>
+          v.lang === utter.lang && (v.name.includes('India') || v.name.includes('IN'))
+        ) || v2.find(v => v.lang.startsWith(utter.lang.split('-')[0]));
+        if (p2) utter.voice = p2;
+        window.speechSynthesis.speak(utter);
+      };
+    } else {
+      window.speechSynthesis.speak(utter);
+    }
+  }
+
+  function stopSpeaking() {
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+    const toggleBtn = document.getElementById('kisanToggleBtn');
+    if (toggleBtn) {
+      toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
+    }
   }
 
   /* ── Voice input ─────────────────────────── */
