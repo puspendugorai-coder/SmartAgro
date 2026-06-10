@@ -1,310 +1,244 @@
-let chatOpen         = false;
-let recognition      = null;
-let isListening      = false;
-let chatHistory      = [];
-let chatLang         = localStorage.getItem('agrosmart_lang') || 'en';
-let currentUtterance = null;
-let speakingMsgId    = null;
+function requestLocation() {
+  const btn = document.getElementById('locationBtn');
+  if (btn) {
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Getting location...</span>';
+    btn.disabled  = true;
+  }
 
-const SPEECH_LANGS = {
-  'hi':'hi-IN','bn':'bn-IN','ta':'ta-IN','te':'te-IN',
-  'mr':'mr-IN','pa':'pa-IN','gu':'gu-IN','kn':'kn-IN',
-  'ml':'ml-IN','en':'en-IN','ur':'ur-IN'
-};
+  if (!navigator.geolocation) {
+    showToast('Geolocation not supported.', 'warning');
+    loadDashboard(28.6139, 77.2090);
+    return;
+  }
 
-/* ── Toggle fullscreen chat ── */
-function toggleChat() {
-  chatOpen = !chatOpen;
-  const overlay = document.getElementById('chatOverlay');
-  const fab     = document.getElementById('chatFab');
-  if (!overlay) return;
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      showToast('📍 Location found!', 'success');
+      if (btn) {
+        btn.innerHTML = '<i class="fas fa-check"></i> <span>Location Found</span>';
+        btn.style.background = '#fff';
+        btn.style.color      = '#1b4332';
+      }
+      loadDashboard(pos.coords.latitude, pos.coords.longitude);
+      // Send notification if alerts found
+      setTimeout(() => {
+        const count = parseInt(sessionStorage.getItem('alert_count') || '0');
+        if (count > 0) sendNotification('SmartAgro Alert', `${count} active alerts for your farm area!`);
+      }, 5000);
+    },
+    err => {
+      console.warn('[Location error]', err.code, err.message);
+      showToast('Using Delhi as default. Please allow location for accurate data.', 'warning');
+      if (btn) {
+        btn.innerHTML = '<i class="fas fa-location-crosshairs"></i> <span>Get My Location</span>';
+        btn.disabled  = false;
+        btn.style.background = '';
+        btn.style.color      = '';
+      }
+      loadDashboard(28.6139, 77.2090);
+    },
+    {timeout: 12000, enableHighAccuracy: false, maximumAge: 300000}
+  );
+}
 
-  if (chatOpen) {
-    overlay.style.display = 'flex';
-    document.body.style.overflow = 'hidden';
-    fab.innerHTML = '<i class="fas fa-times"></i>';
-    fab.classList.add('chat-open');
-    setTimeout(() => overlay.classList.add('open'), 10);
-    if (chatHistory.length === 0) showWelcome();
-    setTimeout(() => {
-      const inp = document.getElementById('chatInput');
-      if (inp) inp.focus();
-    }, 300);
-  } else {
-    overlay.classList.remove('open');
-    document.body.style.overflow = '';
-    fab.innerHTML = '<i class="fas fa-microphone"></i>';
-    fab.classList.remove('chat-open');
-    setTimeout(() => { overlay.style.display = 'none'; }, 280);
-    stopSpeaking();
+async function loadDashboard(lat, lon) {
+  const card = document.getElementById('heroWeatherCard');
+  if (card) card.innerHTML = `
+    <div class="hwc-loading">
+      <div style="width:28px;height:28px;border:3px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 8px"></div>
+      <span style="font-size:0.82rem">Loading weather...</span>
+    </div>`;
+
+  const data = await fetchWeather(lat, lon);
+  if (!data) return;
+
+  renderHeroCard(data.current);
+  renderWeatherSection(data.current, data.forecast);
+  renderStatBar(data.current);
+  renderRainForecast(data.forecast);
+  loadCrops(data.current);
+}
+
+function renderHeroCard(w) {
+  const card = document.getElementById('heroWeatherCard');
+  if (!card) return;
+  card.innerHTML = `
+    <div class="hwc-loaded">
+      <div class="hwc-city"><i class="fas fa-location-dot"></i> ${w.city}</div>
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px">
+        <div>
+          <div class="hwc-temp">${w.temp}°</div>
+          <div class="hwc-desc">${capitalize(w.description)}</div>
+        </div>
+        <div class="hwc-icon-large">${getWeatherEmoji(w.icon)}</div>
+      </div>
+      <div class="hwc-stats">
+        <div class="hwc-stat"><i class="fas fa-droplets"></i> ${w.humidity}%</div>
+        <div class="hwc-stat"><i class="fas fa-wind"></i> ${w.wind_speed} m/s</div>
+        <div class="hwc-stat"><i class="fas fa-temperature-half"></i> ${w.feels_like}°C</div>
+        <div class="hwc-stat"><i class="fas fa-gauge-high"></i> ${w.pressure} hPa</div>
+      </div>
+    </div>`;
+}
+
+function renderWeatherSection(current, forecast) {
+  const section = document.getElementById('weatherSection');
+  if (section) section.style.display = '';
+
+  const main = document.getElementById('weatherMain');
+  if (main) main.innerHTML = `
+    <div class="weather-primary-card">
+      <div style="font-size:4rem">${getWeatherEmoji(current.icon)}</div>
+      <div>
+        <div class="wpc-temp">${current.temp}°C</div>
+        <div class="wpc-city"><i class="fas fa-location-dot" style="margin-right:4px"></i>${current.city}</div>
+        <div class="wpc-desc">${capitalize(current.description)}</div>
+        <div class="wpc-feels">Feels like ${current.feels_like}°C</div>
+      </div>
+    </div>
+    <div class="weather-stat-card">
+      <div class="wsc-icon"><i class="fas fa-droplets"></i></div>
+      <div class="wsc-label">Humidity</div>
+      <div class="wsc-val">${current.humidity}<span class="wsc-unit">%</span></div>
+    </div>
+    <div class="weather-stat-card">
+      <div class="wsc-icon"><i class="fas fa-wind"></i></div>
+      <div class="wsc-label">Wind Speed</div>
+      <div class="wsc-val">${current.wind_speed}<span class="wsc-unit"> m/s</span></div>
+    </div>
+    <div class="weather-stat-card">
+      <div class="wsc-icon"><i class="fas fa-eye"></i></div>
+      <div class="wsc-label">Visibility</div>
+      <div class="wsc-val">${current.visibility.toFixed(1)}<span class="wsc-unit"> km</span></div>
+    </div>`;
+
+  const fg = document.getElementById('forecastGrid');
+  if (fg && forecast) {
+    const todayStr = new Date().toISOString().split('T')[0];
+    fg.innerHTML = forecast.map((day, i) => `
+      <div class="forecast-card ${day.date === todayStr ? 'today' : ''}" style="animation-delay:${i*0.06}s">
+        <div class="fc-day">${getDayName(day.date)}</div>
+        <div class="fc-icon">${getWeatherEmoji(day.icon)}</div>
+        <div class="fc-desc">${capitalize(day.description)}</div>
+        <div class="fc-temps">
+          <span class="fc-max">${Math.round(day.temp_max)}°</span>
+          <span class="fc-min">${Math.round(day.temp_min)}°</span>
+        </div>
+        <div style="font-size:0.65rem;color:var(--text-3);margin-top:3px">
+          <i class="fas fa-droplets" style="color:#1d4e89"></i> ${day.humidity}%
+        </div>
+      </div>`).join('');
   }
 }
 
-function closeChat() {
-  if (chatOpen) toggleChat();
+function renderStatBar(w) {
+  const bar = document.getElementById('statsBar');
+  if (bar) bar.style.display = '';
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('statTemp',       `${w.temp}°C`);
+  set('statHumidity',   `${w.humidity}%`);
+  set('statWind',       `${w.wind_speed} m/s`);
+  set('statVisibility', `${w.visibility.toFixed(1)} km`);
+  set('statPressure',   `${w.pressure} hPa`);
 }
 
-/* ── Welcome message ── */
-function showWelcome() {
-  const lang = localStorage.getItem('agrosmart_lang') || 'en';
-  const msgs = {
-    hi: '🌾 नमस्ते किसान भाई!\n\nमैं SmartAgro सहायक हूं। मुझसे पूछें:\n• फसल की बीमारी और इलाज\n• आज का मौसम और खेती सलाह\n• मंडी भाव और MSP\n• सरकारी योजनाएं (PM-KISAN, फसल बीमा)\n• खाद और कीटनाशक की जानकारी',
-    en: '🌾 Hello Farmer!\n\nI am SmartAgro Assistant. Ask me about:\n• Crop diseases and treatment\n• Weather and farming advice\n• Mandi prices and MSP rates\n• Government schemes (PM-KISAN, Crop Insurance)\n• Fertilizers and pesticides',
-    bn: '🌾 নমস্কার কৃষক ভাই!\n\nআমি SmartAgro সহায়ক। জিজ্ঞাসা করুন:\n• ফসলের রোগ ও চিকিৎসা\n• আবহাওয়া ও চাষের পরামর্শ\n• বাজার মূল্য ও MSP\n• সরকারি প্রকল্প',
-    ta: '🌾 வணக்கம் விவசாயி!\n\nநான் SmartAgro உதவியாளர். கேளுங்கள்:\n• பயிர் நோய்கள் மற்றும் சிகிச்சை\n• வானிலை மற்றும் விவசாய ஆலோசனை\n• சந்தை விலைகள் மற்றும் MSP\n• அரசு திட்டங்கள்',
-    te: '🌾 నమస్కారం రైతు అన్న!\n\nనేను SmartAgro సహాయకుడిని. అడగండి:\n• పంట రోగాలు మరియు చికిత్స\n• వాతావరణం మరియు వ్యవసాయ సలహా\n• మార్కెట్ ధరలు మరియు MSP\n• ప్రభుత్వ పథకాలు',
-    mr: '🌾 नमस्कार शेतकरी!\n\nमी SmartAgro सहाय्यक आहे. विचारा:\n• पीक रोग आणि उपचार\n• हवामान आणि शेती सल्ला\n• बाजारभाव आणि MSP\n• सरकारी योजना',
-    pa: '🌾 ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਕਿਸਾਨ ਵੀਰ!\n\nਮੈਂ SmartAgro ਸਹਾਇਕ ਹਾਂ। ਪੁੱਛੋ:\n• ਫਸਲ ਰੋਗ ਅਤੇ ਇਲਾਜ\n• ਮੌਸਮ ਅਤੇ ਖੇਤੀ ਸਲਾਹ\n• ਮੰਡੀ ਭਾਅ ਅਤੇ MSP\n• ਸਰਕਾਰੀ ਯੋਜਨਾਵਾਂ',
-  };
-  addBotMsg(msgs[lang] || msgs.en);
-}
-
-/* ── Add bot message with speaker ── */
-function addBotMsg(text) {
-  const list = document.getElementById('chatMessages');
-  if (!list) return;
-  const id  = 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2,5);
-  const div = document.createElement('div');
-  div.className   = 'chat-msg bot';
-  div.id          = id;
-  div.dataset.text = text;
-
-  const formatted = text
-    .replace(/&/g,'&amp;')
-    .replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;')
-    .replace(/\n/g,'<br>')
-    .replace(/•/g,'<span style="color:var(--green);margin-right:4px">•</span>');
-
-  div.innerHTML = `
-    <div class="msg-avatar">🌾</div>
-    <div class="msg-content">
-      <div class="msg-bubble">${formatted}</div>
-      <div class="msg-actions">
-        <button class="msg-speak-btn" id="speak_${id}" onclick="toggleSpeak('${id}')" title="Listen">
-          <i class="fas fa-volume-up"></i>
-        </button>
-        <span class="msg-time">${getTime()}</span>
-      </div>
+function renderRainForecast(forecast) {
+  const section = document.getElementById('rainSection');
+  if (!section || !forecast) return;
+  section.style.display = '';
+  const today    = forecast[0] || {};
+  const tomorrow = forecast[1] || {};
+  const todayRain    = today.rain > 0    || (today.description    || '').toLowerCase().includes('rain');
+  const tomorrowRain = tomorrow.rain > 0 || (tomorrow.description || '').toLowerCase().includes('rain');
+  const grid = document.getElementById('rainGrid');
+  if (!grid) return;
+  grid.innerHTML = `
+    <div class="rain-card ${todayRain ? 'rain-yes' : 'rain-no'}">
+      <div class="rain-icon">${todayRain ? '🌧️' : '☀️'}</div>
+      <div class="rain-label">Today</div>
+      <div class="rain-answer">${todayRain ? 'YES — Rain Expected' : 'NO — Clear Sky'}</div>
+      <div class="rain-temp">${Math.round(today.temp_max||0)}° / ${Math.round(today.temp_min||0)}°</div>
+    </div>
+    <div class="rain-card ${tomorrowRain ? 'rain-yes' : 'rain-no'}">
+      <div class="rain-icon">${tomorrowRain ? '🌧️' : '☀️'}</div>
+      <div class="rain-label">Tomorrow</div>
+      <div class="rain-answer">${tomorrowRain ? 'YES — Rain Expected' : 'NO — Clear Sky'}</div>
+      <div class="rain-temp">${Math.round(tomorrow.temp_max||0)}° / ${Math.round(tomorrow.temp_min||0)}°</div>
     </div>`;
-  list.appendChild(div);
-  list.scrollTop = list.scrollHeight;
 }
 
-/* ── Add user message ── */
-function addUserMsg(text) {
-  const list = document.getElementById('chatMessages');
-  if (!list) return;
-  const div = document.createElement('div');
-  div.className = 'chat-msg user';
-  div.innerHTML = `
-    <div class="msg-content">
-      <div class="msg-bubble">${text.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>
-      <span class="msg-time">${getTime()}</span>
-    </div>`;
-  list.appendChild(div);
-  list.scrollTop = list.scrollHeight;
-}
-
-/* ── Typing indicator ── */
-function addTyping() {
-  const list = document.getElementById('chatMessages');
-  if (!list) return null;
-  const div = document.createElement('div');
-  div.className = 'chat-msg bot typing-msg';
-  div.innerHTML = `
-    <div class="msg-avatar">🌾</div>
-    <div class="msg-content">
-      <div class="msg-bubble">
-        <span class="typing-dots"><span></span><span></span><span></span></span>
-      </div>
-    </div>`;
-  list.appendChild(div);
-  list.scrollTop = list.scrollHeight;
-  return div;
-}
-
-function getTime() {
-  return new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
-}
-
-/* ── Send message ── */
-async function sendMessage() {
-  const input = document.getElementById('chatInput');
-  const msg   = input?.value.trim();
-  if (!msg) return;
-  input.value = '';
-
-  addUserMsg(msg);
-  chatHistory.push({role:'user', content:msg});
-
-  const typing  = addTyping();
-  const weather = window.weatherData?.current || {};
-
+async function loadCrops(current) {
   try {
-    const res = await fetch('/api/chat', {
-      method:  'POST',
-      headers: {'Content-Type':'application/json'},
-      body:    JSON.stringify({
-        message:         msg,
-        weather_context: weather,
-        history:         chatHistory.slice(-6)
-      })
+    const res  = await fetch('/api/crop-recommendations', {
+      method: 'POST', headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({temp: current.temp, humidity: current.humidity, rain: current.rain || 0})
     });
     const data = await res.json();
-    if (typing) typing.remove();
-    const reply = data.reply || 'Sorry, try again.';
-    addBotMsg(reply);
-    chatHistory.push({role:'assistant', content:reply});
-    if (chatHistory.length > 20) chatHistory = chatHistory.slice(-20);
-  } catch {
-    if (typing) typing.remove();
-    addBotMsg('Connection error. Please check internet and try again.');
-  }
+    renderCrops(data);
+    renderSoilTips(data.soil_tips);
+    renderPesticides(data.pesticides);
+    const label = document.getElementById('seasonLabel');
+    if (label) label.textContent = `Season: ${data.season} — ${current.city}`;
+  } catch { showToast('Could not load crop data.', 'error'); }
 }
 
-function handleChatKey(e) {
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    sendMessage();
-  }
+function renderCrops(data) {
+  const section = document.getElementById('cropSection');
+  const grid    = document.getElementById('cropsGrid');
+  if (!section || !grid) return;
+  section.style.display = '';
+  grid.innerHTML = (data.crops || []).map((crop, i) => `
+    <div class="crop-card" style="animation-delay:${i*0.07}s">
+      <div class="crop-card-top">
+        <div class="crop-emoji">${crop.icon}</div>
+        <div class="crop-match-badge"><i class="fas fa-check-circle"></i> ${crop.match}</div>
+      </div>
+      <div class="crop-name">${crop.name}</div>
+      <div class="crop-desc">${crop.description}</div>
+      <div class="crop-meta">
+        <div class="cm-item"><span class="cm-label">Season</span><span class="cm-val">${crop.season.split(' ')[0]}</span></div>
+        <div class="cm-item"><span class="cm-label">Water</span><span class="cm-val">${crop.water}</span></div>
+        <div class="cm-item"><span class="cm-label">Yield</span><span class="cm-val">${crop.yield}</span></div>
+        <div class="cm-item"><span class="cm-label">Duration</span><span class="cm-val">${crop.duration}</span></div>
+      </div>
+      <div class="crop-profit"><i class="fas fa-indian-rupee-sign"></i> ${crop.profit}</div>
+    </div>`).join('');
+  setTimeout(() => observeAnimations(), 100);
 }
 
-/* ── Text to Speech ── */
-function toggleSpeak(msgId) {
-  const div  = document.getElementById(msgId);
-  const btn  = document.getElementById('speak_' + msgId);
-  if (!div || !btn) return;
-
-  if (speakingMsgId === msgId) {
-    stopSpeaking();
-    return;
-  }
-
-  stopSpeaking();
-
-  const text = div.dataset.text || div.querySelector('.msg-bubble')?.innerText || '';
-  if (!text) return;
-
-  const lang     = localStorage.getItem('agrosmart_lang') || 'en';
-  const utterance = new SpeechSynthesisUtterance(text);
-  utterance.lang  = SPEECH_LANGS[lang] || 'en-IN';
-  utterance.rate  = 0.9;
-  utterance.pitch = 1;
-
-  utterance.onstart = () => {
-    speakingMsgId = msgId;
-    btn.innerHTML = '<i class="fas fa-stop"></i>';
-    btn.classList.add('speaking');
-  };
-
-  utterance.onend = utterance.onerror = () => {
-    speakingMsgId = null;
-    btn.innerHTML = '<i class="fas fa-volume-up"></i>';
-    btn.classList.remove('speaking');
-  };
-
-  currentUtterance = utterance;
-  window.speechSynthesis.speak(utterance);
+function renderSoilTips(tips) {
+  const section = document.getElementById('soilSection');
+  const grid    = document.getElementById('soilGrid');
+  if (!section || !grid || !tips?.length) return;
+  section.style.display = '';
+  grid.innerHTML = tips.map((tip, i) => `
+    <div class="soil-tip-card" style="animation-delay:${i*0.08}s">
+      <div class="soil-tip-icon">${tip.icon}</div>
+      <div class="soil-tip-content">
+        <div class="soil-tip-title">${tip.title}</div>
+        <div class="soil-tip-text">${tip.tip}</div>
+      </div>
+    </div>`).join('');
 }
 
-function stopSpeaking() {
-  if (window.speechSynthesis) {
-    window.speechSynthesis.cancel();
-  }
-  if (speakingMsgId) {
-    const btn = document.getElementById('speak_' + speakingMsgId);
-    if (btn) {
-      btn.innerHTML = '<i class="fas fa-volume-up"></i>';
-      btn.classList.remove('speaking');
-    }
-    speakingMsgId = null;
-  }
+function renderPesticides(pesticides) {
+  const section = document.getElementById('pestSection');
+  const cards   = document.getElementById('pestCards');
+  if (!section || !cards || !pesticides?.length) return;
+  section.style.display = '';
+  cards.innerHTML = pesticides.map(p => `
+    <div class="pest-crop-card">
+      <div class="pcc-header">🌾 ${p.crop} — Pest Control</div>
+      <div class="pcc-items">
+        ${p.guides.map(g => `
+          <div class="pcc-item">
+            <div class="pcc-pest"><i class="fas fa-bug" style="color:var(--amber);margin-right:5px"></i>${g.pest}</div>
+            <div class="pcc-meta">
+              <span><i class="fas fa-flask"></i> ${g.pesticide}</span>
+              <span><i class="fas fa-scale-balanced"></i> ${g.dose}</span>
+            </div>
+            <div class="pcc-eco eco-${g.eco}">${g.eco ? '🌿 Eco-Friendly' : '⚗️ Chemical'}</div>
+          </div>`).join('')}
+      </div>
+    </div>`).join('');
 }
-
-/* ── Voice input ── */
-function startVoice() {
-  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-  if (!SR) {
-    showToast('Voice not supported. Please use Chrome browser.', 'error');
-    return;
-  }
-  if (isListening) {
-    recognition?.stop();
-    return;
-  }
-  if (!chatOpen) toggleChat();
-
-  const langCode   = localStorage.getItem('agrosmart_lang') || 'en';
-  const speechLang = SPEECH_LANGS[langCode] || 'en-IN';
-
-  recognition = new SR();
-  recognition.lang            = speechLang;
-  recognition.interimResults  = false;
-  recognition.maxAlternatives = 1;
-  recognition.continuous      = false;
-
-  recognition.onstart = () => {
-    isListening = true;
-    updateMicState(true);
-    showToast('🎤 Listening... speak now', 'success');
-  };
-
-  recognition.onresult = e => {
-    const transcript = e.results[0][0].transcript;
-    const input      = document.getElementById('chatInput');
-    if (input) input.value = transcript;
-    sendMessage();
-  };
-
-  recognition.onerror = e => {
-    isListening = false;
-    updateMicState(false);
-    if (e.error === 'no-speech')     showToast('No speech detected. Try again.', 'warning');
-    else if (e.error === 'not-allowed') showToast('Microphone access denied.', 'error');
-    else showToast('Voice error. Try again.', 'error');
-  };
-
-  recognition.onend = () => {
-    isListening = false;
-    updateMicState(false);
-  };
-
-  try { recognition.start(); }
-  catch { showToast('Could not start mic. Try again.', 'error'); }
-}
-
-function updateMicState(listening) {
-  const micBtn = document.getElementById('micBtn');
-  const fab    = document.getElementById('chatFab');
-
-  if (micBtn) {
-    micBtn.classList.toggle('listening', listening);
-    micBtn.innerHTML = listening
-      ? '<i class="fas fa-stop"></i>'
-      : '<i class="fas fa-microphone"></i>';
-  }
-  if (fab && !chatOpen) {
-    fab.classList.toggle('listening', listening);
-    fab.innerHTML = listening
-      ? '<i class="fas fa-stop"></i>'
-      : '<i class="fas fa-microphone"></i>';
-  }
-}
-
-/* ── Clear chat ── */
-function clearChat() {
-  chatHistory = [];
-  const list = document.getElementById('chatMessages');
-  if (list) list.innerHTML = '';
-  showWelcome();
-}
-
-/* ── Sync lang ── */
-document.addEventListener('DOMContentLoaded', () => {
-  chatLang = localStorage.getItem('agrosmart_lang') || 'en';
-});
-
-window.addEventListener('storage', e => {
-  if (e.key === 'agrosmart_lang') chatLang = e.newValue || 'en';
-});
