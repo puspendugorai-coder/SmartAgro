@@ -3,6 +3,8 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="theme-color" content="#c1121f"/>
+  <link rel="manifest" href="/manifest.json"/>
   <title>SmartAgro – Alerts</title>
   <link rel="stylesheet" href="/static/css/main.css"/>
   <link rel="stylesheet" href="/static/css/alerts.css"/>
@@ -130,7 +132,7 @@
   <button class="helpline-btn"><i class="fas fa-phone"></i> <span data-translate="helpline">Kisan Helpline</span></button>
 </a>
 <button class="chat-fab" id="chatFab" onclick="toggleChat()"><i class="fas fa-microphone"></i></button>
-<div class="chat-overlay" id="chatOverlay" onclick="handleOverlayClick(event)">
+<div class="chat-overlay" id="chatOverlay">
   <div class="chat-window" id="chatWindow">
     <div class="chat-header-full">
       <div class="chat-header-icon-lg">🌾</div>
@@ -139,9 +141,9 @@
         <p data-translate="chatbot_sub">Ask in any language</p>
       </div>
       <div class="chat-header-actions">
-        <button class="chat-action-btn" onclick="clearChat()" title="Clear"><i class="fas fa-rotate-left"></i></button>
-        <button class="chat-action-btn" id="micBtn" onclick="startVoice()" title="Voice"><i class="fas fa-microphone"></i></button>
-        <button class="chat-action-btn" onclick="closeChat()" title="Close"><i class="fas fa-times"></i></button>
+        <button class="chat-action-btn" onclick="clearChat()"><i class="fas fa-rotate-left"></i></button>
+        <button class="chat-action-btn" id="micBtn" onclick="startVoice()"><i class="fas fa-microphone"></i></button>
+        <button class="chat-action-btn" onclick="closeChat()"><i class="fas fa-times"></i></button>
       </div>
     </div>
     <div class="chat-messages" id="chatMessages"></div>
@@ -159,6 +161,6 @@
 <script src="/static/js/main.js"></script>
 <script src="/static/js/alerts.js"></script>
 <script src="/static/js/chatbot.js"></script>
-<script>function handleOverlayClick(e){if(e.target===document.getElementById('chatOverlay'))closeChat();}</script>
+<script>document.getElementById('chatOverlay').addEventListener('click',function(e){if(e.target===this)closeChat();});</script>
 </body>
 </html>
