@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
   <meta name="theme-color" content="#b45309"/>
   <link rel="manifest" href="/manifest.json"/>
   <title>SmartAgro – Mandi Prices</title>
@@ -11,6 +11,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    html, body {
+      width: 100%;
+      max-width: 100%;
+      overflow-x: hidden;
+    }
+  </style>
 </head>
 <body>
 <nav class="navbar" id="navbar">
@@ -37,7 +44,7 @@
   </div>
 </nav>
 
-<div style="background:var(--amber-light);border-bottom:2px solid var(--amber);padding:8px 20px;text-align:center;font-size:0.78rem;color:var(--amber);font-weight:500">
+<div style="background:var(--amber-light);border-bottom:2px solid var(--amber);padding:8px 12px;text-align:center;font-size:0.75rem;color:var(--amber);font-weight:500;overflow:hidden">
   <i class="fas fa-circle-info"></i> Prices are indicative based on MSP rates. Check your local mandi for exact rates. | Helpline: <strong>1800-180-1551</strong>
 </div>
 
@@ -77,7 +84,10 @@
       <h2 data-translate="market_title">Prices by City</h2>
       <p id="marketSubtitle" data-translate="market_sub">All major Indian markets</p>
     </div>
-    <div class="market-loading" id="marketLoading"><div class="loading-spinner"></div><p>Loading mandi prices...</p></div>
+    <div class="market-loading" id="marketLoading">
+      <div class="loading-spinner"></div>
+      <p>Loading mandi prices...</p>
+    </div>
     <div class="market-cities-grid" id="marketCitiesGrid" style="display:none"></div>
     <div class="no-results" id="noResults" style="display:none">
       <i class="fas fa-store-slash"></i>
@@ -125,7 +135,21 @@
     </div>
     <div class="table-wrapper">
       <table class="price-table" id="priceTable">
-        <thead><tr><th>Crop</th><th>Delhi</th><th>Mumbai</th><th>Kolkata</th><th>Patna</th><th>Lucknow</th><th>Jaipur</th><th>Bhopal</th><th>Indore</th><th>Amritsar</th><th>Hyderabad</th></tr></thead>
+        <thead>
+          <tr>
+            <th>Crop</th>
+            <th>Delhi</th>
+            <th>Mumbai</th>
+            <th>Kolkata</th>
+            <th>Patna</th>
+            <th>Lucknow</th>
+            <th>Jaipur</th>
+            <th>Bhopal</th>
+            <th>Indore</th>
+            <th>Amritsar</th>
+            <th>Hyderabad</th>
+          </tr>
+        </thead>
         <tbody id="priceTableBody"></tbody>
       </table>
     </div>
@@ -178,10 +202,15 @@
     </div>
   </div>
 </div>
+
 <script src="/static/js/translations.js"></script>
 <script src="/static/js/main.js"></script>
 <script src="/static/js/market.js"></script>
 <script src="/static/js/chatbot.js"></script>
-<script>document.getElementById('chatOverlay').addEventListener('click',function(e){if(e.target===this)closeChat();});</script>
+<script>
+  document.getElementById('chatOverlay').addEventListener('click', function(e){
+    if(e.target === this) closeChat();
+  });
+</script>
 </body>
 </html>
