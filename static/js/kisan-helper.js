@@ -47,7 +47,7 @@
   <a id="kisanHelpline"
      href="https://www.google.com/search?q=kisan+helpline+1800-180-1551"
      target="_blank" rel="noopener">
-    <i class="fas fa-phone-alt"></i>
+    <i class="fas fa-phone"></i>
     <span>Kisan Helpline: <strong>1800-180-1551</strong></span>
   </a>`);
 
