@@ -107,6 +107,14 @@ body.dark .hero { background:linear-gradient(135deg, #071a0e 0%, #0d2b1a 35%, #1
 .cm-val     { font-size:0.78rem; font-weight:600; color:var(--text); }
 .crop-profit { display:flex; align-items:center; gap:5px; padding:7px 11px; background:var(--amber-light); border:1px solid rgba(232,93,4,0.22); border-radius:var(--radius-sm); font-size:0.78rem; color:var(--amber); font-weight:600; }
 
+/* ── SOIL TIPS ── */
+.soil-tips-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:12px; }
+.soil-tip-card { display:flex; align-items:flex-start; gap:12px; padding:16px; background:var(--card); border:1px solid var(--border); border-left:3px solid var(--green); border-radius:var(--radius); transition:var(--trans); animation:fadeInUp 0.4s ease both; }
+.soil-tip-card:hover { box-shadow:var(--shadow); border-color:var(--green); }
+.soil-tip-icon { font-size:1.8rem; flex-shrink:0; }
+.soil-tip-title { font-size:0.88rem; font-weight:700; color:var(--text); margin-bottom:3px; }
+.soil-tip-text  { font-size:0.78rem; color:var(--text-2); line-height:1.5; }
+
 /* ── PEST CARDS ── */
 .pest-cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(310px,1fr)); gap:14px; }
 .pest-crop-card { background:var(--card); border:1px solid var(--border); border-radius:var(--radius-lg); overflow:hidden; }
@@ -119,38 +127,77 @@ body.dark .hero { background:linear-gradient(135deg, #071a0e 0%, #0d2b1a 35%, #1
 .pcc-eco.eco-true  { background:var(--green-light); color:var(--green); border:1px solid var(--border-2); }
 .pcc-eco.eco-false { background:var(--red-light); color:var(--red); border:1px solid rgba(193,18,31,0.2); }
 
-/* ── RESPONSIVE ── */
+/* ═══════════════════════
+   RESPONSIVE — MOBILE
+═══════════════════════ */
 @media (max-width:1100px) {
-  .hero { padding:calc(var(--nav-h)+24px) 24px 44px; flex-direction:column; align-items:flex-start; }
+  .hero { padding:calc(var(--nav-h)+24px) 28px 44px; flex-direction:column; align-items:flex-start; }
   .hero-visual { display:none; }
   .weather-main { grid-template-columns:1fr 1fr; }
   .weather-primary-card { grid-column:1/-1; }
   .forecast-grid { grid-template-columns:repeat(4,1fr); }
   .quick-grid { grid-template-columns:1fr; gap:10px; }
 }
+
 @media (max-width:768px) {
-  .hero { padding:calc(var(--nav-h)+14px) 16px 32px !important; }
-  .hero-title { font-size:clamp(1.7rem,7vw,2.3rem) !important; word-break:break-word; }
-  .hero-subtitle { font-size:0.87rem; }
-  .hero-cta { gap:8px; }
-  .weather-main { grid-template-columns:1fr !important; }
-  .wpc-temp { font-size:3rem; }
-  .forecast-grid { grid-template-columns:repeat(3,1fr) !important; gap:7px; }
-  .fc-desc { display:none; }
-  .crops-grid { grid-template-columns:1fr; }
-  .pest-cards { grid-template-columns:1fr; }
-  .soil-tips-grid { grid-template-columns:1fr; }
+  /* Hero — critical fix */
+  .hero {
+    min-height:auto !important;
+    padding:calc(var(--nav-h) + 20px) 18px 36px !important;
+    flex-direction:column !important;
+    align-items:flex-start !important;
+    gap:20px !important;
+  }
+  .hero-visual { display:none !important; }
+  .hero-content { width:100% !important; max-width:100% !important; }
+  .hero-title {
+    font-size:clamp(1.65rem, 6.5vw, 2.2rem) !important;
+    word-break:break-word !important;
+    hyphens:auto !important;
+  }
+  .hero-subtitle { font-size:0.86rem !important; }
+  .hero-cta { flex-direction:column !important; width:100% !important; gap:10px !important; align-items:stretch !important; }
+  .btn-hero-primary,
+  .btn-hero-secondary {
+    width:100% !important;
+    justify-content:center !important;
+    padding:13px 16px !important;
+    font-size:0.88rem !important;
+    border-radius:50px !important;
+  }
+
+  /* Weather */
+  .weather-main { grid-template-columns:1fr !important; gap:10px !important; }
+  .wpc-temp { font-size:3rem !important; }
+  .weather-stat-card { flex-direction:row !important; align-items:center !important; gap:12px !important; padding:14px !important; }
+  .wsc-val { font-size:1.2rem !important; }
+
+  /* Forecast */
+  .forecast-grid { grid-template-columns:repeat(3,1fr) !important; gap:7px !important; }
+  .fc-desc { display:none !important; }
+
+  /* Crops */
+  .crops-grid { grid-template-columns:1fr !important; }
+  .crop-card { padding:15px !important; }
+
+  /* Soil tips */
+  .soil-tips-grid { grid-template-columns:1fr !important; }
+
+  /* Pest */
+  .pest-cards { grid-template-columns:1fr !important; }
+
+  /* Quick cards */
   .quick-card p { display:none; }
   .qc-arrow { display:none; }
 }
+
 @media (max-width:500px) {
-  .weather-stat-card { flex-direction:row; align-items:center; gap:10px; padding:14px; }
-  .wsc-val { font-size:1.2rem; }
-}
-@media (max-width:400px) {
+  .hero-title { font-size:1.6rem !important; }
   .forecast-grid { grid-template-columns:repeat(2,1fr) !important; }
 }
+
 @media (max-width:600px) {
-  .stats-bar .container { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; justify-items:start; }
-  .stat-val { font-size:1rem; }
+  .stats-bar .container { display:grid !important; grid-template-columns:repeat(3,1fr) !important; gap:10px !important; justify-items:start !important; }
+  .stat-val { font-size:1rem !important; }
+  .stat-label { font-size:0.62rem !important; }
 }
