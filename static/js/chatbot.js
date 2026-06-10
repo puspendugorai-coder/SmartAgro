@@ -11,7 +11,6 @@ const SPEECH_LANGS = {
   'ml':'ml-IN','en':'en-IN'
 };
 
-// Load all available voices
 function loadVoices() {
   availableVoices = window.speechSynthesis.getVoices();
 }
@@ -20,21 +19,33 @@ if (window.speechSynthesis) {
   window.speechSynthesis.onvoiceschanged = loadVoices;
 }
 
-// Find best voice for language
 function getBestVoice(langCode) {
   const speechLang = SPEECH_LANGS[langCode] || 'en-IN';
-  const langPrefix = speechLang.split('-')[0]; // 'hi', 'bn', etc.
-
-  // Try exact match first
+  const langPrefix = speechLang.split('-')[0];
   let voice = availableVoices.find(v => v.lang === speechLang);
-  // Try language prefix
   if (!voice) voice = availableVoices.find(v => v.lang.startsWith(langPrefix));
-  // Try any Indian English if Hindi/Bengali not found
   if (!voice && langCode !== 'en') voice = availableVoices.find(v => v.lang === 'en-IN');
-  // Fall back to any English
   if (!voice) voice = availableVoices.find(v => v.lang.startsWith('en'));
-
   return voice || null;
+}
+
+function cleanTextForSpeech(text) {
+  return text
+    // Remove all emojis
+    .replace(/[\u{1F000}-\u{1FFFF}]/gu, '')
+    .replace(/[\u{2600}-\u{27FF}]/gu, '')
+    .replace(/[\u{FE00}-\u{FEFF}]/gu, '')
+    // Remove specific farm emojis that may not be caught
+    .replace(/[🌾🌿🌽🍅🎋🫘🌻🧅🥔🌶️🥜☁️🌧️⛅☀️❄️⛈️🌦️🌤️🌫️]/g, '')
+    // Remove bullet points and special chars
+    .replace(/•/g, '')
+    .replace(/[►▶→←↑↓]/g, '')
+    // Remove markdown-like formatting
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    // Clean up extra spaces
+    .replace(/\s+/g, ' ')
+    .trim();
 }
 
 /* ── Toggle fullscreen ── */
@@ -67,22 +78,20 @@ function toggleChat() {
 
 function closeChat() { if (chatOpen) toggleChat(); }
 
-/* ── Welcome ── */
 function showWelcome() {
   const lang = localStorage.getItem('agrosmart_lang') || 'en';
   const msgs = {
-    hi: '🌾 नमस्ते किसान भाई!\n\nमैं SmartAgro सहायक हूं। पूछें:\n• फसल की बीमारी और इलाज\n• आज का मौसम\n• मंडी भाव और MSP\n• सरकारी योजनाएं (PM-KISAN)\n• खाद और कीटनाशक',
-    en: '🌾 Hello Farmer!\n\nI am SmartAgro Assistant. Ask me:\n• Crop diseases and treatment\n• Weather and farming advice\n• Mandi prices and MSP\n• Government schemes (PM-KISAN)\n• Fertilizers and pesticides',
-    bn: '🌾 নমস্কার কৃষক ভাই!\n\nআমি SmartAgro সহায়ক। জিজ্ঞাসা করুন:\n• ফসলের রোগ ও চিকিৎসা\n• আজকের আবহাওয়া\n• বাজার মূল্য ও MSP\n• সরকারি প্রকল্প',
-    ta: '🌾 வணக்கம்!\n\nகேளுங்கள்:\n• பயிர் நோய்கள்\n• வானிலை\n• சந்தை விலைகள்\n• அரசு திட்டங்கள்',
-    te: '🌾 నమస్కారం!\n\nఅడగండి:\n• పంట రోగాలు\n• వాతావరణం\n• మార్కెట్ ధరలు\n• ప్రభుత్వ పథకాలు',
-    mr: '🌾 नमस्कार!\n\nविचारा:\n• पीक रोग\n• हवामान\n• बाजारभाव\n• सरकारी योजना',
-    pa: '🌾 ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ!\n\nਪੁੱਛੋ:\n• ਫਸਲ ਰੋਗ\n• ਮੌਸਮ\n• ਮੰਡੀ ਭਾਅ\n• ਸਰਕਾਰੀ ਯੋਜਨਾਵਾਂ',
+    hi: 'नमस्ते किसान भाई! मैं SmartAgro सहायक हूं। पूछें:\n• फसल की बीमारी और इलाज\n• आज का मौसम\n• मंडी भाव और MSP\n• सरकारी योजनाएं (PM-KISAN)\n• खाद और कीटनाशक',
+    en: 'Hello Farmer! I am SmartAgro Assistant. Ask me:\n• Crop diseases and treatment\n• Weather and farming advice\n• Mandi prices and MSP\n• Government schemes (PM-KISAN)\n• Fertilizers and pesticides',
+    bn: 'নমস্কার কৃষক ভাই! আমি SmartAgro সহায়ক। জিজ্ঞাসা করুন:\n• ফসলের রোগ ও চিকিৎসা\n• আজকের আবহাওয়া\n• বাজার মূল্য ও MSP\n• সরকারি প্রকল্প',
+    ta: 'வணக்கம்! நான் SmartAgro உதவியாளர். கேளுங்கள்:\n• பயிர் நோய்கள்\n• வானிலை\n• சந்தை விலைகள்\n• அரசு திட்டங்கள்',
+    te: 'నమస్కారం! నేను SmartAgro సహాయకుడిని. అడగండి:\n• పంట రోగాలు\n• వాతావరణం\n• మార్కెట్ ధరలు\n• ప్రభుత్వ పథకాలు',
+    mr: 'नमस्कार! मी SmartAgro सहाय्यक आहे. विचारा:\n• पीक रोग\n• हवामान\n• बाजारभाव\n• सरकारी योजना',
+    pa: 'ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ! ਮੈਂ SmartAgro ਸਹਾਇਕ ਹਾਂ। ਪੁੱਛੋ:\n• ਫਸਲ ਰੋਗ\n• ਮੌਸਮ\n• ਮੰਡੀ ਭਾਅ\n• ਸਰਕਾਰੀ ਯੋਜਨਾਵਾਂ',
   };
   addBotMsg(msgs[lang] || msgs.en);
 }
 
-/* ── Messages ── */
 function addBotMsg(text) {
   const list = document.getElementById('chatMessages');
   if (!list) return;
@@ -147,7 +156,6 @@ function getTime() {
   return new Date().toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'});
 }
 
-/* ── Send ── */
 async function sendMessage() {
   const input = document.getElementById('chatInput');
   const msg   = input?.value.trim();
@@ -181,7 +189,7 @@ function handleChatKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
 }
 
-/* ── Text to Speech — fixed for all languages ── */
+/* ── Text to Speech — emoji cleaned ── */
 function toggleSpeak(msgId) {
   const div = document.getElementById(msgId);
   const btn = document.getElementById('speak_' + msgId);
@@ -190,11 +198,13 @@ function toggleSpeak(msgId) {
   if (speakingMsgId === msgId) { stopSpeaking(); return; }
   stopSpeaking();
 
-  const text = div.dataset.text || '';
+  // Clean text — remove emojis and symbols
+  const rawText = div.dataset.text || '';
+  const text    = cleanTextForSpeech(rawText);
   if (!text || !window.speechSynthesis) return;
 
-  const lang     = localStorage.getItem('agrosmart_lang') || 'en';
-  const voice    = getBestVoice(lang);
+  const lang       = localStorage.getItem('agrosmart_lang') || 'en';
+  const voice      = getBestVoice(lang);
   const speechLang = SPEECH_LANGS[lang] || 'en-IN';
 
   const utterance  = new SpeechSynthesisUtterance(text);
@@ -203,9 +213,8 @@ function toggleSpeak(msgId) {
   utterance.pitch  = 1;
   if (voice) utterance.voice = voice;
 
-  // Show warning if no native voice available for Indian language
   if (!voice && lang !== 'en') {
-    showToast(`No ${lang.toUpperCase()} voice on this device. Reading in available voice.`, 'warning', 3000);
+    showToast(`No ${lang.toUpperCase()} voice on this device. Using available voice.`, 'warning', 3000);
   }
 
   utterance.onstart = () => {
@@ -242,46 +251,30 @@ function startVoice() {
   const speechLang = SPEECH_LANGS[lang] || 'en-IN';
 
   recognition = new SR();
-  recognition.lang           = speechLang;
-  recognition.interimResults = false;
+  recognition.lang            = speechLang;
+  recognition.interimResults  = false;
   recognition.maxAlternatives = 1;
-  recognition.continuous     = false;
+  recognition.continuous      = false;
 
-  recognition.onstart = () => {
-    isListening = true;
-    updateMicState(true);
-    showToast('🎤 Listening... speak now', 'success');
-  };
-  recognition.onresult = e => {
-    const transcript = e.results[0][0].transcript;
-    const inp = document.getElementById('chatInput');
-    if (inp) inp.value = transcript;
-    sendMessage();
-  };
-  recognition.onerror = e => {
+  recognition.onstart  = () => { isListening = true;  updateMicState(true);  showToast('Listening... speak now', 'success'); };
+  recognition.onresult = e  => { const t = e.results[0][0].transcript; const inp = document.getElementById('chatInput'); if(inp) inp.value=t; sendMessage(); };
+  recognition.onerror  = e  => {
     isListening = false; updateMicState(false);
-    if (e.error === 'no-speech')     showToast('No speech detected. Try again.', 'warning');
-    else if (e.error === 'not-allowed') showToast('Microphone access denied.', 'error');
-    else showToast('Voice error. Try again.', 'error');
+    if (e.error==='no-speech') showToast('No speech. Try again.','warning');
+    else if (e.error==='not-allowed') showToast('Mic access denied.','error');
+    else showToast('Voice error. Try again.','error');
   };
   recognition.onend = () => { isListening = false; updateMicState(false); };
-  try { recognition.start(); } catch { showToast('Could not start mic.', 'error'); }
+  try { recognition.start(); } catch { showToast('Could not start mic.','error'); }
 }
 
 function updateMicState(listening) {
   const micBtn = document.getElementById('micBtn');
   const fab    = document.getElementById('chatFab');
-  if (micBtn) {
-    micBtn.classList.toggle('listening', listening);
-    micBtn.innerHTML = listening ? '<i class="fas fa-stop"></i>' : '<i class="fas fa-microphone"></i>';
-  }
-  if (fab && !chatOpen) {
-    fab.classList.toggle('listening', listening);
-    fab.innerHTML = listening ? '<i class="fas fa-stop"></i>' : '<i class="fas fa-microphone"></i>';
-  }
+  if (micBtn) { micBtn.classList.toggle('listening',listening); micBtn.innerHTML = listening ? '<i class="fas fa-stop"></i>' : '<i class="fas fa-microphone"></i>'; }
+  if (fab && !chatOpen) { fab.classList.toggle('listening',listening); fab.innerHTML = listening ? '<i class="fas fa-stop"></i>' : '<i class="fas fa-microphone"></i>'; }
 }
 
-/* ── Clear chat ── */
 function clearChat() {
   chatHistory = [];
   const list = document.getElementById('chatMessages');
@@ -289,19 +282,12 @@ function clearChat() {
   showWelcome();
 }
 
-/* ── Swipe to close on mobile ── */
+// Swipe down to close
 let touchStartY = 0;
-document.addEventListener('touchstart', e => {
-  touchStartY = e.touches[0].clientY;
-}, {passive: true});
-document.addEventListener('touchmove', e => {
+document.addEventListener('touchstart', e => { touchStartY = e.touches[0].clientY; }, {passive:true});
+document.addEventListener('touchmove',  e => {
   if (!chatOpen) return;
-  const chatWindow = document.getElementById('chatWindow');
-  if (!chatWindow) return;
-  const touchY = e.touches[0].clientY;
-  const diff   = touchY - touchStartY;
-  // Swipe down more than 80px to close
-  if (diff > 80 && chatWindow.contains(e.target)) {
-    closeChat();
-  }
-}, {passive: true});
+  const win = document.getElementById('chatWindow');
+  if (!win) return;
+  if (e.touches[0].clientY - touchStartY > 80 && win.contains(e.target)) closeChat();
+}, {passive:true});
