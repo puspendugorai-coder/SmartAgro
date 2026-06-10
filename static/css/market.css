@@ -7,7 +7,7 @@
 
 .search-bar-section { background:var(--card); border-bottom:1px solid var(--border); padding:18px 0; position:sticky; top:var(--nav-h); z-index:100; box-shadow:var(--shadow); }
 .search-filter-bar { display:flex; flex-direction:column; gap:10px; }
-.search-box { display:flex; align-items:center; gap:7px; background:var(--bg-2); border:1.5px solid var(--border); border-radius:var(--radius); padding:7px 13px; transition:var(--trans); }
+.search-box { display:flex; align-items:center; gap:7px; background:var(--bg-2); border:1.5px solid var(--border); border-radius:var(--radius); padding:7px 13px; transition:var(--trans); min-width:0; }
 .search-box:focus-within { border-color:var(--amber); }
 .search-box i { color:var(--text-3); font-size:0.86rem; flex-shrink:0; }
 .search-box input { flex:1; min-width:0; background:none; border:none; outline:none; color:var(--text); font-size:0.87rem; font-family:inherit; }
@@ -15,7 +15,7 @@
 .search-btn { flex-shrink:0; padding:6px 14px; background:var(--amber); color:#fff; font-weight:700; font-size:0.78rem; border-radius:var(--radius-sm); transition:var(--trans); border:none; cursor:pointer; white-space:nowrap; }
 .search-btn:hover { opacity:0.9; }
 .clear-btn { flex-shrink:0; width:25px; height:25px; border-radius:50%; background:var(--bg-3); border:1px solid var(--border); color:var(--text-3); display:flex; align-items:center; justify-content:center; font-size:0.7rem; transition:var(--trans); cursor:pointer; }
-.clear-btn:hover { background:var(--red); color:#fff; border-color:transparent; }
+.clear-btn:hover { background:var(--red); color:#fff; }
 .filter-chips { display:flex; gap:6px; flex-wrap:wrap; }
 .chip { padding:5px 12px; border-radius:50px; font-size:0.74rem; font-weight:600; border:1.5px solid var(--border); color:var(--text-2); background:var(--bg-2); cursor:pointer; transition:var(--trans); }
 .chip:hover,.chip.active { background:var(--green-light); border-color:var(--green); color:var(--green); }
@@ -33,16 +33,37 @@ body.dark .city-card-header { background:rgba(255,183,3,0.08); }
 .city-name { display:flex; align-items:center; gap:6px; font-size:0.97rem; font-weight:700; color:var(--amber); }
 .city-name i { font-size:0.84rem; }
 .city-count { font-size:0.7rem; color:var(--text-3); }
+
+/* Crop rows — 3 columns by default, 2 on mobile */
 .crop-rows { padding:4px 0; }
-.crop-row-header { display:grid; grid-template-columns:1.5fr 1fr 1fr 72px; padding:7px 14px; font-size:0.64rem; color:var(--text-3); font-weight:700; text-transform:uppercase; letter-spacing:0.4px; border-bottom:1px solid var(--border); }
-.crop-row { display:grid; grid-template-columns:1.5fr 1fr 1fr 72px; align-items:center; padding:9px 14px; border-bottom:1px solid var(--border); transition:var(--trans); gap:6px; }
+.crop-row-header {
+  display:grid;
+  grid-template-columns:1.6fr 1fr 1fr 68px;
+  padding:7px 14px;
+  font-size:0.64rem; color:var(--text-3); font-weight:700;
+  text-transform:uppercase; letter-spacing:0.4px;
+  border-bottom:1px solid var(--border);
+}
+.crop-row {
+  display:grid;
+  grid-template-columns:1.6fr 1fr 1fr 68px;
+  align-items:center;
+  padding:9px 14px;
+  border-bottom:1px solid var(--border);
+  transition:var(--trans); gap:6px;
+}
 .crop-row:last-child { border-bottom:none; }
 .crop-row:hover { background:var(--bg-2); }
-.cr-name  { font-size:0.81rem; font-weight:600; color:var(--text); }
+.cr-name  { font-size:0.81rem; font-weight:600; color:var(--text); min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
 .cr-price { font-size:0.9rem; font-weight:700; color:var(--text); }
 .cr-unit  { font-size:0.6rem; color:var(--text-3); display:block; }
 .cr-msp   { font-size:0.76rem; color:var(--text-3); }
-.cr-change { display:flex; align-items:center; gap:3px; font-size:0.76rem; font-weight:700; padding:3px 7px; border-radius:50px; }
+.cr-change {
+  display:flex; align-items:center; justify-content:center; gap:3px;
+  font-size:0.73rem; font-weight:700;
+  padding:3px 6px; border-radius:50px;
+  white-space:nowrap;
+}
 .cr-change.up   { color:var(--green); background:var(--green-light); }
 .cr-change.down { color:var(--red);   background:var(--red-light); }
 
@@ -71,10 +92,39 @@ body.dark .price-table th { background:rgba(255,183,3,0.08); }
 .price-table tr:hover td { background:var(--bg-2); }
 .price-table td.not-available { color:var(--text-3); }
 
+/* ═══════════════════════
+   RESPONSIVE
+═══════════════════════ */
 @media (max-width:768px) {
   .market-cities-grid { grid-template-columns:1fr; }
-  .crop-row,.crop-row-header { grid-template-columns:1.3fr 1fr 1fr; }
-  .crop-row .cr-change { display:none; }
-  .crop-row-header span:last-child { display:none; }
+
+  /* Show 3 columns: crop, mandi price, change */
+  .crop-row,
+  .crop-row-header {
+    grid-template-columns:1.5fr 1fr 60px !important;
+  }
+  /* Hide MSP column on mobile */
+  .crop-row .cr-msp,
+  .crop-row-header span:nth-child(3) { display:none !important; }
+
+  .cr-change { font-size:0.7rem; padding:2px 5px; }
+  .cr-name { font-size:0.78rem; }
+  .cr-price { font-size:0.86rem; }
 }
-@media (max-width:600px) { .chart-canvas-wrap { padding:10px; height:250px; } }
+
+@media (max-width:480px) {
+  /* On very small phones: 2 columns only */
+  .crop-row,
+  .crop-row-header {
+    grid-template-columns:1.6fr 1fr !important;
+  }
+  .crop-row .cr-change,
+  .crop-row-header span:last-child { display:none !important; }
+  .cr-price { font-size:0.84rem; }
+}
+
+@media (max-width:600px) {
+  .chart-canvas-wrap { padding:10px; height:250px; }
+  .ticker-label { padding:0 10px; font-size:0.62rem; }
+  .ticker-content { font-size:0.72rem; }
+}
