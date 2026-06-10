@@ -570,58 +570,49 @@ window.stopKisanTyping = function () {
 
     speakBtn.addEventListener('click', handleSpeakBtnAction);
     speakBtn.addEventListener('touchstart', function(e) {
-      e.preventDefault(); // prevent ghost click on mobile
+      e.preventDefault();
       handleSpeakBtnAction(e);
     }, { passive: false });
 
     function handleSpeakBtnAction(e) {
-    e.stopPropagation();
-    const synth = window.speechSynthesis;
-    if (!synth) return;
+      e.stopPropagation();
 
-    // ── This button is active and speaking → PAUSE ──────────────────
-    if (currentSpeakBtn === speakBtn && !speechPaused) {
-      if (isMobile) {
-        // Mobile: cancel is the only reliable way to "pause"
-        // offset is already tracked via onboundary
-        synth.cancel();
+      // ── This button is active and speaking → PAUSE ──
+      if (currentSpeakBtn === speakBtn && !speechPaused) {
         speechPaused = true;
         speakBtn.classList.remove('speaking');
         speakBtn.classList.add('paused');
         speakBtn.innerHTML = '<i class="fas fa-play"></i>';
         speakBtn.title = 'Resume';
-      } else {
-        synth.pause();
-        speechPaused = true;
-        speakBtn.classList.remove('speaking');
-        speakBtn.classList.add('paused');
-        speakBtn.innerHTML = '<i class="fas fa-play"></i>';
-        speakBtn.title = 'Resume';
+
+        if (isMobile) {
+          // Native Audio.pause() works reliably
+          if (_mobileAudio && typeof _mobileAudio.pause === 'function') _mobileAudio.pause();
+        } else {
+          if (window.speechSynthesis) window.speechSynthesis.pause();
+        }
+        return;
       }
-      return;
-    }
 
-    // ── This button is active and paused → RESUME ───────────────────
-    if (currentSpeakBtn === speakBtn && speechPaused) {
-      if (isMobile) {
-        // Mobile: re-fire from saved offset
-        synth.cancel();
-        const lang = getAppLang();
-        _fireUtterance(mobileSpeechText, lang, speakBtn, mobileSpeechOffset);
-      } else {
-        synth.resume();
+      // ── This button is active and paused → RESUME ──
+      if (currentSpeakBtn === speakBtn && speechPaused) {
         speechPaused = false;
         speakBtn.classList.remove('paused');
         speakBtn.classList.add('speaking');
         speakBtn.innerHTML = '<i class="fas fa-pause"></i>';
         speakBtn.title = 'Pause';
-      }
-      return;
-    }
 
-    // ── Different / new message → start fresh ───────────────────────
-    speakText(el.textContent, getAppLang(), speakBtn);
-  }
+        if (isMobile) {
+          if (_mobileAudio && typeof _mobileAudio.play === 'function') _mobileAudio.play().catch(() => {});
+        } else {
+          if (window.speechSynthesis) window.speechSynthesis.resume();
+        }
+        return;
+      }
+
+      // ── Different / new message → start fresh ──
+      speakText(el.textContent, getAppLang(), speakBtn);
+    }
 
     footer.appendChild(speakBtn);
     wrapper.appendChild(el);
@@ -689,162 +680,147 @@ function typeWriter(el, text, i, onComplete) {
     speechPaused = false;
   }
 
-  /* ── Text-to-Speech ──────────────────────────── */
+  /* ══════════════════════════════════════════════════════════
+     TEXT-TO-SPEECH  —  DUAL ENGINE
+     ┌─────────────────────────────────────────────────────┐
+     │  MOBILE  → Google Translate TTS audio endpoint      │
+     │            Supports ALL Indian languages natively.  │
+     │            No device voices needed.                 │
+     │  DESKTOP → Web Speech API (SpeechSynthesis)         │
+     └─────────────────────────────────────────────────────┘
+  ══════════════════════════════════════════════════════════ */
 
   /*
-   * MOBILE REALITY: Most Android/iOS devices only ship voices for:
-   *   English, Hindi, Bengali (on some devices), and possibly Tamil/Telugu.
-   * All other Indian languages must fall back to a voice that CAN speak
-   * their script. We map each language to its script family, then find
-   * the best available voice for that script on the device.
-   *
-   * Script families and their device-voice candidates (in priority order):
-   *   Devanagari  → hi-IN, mr-IN, ne-NP  (Hindi voice reads Devanagari text)
-   *   Bengali     → bn-IN, bn-BD
-   *   Tamil       → ta-IN
-   *   Telugu      → te-IN
-   *   Gujarati    → gu-IN
-   *   Kannada     → kn-IN
-   *   Malayalam   → ml-IN
-   *   Punjabi/Gurmukhi → pa-IN
-   *   Odia        → or-IN  (fallback: hi-IN)
-   *   Urdu/Arabic → ur-PK, ur-IN, ar  (fallback: hi-IN)
-   *   Latin       → en-IN, en-US
+   * Google Translate TTS language codes.
+   * These are the "tl" parameter values accepted by the translate_tts endpoint.
+   * Languages without a direct GT code fall back to their closest supported one.
    */
-  const SCRIPT_FAMILY = {
-    hi:   'devanagari', mr:  'devanagari', mai: 'devanagari',
-    sa:   'devanagari', kok: 'devanagari', doi: 'devanagari',
-    bodo: 'devanagari', ne:  'devanagari',
-    bn:   'bengali',    mni: 'bengali',    as:  'bengali-assamese',
-    ta:   'tamil',
-    te:   'telugu',
-    gu:   'gujarati',
-    kn:   'kannada',
-    ml:   'malayalam',
-    pa:   'gurmukhi',
-    or:   'odia',
-    ur:   'urdu',       ks:  'urdu',       sd:  'urdu',
-    en:   'latin',      sat: 'latin',
+  const GT_TTS_LANG = {
+    en:   'en',
+    hi:   'hi',
+    bn:   'bn',
+    te:   'te',
+    mr:   'mr',
+    ta:   'ta',
+    gu:   'gu',
+    kn:   'kn',
+    ml:   'ml',
+    pa:   'pa',
+    or:   'or',
+    as:   'as',
+    ur:   'ur',
+    mai:  'hi',   // Maithili — no GT voice, Hindi is closest (Devanagari)
+    ne:   'ne',
+    sa:   'hi',   // Sanskrit — use Hindi (Devanagari)
+    kok:  'mr',   // Konkani — Marathi is closest
+    mni:  'bn',   // Meitei/Manipuri — Bengali script
+    bodo: 'hi',   // Bodo — Devanagari, use Hindi
+    doi:  'hi',   // Dogri — Devanagari, use Hindi
+    sat:  'hi',   // Santali — use Hindi
+    ks:   'ur',   // Kashmiri — Perso-Arabic, use Urdu
+    sd:   'ur',   // Sindhi — Perso-Arabic, use Urdu
   };
 
-  // For each script family, ordered list of BCP-47 lang codes to try
-  const SCRIPT_VOICE_PRIORITY = {
-    devanagari:        ['hi-IN','hi','mr-IN','ne-NP','hi_IN'],
-    bengali:           ['bn-IN','bn-BD','bn'],
-    'bengali-assamese':['as-IN','bn-IN','bn-BD','bn'],
-    tamil:             ['ta-IN','ta'],
-    telugu:            ['te-IN','te'],
-    gujarati:          ['gu-IN','gu'],
-    kannada:           ['kn-IN','kn'],
-    malayalam:         ['ml-IN','ml'],
-    gurmukhi:          ['pa-IN','pa','pa-Guru-IN'],
-    odia:              ['or-IN','or','hi-IN','hi'],
-    urdu:              ['ur-PK','ur-IN','ur','ar','hi-IN','hi'],
-    latin:             ['en-IN','en-GB','en-US','en'],
-  };
-
-  /* Clean text before TTS */
+  /* Clean text before TTS — strip emoji, symbols, markdown */
   function cleanForTTS(text) {
     return text
       .replace(/[\u{1F300}-\u{1FFFF}]/gu, '')
-      .replace(/[⚠️✓•→]/g, '')
+      .replace(/[\u2600-\u27BF]/g, '')
+      .replace(/[⚠️✓•→★☆]/g, '')
       .replace(/\*/g, '')
+      .replace(/#{1,6}\s/g, '')
       .trim();
   }
 
+  /* ── Active Audio element for mobile TTS ── */
+  let _mobileAudio = null;
+
   /*
-   * findBestVoice — script-aware, mobile-first
-   * 1. Try voices matching the script family priority list
-   * 2. Fall back to hi-IN (Devanagari can read several Indian scripts at least phonetically)
-   * 3. Last resort: first available voice
+   * Google Translate TTS splits long text into ≤200-char chunks
+   * (the endpoint has a hard limit). We queue the chunks and play
+   * them one after another.
    */
-  function findBestVoice(voices, langCode) {
-    if (!voices || voices.length === 0) return null;
+  function _chunkText(text, maxLen) {
+    maxLen = maxLen || 180; // stay safely under the 200-char limit
+    const chunks = [];
+    // Split on sentence-ending punctuation first, then on spaces
+    const sentences = text.match(/[^।|!|?|.|\n]+[।!?.\n]?/g) || [text];
+    let current = '';
+    for (const s of sentences) {
+      if ((current + s).length <= maxLen) {
+        current += s;
+      } else {
+        if (current) chunks.push(current.trim());
+        // If a single sentence is still too long, split by word
+        if (s.length > maxLen) {
+          const words = s.split(' ');
+          current = '';
+          for (const w of words) {
+            if ((current + ' ' + w).trim().length <= maxLen) {
+              current = (current + ' ' + w).trim();
+            } else {
+              if (current) chunks.push(current);
+              current = w;
+            }
+          }
+        } else {
+          current = s;
+        }
+      }
+    }
+    if (current.trim()) chunks.push(current.trim());
+    return chunks.filter(Boolean);
+  }
 
-    const script   = SCRIPT_FAMILY[langCode] || 'devanagari';
-    const priority = SCRIPT_VOICE_PRIORITY[script] || SCRIPT_VOICE_PRIORITY.devanagari;
+  /*
+   * _playMobileChunks — plays an array of text chunks sequentially
+   * using the Google Translate TTS audio endpoint.
+   * Calls onDone() when all chunks finish or on error/stop.
+   */
+  function _playMobileChunks(chunks, gtLang, onDone) {
+    if (!chunks.length) { onDone(); return; }
+    let idx = 0;
+    let stopped = false;
 
-    // Try each candidate lang code in priority order
-    for (const candidate of priority) {
-      // Exact match first
-      let v = voices.find(v => v.lang === candidate);
-      if (v) return v;
-      // Prefix match (e.g. "hi" matches "hi-IN")
-      v = voices.find(v => v.lang.startsWith(candidate.split('-')[0] + '-') ||
-                           v.lang === candidate.split('-')[0]);
-      if (v) return v;
+    function playNext() {
+      if (stopped || idx >= chunks.length) { if (!stopped) onDone(); return; }
+      const chunk = encodeURIComponent(chunks[idx++]);
+      const url   = 'https://translate.google.com/translate_tts?ie=UTF-8&tl='
+                  + gtLang + '&client=tw-ob&q=' + chunk;
+
+      const audio = new Audio();
+      audio.crossOrigin = 'anonymous';
+      _mobileAudio = audio;
+
+      audio.onended  = playNext;
+      audio.onerror  = () => { if (!stopped) onDone(); };
+      audio.src = url;
+      audio.play().catch(() => { if (!stopped) onDone(); });
     }
 
-    // Hindi as universal Indian script fallback
-    const hiVoice = voices.find(v => v.lang === 'hi-IN' || v.lang === 'hi' || v.lang.startsWith('hi'));
-    if (hiVoice) return hiVoice;
-
-    // English as absolute last resort
-    const enVoice = voices.find(v => v.lang.startsWith('en'));
-    if (enVoice) return enVoice;
-
-    return voices[0];
+    // Expose a stop handle on the audio manager
+    _mobileAudio = { stop: () => { stopped = true; if (_mobileAudio && _mobileAudio.pause) _mobileAudio.pause(); } };
+    playNext();
   }
 
   /*
-   * getEffectiveLang — returns the BCP-47 lang code that should be set on the
-   * utterance. On mobile, if the device has no voice for the exact language,
-   * we set the lang to the best available voice's lang so the browser doesn't
-   * silently refuse to speak.
+   * speakText — main entry point.
+   * Mobile  → Google Translate TTS (Audio element, chunked)
+   * Desktop → Web Speech API
    */
-  function getEffectiveLang(voices, langCode) {
-    const desired  = TTS_LANGS[langCode] || 'hi-IN';
-    // Check if device actually has a voice for the desired lang
-    const hasExact = voices.some(v => v.lang === desired || v.lang.startsWith(desired.split('-')[0]));
-    if (hasExact) return desired;
-    // Fall back to the lang of the best voice we'd pick
-    const best = findBestVoice(voices, langCode);
-    return best ? best.lang : desired;
-  }
+  function speakText(text, lang, speakBtn) {
+    stopSpeaking(); // cancel whatever is playing
+    resetSpeakBtnUI();
 
-  /*
-   * loadVoicesWithRetry — mobile browsers load voices asynchronously and
-   * getVoices() often returns [] on the first call. Retry up to 10 times
-   * with 150ms gaps before giving up.
-   */
-  function loadVoicesWithRetry(callback, retries) {
-    retries = retries === undefined ? 10 : retries;
-    const voices = window.speechSynthesis.getVoices();
-    if (voices.length > 0) { callback(voices); return; }
-    if (retries <= 0)       { callback([]);     return; }
-    // Also listen for the event in case it fires before our next retry
-    const handler = () => {
-      window.speechSynthesis.onvoiceschanged = null;
-      callback(window.speechSynthesis.getVoices());
-    };
-    window.speechSynthesis.onvoiceschanged = handler;
-    setTimeout(() => {
-      const v2 = window.speechSynthesis.getVoices();
-      if (v2.length > 0) {
-        window.speechSynthesis.onvoiceschanged = null;
-        callback(v2);
-      } else if (retries > 1) {
-        window.speechSynthesis.onvoiceschanged = null;
-        loadVoicesWithRetry(callback, retries - 1);
-      }
-    }, 150);
-  }
+    const cleaned = cleanForTTS(text);
+    if (!cleaned) return;
 
-  /* Build and fire a SpeechSynthesisUtterance from a given char offset */
-  function _fireUtterance(cleaned, lang, speakBtn, startOffset) {
-    const synth = window.speechSynthesis;
-    const slice = cleaned.slice(startOffset);
-    if (!slice) return;
+    mobileSpeechText   = cleaned;
+    mobileSpeechOffset = 0;
 
     const toggleBtn = document.getElementById('kisanToggleBtn');
-    const onDone = () => {
-      mobileSpeechOffset = 0;
-      mobileSpeechText   = '';
-      if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
-      resetSpeakBtnUI();
-    };
 
-    // Update button UI immediately so the user sees feedback
+    // ── Button UI: show speaking state ──
     if (speakBtn) {
       currentSpeakBtn = speakBtn;
       speechPaused    = false;
@@ -855,66 +831,71 @@ function typeWriter(el, text, i, onComplete) {
     }
     if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-volume-up" style="color:#fff;font-size:1.3rem"></i><span class="kw-pulse"></span>';
 
-    loadVoicesWithRetry(function(voices) {
-      const utter = new SpeechSynthesisUtterance(slice);
+    const onDone = () => {
+      mobileSpeechText   = '';
+      mobileSpeechOffset = 0;
+      if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
+      resetSpeakBtnUI();
+    };
 
-      // Set the most device-compatible lang for this language
-      utter.lang   = getEffectiveLang(voices, lang);
-      utter.rate   = 0.88;
-      utter.pitch  = 1.0;
-      utter.volume = 1.0;
+    if (isMobile) {
+      /* ── MOBILE PATH: Google Translate TTS ── */
+      const gtLang = GT_TTS_LANG[lang] || 'hi';
+      const chunks = _chunkText(cleaned);
+      _playMobileChunks(chunks, gtLang, onDone);
 
-      const best = findBestVoice(voices, lang);
-      if (best) utter.voice = best;
+    } else {
+      /* ── DESKTOP PATH: Web Speech API ── */
+      if (!window.speechSynthesis) { onDone(); return; }
 
-      // Track word boundaries for mobile resume-from-position
-      utter.onboundary = (e) => {
-        if (e.name === 'word') mobileSpeechOffset = startOffset + (e.charIndex || 0);
+      const doSpeak = (voices) => {
+        const utter = new SpeechSynthesisUtterance(cleaned);
+        utter.lang   = TTS_LANGS[lang] || 'hi-IN';
+        utter.rate   = 0.88;
+        utter.pitch  = 1.0;
+        utter.volume = 1.0;
+
+        // Best-effort voice matching for desktop
+        const ttsLang  = TTS_LANGS[lang] || 'hi-IN';
+        const baseLang = ttsLang.split('-')[0];
+        let best = voices.find(v => v.lang === ttsLang);
+        if (!best) best = voices.find(v => v.lang.startsWith(baseLang));
+        if (!best) best = voices.find(v => v.lang.startsWith('hi'));
+        if (!best && voices.length) best = voices[0];
+        if (best) utter.voice = best;
+
+        utter.onend   = onDone;
+        utter.onerror = (e) => { if (e.error !== 'interrupted') onDone(); };
+        window.speechSynthesis.speak(utter);
       };
-      utter.onend   = onDone;
-      utter.onerror = (e) => { if (e.error !== 'interrupted') onDone(); };
 
-      // iOS needs a small gap after cancel() before a new speak()
-      setTimeout(() => synth.speak(utter), isMobile ? 150 : 0);
-    });
-  }
-
-  function speakText(text, lang, speakBtn) {
-    if (!window.speechSynthesis) return;
-
-    window.speechSynthesis.cancel();
-    resetSpeakBtnUI();
-
-    const cleaned = cleanForTTS(text);
-    if (!cleaned) return;
-
-    mobileSpeechText   = cleaned;
-    mobileSpeechOffset = 0;
-
-    _fireUtterance(cleaned, lang, speakBtn, 0);
-  }
-
-  function stopSpeaking() {
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
-    mobileSpeechText   = '';
-    mobileSpeechOffset = 0;
-    resetSpeakBtnUI();
-    const toggleBtn = document.getElementById('kisanToggleBtn');
-    if (toggleBtn) {
-      toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
+      const voices = window.speechSynthesis.getVoices();
+      if (voices.length > 0) {
+        doSpeak(voices);
+      } else {
+        window.speechSynthesis.onvoiceschanged = () => {
+          window.speechSynthesis.onvoiceschanged = null;
+          doSpeak(window.speechSynthesis.getVoices());
+        };
+      }
     }
   }
 
-  /* ── iOS requires speechSynthesis to be "unlocked" by a user gesture ── */
-  if (isMobile) {
-    document.addEventListener('touchstart', function _iosUnlock() {
-      if (window.speechSynthesis) {
-        const u = new SpeechSynthesisUtterance('');
-        window.speechSynthesis.speak(u);
-        window.speechSynthesis.cancel();
-      }
-      document.removeEventListener('touchstart', _iosUnlock);
-    }, { once: true, passive: true });
+  function stopSpeaking() {
+    // Stop mobile Audio
+    if (_mobileAudio) {
+      if (typeof _mobileAudio.stop === 'function') _mobileAudio.stop();
+      else if (typeof _mobileAudio.pause === 'function') { _mobileAudio.pause(); _mobileAudio.src = ''; }
+      _mobileAudio = null;
+    }
+    // Stop Web Speech
+    if (window.speechSynthesis) window.speechSynthesis.cancel();
+
+    mobileSpeechText   = '';
+    mobileSpeechOffset = 0;
+
+    const toggleBtn = document.getElementById('kisanToggleBtn');
+    if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
   }
 
   /* ── Voice input ─────────────────────────── */
