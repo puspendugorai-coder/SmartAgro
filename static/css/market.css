@@ -617,9 +617,111 @@ body.dark .city-card-header {
 }
 
 /* ============================================
-   PRICE TABLE
+   PRICE TABLE - IMPROVED
    ============================================
 */
+
+.table-section {
+  background: var(--bg-1);
+}
+
+.table-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-bottom: 16px;
+  padding: 0 15px;
+}
+
+.table-controls label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.table-city-selector {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.city-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 10px;
+  background: var(--bg-2);
+  border: 1.5px solid var(--border);
+  border-radius: 50px;
+  cursor: pointer;
+  transition: var(--trans);
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-2);
+}
+
+.city-checkbox:hover {
+  border-color: var(--amber);
+  background: var(--amber-light);
+}
+
+.city-checkbox input[type="checkbox"] {
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+}
+
+.city-checkbox input[type="checkbox"]:checked + label {
+  color: var(--green);
+}
+
+.table-legend {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 12px 15px;
+  background: var(--bg-2);
+  border-radius: var(--radius);
+  margin-bottom: 16px;
+  font-size: 0.75rem;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.legend-icon {
+  width: 16px;
+  height: 16px;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.6rem;
+  font-weight: bold;
+}
+
+.legend-up {
+  background: var(--green);
+  color: white;
+}
+
+.legend-down {
+  background: var(--red);
+  color: white;
+}
+
+.legend-na {
+  background: var(--bg-3);
+  color: var(--text-3);
+  border: 1px solid var(--border);
+}
 
 .table-wrapper {
   overflow-x: auto;
@@ -633,12 +735,12 @@ body.dark .city-card-header {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.75rem;
-  min-width: 650px;
+  min-width: 550px;
   background: var(--card);
 }
 
 .price-table th {
-  padding: 8px 10px;
+  padding: 10px 8px;
   background: var(--amber-light);
   color: var(--amber);
   font-weight: 700;
@@ -655,10 +757,11 @@ body.dark .price-table th {
 
 .price-table th:first-child {
   text-align: left;
+  font-weight: 700;
 }
 
 .price-table td {
-  padding: 8px 10px;
+  padding: 10px 8px;
   border-bottom: 1px solid var(--border);
   text-align: center;
   color: var(--text);
@@ -681,7 +784,7 @@ body.dark .price-table th {
 
 .price-table td.not-available {
   color: var(--text-3);
-  font-weight: 400;
+  font-weight: 500;
 }
 
 /* Price colors for table */
@@ -767,16 +870,26 @@ body.dark .price-table th {
   }
 
   .price-table {
-    min-width: 550px;
+    min-width: 450px;
   }
 
   .price-table th {
-    padding: 7px 8px;
+    padding: 8px 6px;
     font-size: 0.65rem;
   }
 
   .price-table td {
-    padding: 7px 8px;
+    padding: 8px 6px;
+  }
+
+  .table-controls {
+    padding: 0 8px;
+  }
+
+  .table-legend {
+    padding: 10px 8px;
+    gap: 8px;
+    font-size: 0.7rem;
   }
 }
 
@@ -860,6 +973,20 @@ body.dark .price-table th {
 
   .no-results i {
     font-size: 2.2rem;
+  }
+
+  .table-controls {
+    padding: 0 8px;
+    gap: 8px;
+  }
+
+  .table-city-selector {
+    gap: 4px;
+  }
+
+  .city-checkbox {
+    padding: 5px 8px;
+    font-size: 0.7rem;
   }
 }
 
@@ -1041,17 +1168,17 @@ body.dark .price-table th {
   }
 
   .price-table {
-    min-width: 450px;
+    min-width: 400px;
   }
 
   .price-table th {
-    padding: 6px 8px;
+    padding: 6px 4px;
     font-size: 0.6rem;
   }
 
   .price-table td {
-    padding: 6px 8px;
-    font-size: 0.7rem;
+    padding: 6px 4px;
+    font-size: 0.65rem;
   }
 
   .section {
@@ -1064,6 +1191,29 @@ body.dark .price-table th {
 
   .section-header p {
     font-size: 0.8rem;
+  }
+
+  .table-controls {
+    padding: 0 6px;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .table-city-selector {
+    width: 100%;
+    gap: 4px;
+  }
+
+  .city-checkbox {
+    flex: 1;
+    min-width: calc(50% - 2px);
+    justify-content: center;
+  }
+
+  .table-legend {
+    padding: 8px 6px;
+    gap: 6px;
+    font-size: 0.65rem;
   }
 }
 
@@ -1113,5 +1263,10 @@ body.dark .price-table th {
 
   .city-name {
     font-size: 0.85rem;
+  }
+
+  .city-checkbox {
+    min-width: calc(50% - 2px);
+    font-size: 0.65rem;
   }
 }
