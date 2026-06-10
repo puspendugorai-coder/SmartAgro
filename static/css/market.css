@@ -29,11 +29,6 @@
   --radius: 8px;
   --radius-lg: 12px;
   --radius-sm: 6px;
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 12px;
-  --spacing-lg: 16px;
-  --spacing-xl: 18px;
   
   /* Transitions & Effects */
   --trans: all 0.2s ease;
@@ -69,10 +64,16 @@ body.dark {
   box-sizing: border-box;
 }
 
-body {
+html, body {
   margin: 0;
   padding: 0;
-  font-family: inherit;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
   background: var(--bg-1);
   color: var(--text);
   transition: var(--trans);
@@ -110,8 +111,23 @@ body {
 
 .market-hero {
   background: linear-gradient(135deg, #7c3f00, #b45309, #d97706, #b45309);
-  padding-bottom: 60px;
+  padding: 40px 20px 80px;
   position: relative;
+  width: 100%;
+  color: white;
+  text-align: center;
+}
+
+.market-hero h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  margin: 0 0 8px;
+}
+
+.market-hero p {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin: 0;
 }
 
 .price-ticker {
@@ -129,7 +145,7 @@ body {
 }
 
 .ticker-label {
-  padding: 0 var(--spacing-lg);
+  padding: 0 13px;
   background: rgba(0, 0, 0, 0.3);
   color: #fff;
   font-weight: 800;
@@ -137,7 +153,7 @@ body {
   height: 100%;
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
+  gap: 5px;
   flex-shrink: 0;
   letter-spacing: 0.7px;
 }
@@ -167,29 +183,32 @@ body {
 .search-bar-section {
   background: var(--card);
   border-bottom: 1px solid var(--border);
-  padding: var(--spacing-xl) 0;
+  padding: 12px;
   position: sticky;
   top: var(--nav-h);
   z-index: 100;
   box-shadow: var(--shadow);
+  width: 100%;
+  max-width: 100%;
 }
 
 .search-filter-bar {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-md);
+  gap: 10px;
+  width: 100%;
 }
 
 .search-box {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: 7px;
   background: var(--bg-2);
   border: 1.5px solid var(--border);
   border-radius: var(--radius);
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: 10px 12px;
   transition: var(--trans);
-  min-width: 0;
+  width: 100%;
 }
 
 .search-box:focus-within {
@@ -210,7 +229,7 @@ body {
   border: none;
   outline: none;
   color: var(--text);
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-family: inherit;
 }
 
@@ -220,11 +239,11 @@ body {
 
 .search-btn {
   flex-shrink: 0;
-  padding: var(--spacing-sm) var(--spacing-lg);
+  padding: 8px 14px;
   background: var(--amber);
   color: #fff;
   font-weight: 700;
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   border-radius: var(--radius-sm);
   border: none;
   cursor: pointer;
@@ -234,7 +253,6 @@ body {
 
 .search-btn:hover {
   opacity: 0.9;
-  transform: translateY(-1px);
 }
 
 .clear-btn {
@@ -261,28 +279,25 @@ body {
 /* Filter Chips */
 .filter-chips {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: 6px;
   flex-wrap: wrap;
+  width: 100%;
 }
 
 .chip {
-  padding: var(--spacing-xs) var(--spacing-lg);
+  padding: 5px 12px;
   border-radius: 50px;
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 600;
   border: 1.5px solid var(--border);
   color: var(--text-2);
   background: var(--bg-2);
   cursor: pointer;
   transition: var(--trans);
+  white-space: nowrap;
 }
 
-.chip:hover {
-  background: var(--green-light);
-  border-color: var(--green);
-  color: var(--green);
-}
-
+.chip:hover,
 .chip.active {
   background: var(--green-light);
   border-color: var(--green);
@@ -315,25 +330,22 @@ body {
    ============================================
 */
 
-.market-loading,
-.no-results {
+.market-loading {
   text-align: center;
-  padding: 65px 0;
+  padding: 40px 20px;
 }
 
-.market-loading p,
-.no-results p {
+.market-loading p {
   color: var(--text-2);
-  margin: var(--spacing-sm) 0 0 0;
+  margin-top: 7px;
 }
 
 .market-cities-grid {
   display: grid;
-  grid-template-columns: repeat(
-    auto-fill,
-    minmax(min(100%, 350px), 1fr)
-  );
-  gap: var(--spacing-xl);
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 14px;
+  padding: 0 10px;
+  width: 100%;
 }
 
 .city-card {
@@ -343,22 +355,23 @@ body {
   overflow: hidden;
   transition: var(--trans);
   animation: fadeInUp 0.4s ease both;
-  contain: content;
+  width: 100%;
+  max-width: 100%;
 }
 
 .city-card:hover {
   border-color: var(--border-2);
   box-shadow: var(--shadow);
-  transform: translateY(-2px);
 }
 
 .city-card-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: 12px 14px;
   background: var(--amber-light);
   border-bottom: 1px solid rgba(232, 93, 4, 0.2);
+  gap: 8px;
 }
 
 body.dark .city-card-header {
@@ -368,50 +381,61 @@ body.dark .city-card-header {
 .city-name {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
-  font-size: 1rem;
+  gap: 6px;
+  font-size: 0.95rem;
   font-weight: 700;
   color: var(--amber);
+  min-width: 0;
+  flex: 1;
 }
 
 .city-name i {
   font-size: 0.9rem;
+  flex-shrink: 0;
 }
 
 .city-count {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: var(--text-3);
+  flex-shrink: 0;
 }
 
 /* ============================================
-   CROP ROWS (MAIN CONTENT)
+   CROP ROWS (MAIN CONTENT) - DESKTOP
    ============================================
 */
 
 .crop-rows {
-  padding: var(--spacing-xs) 0;
+  padding: 0;
+  width: 100%;
+  max-width: 100%;
+  overflow-x: visible;
 }
 
 .crop-row-header {
   display: grid;
-  grid-template-columns: 1.6fr 1fr 1fr 68px;
-  padding: var(--spacing-md) var(--spacing-lg);
-  font-size: 0.68rem;
+  grid-template-columns: 2fr 1fr 1fr 70px;
+  padding: 10px 12px;
+  font-size: 0.65rem;
   color: var(--text-3);
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.4px;
+  letter-spacing: 0.3px;
   border-bottom: 1px solid var(--border);
+  gap: 8px;
+  background: var(--bg-2);
+  width: 100%;
 }
 
 .crop-row {
   display: grid;
-  grid-template-columns: 1.6fr 1fr 1fr 68px;
+  grid-template-columns: 2fr 1fr 1fr 70px;
   align-items: center;
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: 12px;
   border-bottom: 1px solid var(--border);
   transition: var(--trans);
-  gap: var(--spacing-sm);
+  gap: 8px;
+  width: 100%;
 }
 
 .crop-row:last-child {
@@ -424,43 +448,47 @@ body.dark .city-card-header {
 
 /* Crop Row Content */
 .cr-name {
-  font-size: 0.88rem;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--text);
   white-space: normal;
   word-break: break-word;
   overflow: visible;
-  line-height: 1.4;
+  line-height: 1.35;
   min-width: 0;
+  padding-right: 4px;
 }
 
 .cr-price {
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: var(--text);
+  text-align: right;
 }
 
 .cr-unit {
-  font-size: 0.7rem;
+  font-size: 0.65rem;
   color: var(--text-3);
   display: block;
-  margin-top: 2px;
+  margin-top: 1px;
+  text-align: right;
 }
 
 .cr-msp {
-  font-size: 0.82rem;
+  font-size: 0.78rem;
   color: var(--text-3);
+  text-align: right;
 }
 
 .cr-change {
   display: flex;
   align-items: center;
-  justify-content: center;
-  gap: 3px;
-  font-size: 0.75rem;
+  justify-content: flex-end;
+  gap: 2px;
+  font-size: 0.72rem;
   font-weight: 700;
-  padding: 4px 8px;
-  border-radius: 50px;
+  padding: 4px 6px;
+  border-radius: 4px;
   white-space: nowrap;
 }
 
@@ -479,21 +507,27 @@ body.dark .city-card-header {
    ============================================
 */
 
+.no-results {
+  text-align: center;
+  padding: 50px 20px;
+  color: var(--text-3);
+}
+
 .no-results i {
-  font-size: 2.6rem;
-  margin-bottom: var(--spacing-lg);
+  font-size: 2.5rem;
+  margin-bottom: 12px;
 }
 
 .no-results h3 {
-  font-size: 1.05rem;
+  font-size: 1rem;
   font-weight: 700;
   color: var(--text-2);
-  margin-bottom: var(--spacing-sm);
+  margin-bottom: 6px;
 }
 
 .no-results p {
-  font-size: 0.85rem;
-  margin-bottom: var(--spacing-lg);
+  font-size: 0.8rem;
+  margin-bottom: 16px;
 }
 
 /* ============================================
@@ -503,6 +537,7 @@ body.dark .city-card-header {
 
 .chart-section {
   background: var(--bg-2);
+  width: 100%;
 }
 
 .chart-wrapper {
@@ -510,33 +545,37 @@ body.dark .city-card-header {
   border: 1px solid var(--border);
   border-radius: var(--radius-lg);
   overflow: hidden;
+  width: 100%;
 }
 
 .chart-controls {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: 12px 14px;
   border-bottom: 1px solid var(--border);
   flex-wrap: wrap;
-  gap: var(--spacing-md);
+  gap: 8px;
+  width: 100%;
 }
 
 .chart-tabs {
   display: flex;
   gap: 3px;
+  flex-wrap: wrap;
 }
 
 .chart-tab {
-  padding: var(--spacing-xs) var(--spacing-md);
+  padding: 5px 10px;
   border-radius: var(--radius-sm);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-2);
   background: var(--bg-2);
   border: 1px solid var(--border);
   transition: var(--trans);
   cursor: pointer;
+  white-space: nowrap;
 }
 
 .chart-tab:hover,
@@ -547,12 +586,12 @@ body.dark .city-card-header {
 }
 
 .chart-city-select select {
-  padding: var(--spacing-xs) var(--spacing-sm);
+  padding: 5px 8px;
   background: var(--bg-2);
   border: 1px solid var(--border-2);
   border-radius: var(--radius-sm);
   color: var(--text);
-  font-size: 0.78rem;
+  font-size: 0.75rem;
   font-family: inherit;
   outline: none;
   cursor: pointer;
@@ -564,9 +603,10 @@ body.dark .city-card-header {
 }
 
 .chart-canvas-wrap {
-  padding: var(--spacing-xl);
-  height: 320px;
+  padding: 14px;
+  height: 280px;
   position: relative;
+  width: 100%;
 }
 
 /* ============================================
@@ -578,24 +618,26 @@ body.dark .city-card-header {
   overflow-x: auto;
   border-radius: var(--radius);
   border: 1px solid var(--border);
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
 }
 
 .price-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.8rem;
-  min-width: 820px;
+  font-size: 0.75rem;
+  min-width: 650px;
 }
 
 .price-table th {
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: 8px 10px;
   background: var(--amber-light);
   color: var(--amber);
   font-weight: 700;
   text-align: right;
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
-  font-size: 0.76rem;
+  font-size: 0.7rem;
 }
 
 body.dark .price-table th {
@@ -607,7 +649,7 @@ body.dark .price-table th {
 }
 
 .price-table td {
-  padding: var(--spacing-sm) var(--spacing-lg);
+  padding: 8px 10px;
   border-bottom: 1px solid var(--border);
   text-align: right;
   color: var(--text);
@@ -631,31 +673,60 @@ body.dark .price-table th {
   color: var(--text-3);
 }
 
+.section {
+  padding: 30px 0;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 15px;
+  width: 100%;
+}
+
+.section-header {
+  margin-bottom: 24px;
+}
+
+.section-tag {
+  color: var(--amber);
+  font-size: 1.5rem;
+  margin-bottom: 8px;
+}
+
+.section-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0 0 6px;
+  color: var(--text);
+}
+
+.section-header p {
+  font-size: 0.9rem;
+  color: var(--text-3);
+  margin: 0;
+}
+
 /* ============================================
-   RESPONSIVE DESIGN (TABLET)
+   RESPONSIVE: TABLET (768px and below)
    ============================================
 */
 
 @media (max-width: 768px) {
-  :root {
-    --spacing-xl: 14px;
-    --spacing-lg: 12px;
+  .search-bar-section {
+    padding: 12px;
   }
 
   .market-cities-grid {
     grid-template-columns: 1fr;
-    gap: var(--spacing-lg);
+    gap: 12px;
+    padding: 0 8px;
   }
 
-  .city-card {
-    margin: 0 var(--spacing-lg);
-  }
-
+  /* Hide MSP on Tablet */
   .crop-row-header,
   .crop-row {
-    grid-template-columns: 1.4fr 1fr 60px;
-    padding-left: var(--spacing-md);
-    padding-right: var(--spacing-md);
+    grid-template-columns: 1.8fr 1fr 60px;
   }
 
   .crop-row .cr-msp,
@@ -664,102 +735,316 @@ body.dark .price-table th {
   }
 
   .cr-change {
-    font-size: 0.72rem;
-    padding: 3px 6px;
+    font-size: 0.68rem;
+    padding: 3px 5px;
   }
 
   .cr-name {
-    font-size: 0.84rem;
+    font-size: 0.8rem;
   }
 
   .cr-price {
-    font-size: 0.9rem;
+    font-size: 0.85rem;
   }
 
-  .ticker-label {
-    padding: 0 var(--spacing-md);
+  .price-table {
+    min-width: 550px;
+  }
+
+  .price-table th {
+    padding: 7px 8px;
     font-size: 0.65rem;
   }
 
-  .ticker-content {
-    font-size: 0.74rem;
-  }
-
-  .chart-canvas-wrap {
-    height: 280px;
+  .price-table td {
+    padding: 7px 8px;
   }
 }
 
 /* ============================================
-   RESPONSIVE DESIGN (MOBILE LANDSCAPE)
+   RESPONSIVE: MOBILE LANDSCAPE (600px and below)
    ============================================
 */
 
 @media (max-width: 600px) {
+  html, body {
+    max-width: 100vw;
+  }
+
   .search-bar-section {
-    padding: var(--spacing-md) 0;
+    padding: 12px;
+    margin: 0;
+    width: 100%;
+  }
+
+  .search-box {
+    padding: 8px 10px;
+    width: 100%;
   }
 
   .search-btn {
-    padding: var(--spacing-sm) var(--spacing-md);
-    font-size: 0.78rem;
+    padding: 7px 10px;
+    font-size: 0.7rem;
   }
 
   .ticker-label {
-    padding: 0 var(--spacing-md);
-    font-size: 0.62rem;
+    padding: 0 8px;
+    font-size: 0.6rem;
   }
 
   .ticker-content {
-    font-size: 0.72rem;
+    font-size: 0.7rem;
   }
 
   .chart-canvas-wrap {
-    padding: var(--spacing-md);
-    height: 250px;
+    padding: 10px;
+    height: 240px;
+  }
+
+  .market-loading {
+    padding: 30px 15px;
+  }
+
+  .no-results {
+    padding: 40px 15px;
+  }
+
+  .no-results i {
+    font-size: 2.2rem;
   }
 }
 
 /* ============================================
-   RESPONSIVE DESIGN (MOBILE PORTRAIT)
+   RESPONSIVE: MOBILE PORTRAIT (480px and below)
    ============================================
 */
 
 @media (max-width: 480px) {
-  :root {
-    --spacing-lg: 10px;
-    --spacing-md: 10px;
+  html, body {
+    max-width: 100vw;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    overflow-x: hidden;
+  }
+
+  .search-bar-section {
+    padding: 10px;
+    width: 100%;
+    margin: 0;
+    overflow-x: hidden;
+  }
+
+  .search-filter-bar {
+    gap: 8px;
+    width: 100%;
+  }
+
+  .search-box {
+    padding: 8px 10px;
+    gap: 5px;
+    width: 100%;
+  }
+
+  .search-box input {
+    font-size: 0.8rem;
+  }
+
+  .search-btn {
+    padding: 6px 10px;
+    font-size: 0.68rem;
+    min-width: 60px;
+  }
+
+  .filter-chips {
+    gap: 4px;
+    width: 100%;
+  }
+
+  .chip {
+    padding: 4px 10px;
+    font-size: 0.7rem;
+  }
+
+  .market-cities-grid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 0 6px;
+    width: 100%;
+  }
+
+  .city-card {
+    width: 100%;
+    margin: 0;
+  }
+
+  .city-card-header {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  .city-name {
+    font-size: 0.9rem;
+  }
+
+  .city-count {
+    font-size: 0.65rem;
+  }
+
+  /* ================================================
+     CRITICAL FIX: Mobile Layout - Name & Price Only
+     ================================================ */
+  
+  .crop-rows {
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+    padding: 0;
+    margin: 0;
   }
 
   .crop-row-header,
   .crop-row {
     grid-template-columns: 1.5fr 1fr !important;
+    padding: 10px 8px;
+    gap: 6px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
   }
 
+  /* Hide MSP & Change columns on mobile */
+  .crop-row .cr-msp,
+  .crop-row-header .col-msp,
   .crop-row .cr-change,
   .crop-row-header .col-change {
     display: none !important;
   }
 
-  .cr-price {
-    font-size: 0.88rem;
+  .cr-name {
+    font-size: 0.78rem;
+    line-height: 1.3;
+    padding-right: 2px;
+    min-width: 0;
+    word-break: break-word;
   }
 
-  .cr-name {
-    font-size: 0.82rem;
+  .cr-price {
+    font-size: 0.85rem;
+    text-align: right;
+  }
+
+  .cr-unit {
+    font-size: 0.62rem;
+    text-align: right;
   }
 
   .chart-canvas-wrap {
-    padding: var(--spacing-md);
-    height: 240px;
+    padding: 8px;
+    height: 220px;
   }
 
-  .search-bar-section {
-    padding: var(--spacing-md) 0;
+  .chart-controls {
+    padding: 10px 12px;
+    gap: 6px;
+  }
+
+  .chart-tabs {
+    gap: 2px;
+  }
+
+  .chart-tab {
+    padding: 4px 8px;
+    font-size: 0.7rem;
+  }
+
+  .chart-city-select select {
+    padding: 4px 6px;
+    font-size: 0.7rem;
+  }
+
+  .market-loading {
+    padding: 25px 12px;
+  }
+
+  .market-loading p {
+    font-size: 0.8rem;
+  }
+
+  .no-results {
+    padding: 30px 12px;
+  }
+
+  .no-results i {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+
+  .no-results h3 {
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+  }
+
+  .no-results p {
+    font-size: 0.75rem;
+  }
+
+  /* Ensure table scrolls properly on mobile */
+  .price-table {
+    min-width: 450px;
+  }
+
+  .price-table th {
+    padding: 6px 8px;
+    font-size: 0.6rem;
+  }
+
+  .price-table td {
+    padding: 6px 8px;
+    font-size: 0.7rem;
+  }
+
+  .section {
+    padding: 20px 0;
+  }
+
+  .section-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .section-header p {
+    font-size: 0.8rem;
+  }
+}
+
+/* ============================================
+   EXTRA SMALL PHONES (below 380px)
+   ============================================
+*/
+
+@media (max-width: 380px) {
+  .crop-row-header,
+  .crop-row {
+    grid-template-columns: 1.5fr 0.9fr !important;
+    padding: 8px;
+  }
+
+  .cr-name {
+    font-size: 0.75rem;
+    padding-right: 0;
+  }
+
+  .cr-price {
+    font-size: 0.8rem;
   }
 
   .search-btn {
-    padding: var(--spacing-xs) var(--spacing-md);
-    font-size: 0.75rem;
+    padding: 5px 8px;
+    font-size: 0.65rem;
+    min-width: 55px;
+  }
+
+  .city-name {
+    font-size: 0.85rem;
   }
 }
