@@ -401,7 +401,7 @@ body.dark .city-card-header {
 }
 
 /* ============================================
-   CROP ROWS (MAIN CONTENT) - DESKTOP
+   CROP ROWS (MAIN CONTENT) - ALL SCREENS
    ============================================
 */
 
@@ -409,12 +409,14 @@ body.dark .city-card-header {
   padding: 0;
   width: 100%;
   max-width: 100%;
-  overflow-x: visible;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  background: var(--card);
 }
 
 .crop-row-header {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 70px;
+  grid-template-columns: 1.8fr 1fr 1fr 70px;
   padding: 10px 12px;
   font-size: 0.65rem;
   color: var(--text-3);
@@ -425,17 +427,19 @@ body.dark .city-card-header {
   gap: 8px;
   background: var(--bg-2);
   width: 100%;
+  min-width: fit-content;
 }
 
 .crop-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 70px;
+  grid-template-columns: 1.8fr 1fr 1fr 70px;
   align-items: center;
   padding: 12px;
   border-bottom: 1px solid var(--border);
   transition: var(--trans);
   gap: 8px;
   width: 100%;
+  min-width: fit-content;
 }
 
 .crop-row:last-child {
@@ -446,7 +450,7 @@ body.dark .city-card-header {
   background: var(--bg-2);
 }
 
-/* Crop Row Content */
+/* Crop Row Content - LIGHT MODE FIXES */
 .cr-name {
   font-size: 0.82rem;
   font-weight: 600;
@@ -468,38 +472,39 @@ body.dark .city-card-header {
 
 .cr-unit {
   font-size: 0.65rem;
-  color: var(--text-3);
+  color: var(--text-2);
   display: block;
   margin-top: 1px;
   text-align: right;
+  font-weight: 500;
 }
 
 .cr-msp {
   font-size: 0.78rem;
-  color: var(--text-3);
+  color: var(--text-2);
   text-align: right;
+  font-weight: 500;
 }
 
 .cr-change {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 2px;
-  font-size: 0.72rem;
+  font-size: 0.7rem;
   font-weight: 700;
   padding: 4px 6px;
   border-radius: 4px;
   white-space: nowrap;
+  color: #ffffff;
 }
 
 .cr-change.up {
-  color: var(--green);
-  background: var(--green-light);
+  background: var(--green);
 }
 
 .cr-change.down {
-  color: var(--red);
-  background: var(--red-light);
+  background: var(--red);
 }
 
 /* ============================================
@@ -627,6 +632,7 @@ body.dark .city-card-header {
   border-collapse: collapse;
   font-size: 0.75rem;
   min-width: 650px;
+  background: var(--card);
 }
 
 .price-table th {
@@ -642,6 +648,7 @@ body.dark .city-card-header {
 
 body.dark .price-table th {
   background: rgba(255, 183, 3, 0.08);
+  color: var(--amber);
 }
 
 .price-table th:first-child {
@@ -653,12 +660,13 @@ body.dark .price-table th {
   border-bottom: 1px solid var(--border);
   text-align: right;
   color: var(--text);
-  font-weight: 500;
+  font-weight: 600;
 }
 
 .price-table td:first-child {
   text-align: left;
   font-weight: 700;
+  color: var(--text);
 }
 
 .price-table tr:last-child td {
@@ -671,6 +679,18 @@ body.dark .price-table th {
 
 .price-table td.not-available {
   color: var(--text-3);
+  font-weight: 400;
+}
+
+/* Price colors for table */
+.price-table .price-up {
+  color: var(--green);
+  font-weight: 700;
+}
+
+.price-table .price-down {
+  color: var(--red);
+  font-weight: 700;
 }
 
 .section {
@@ -723,28 +743,25 @@ body.dark .price-table th {
     padding: 0 8px;
   }
 
-  /* Hide MSP on Tablet */
   .crop-row-header,
   .crop-row {
-    grid-template-columns: 1.8fr 1fr 60px;
-  }
-
-  .crop-row .cr-msp,
-  .crop-row-header .col-msp {
-    display: none !important;
-  }
-
-  .cr-change {
-    font-size: 0.68rem;
-    padding: 3px 5px;
+    grid-template-columns: 1.5fr 0.9fr 0.9fr 60px;
+    padding: 10px;
+    gap: 6px;
+    font-size: 0.75rem;
   }
 
   .cr-name {
-    font-size: 0.8rem;
+    font-size: 0.76rem;
   }
 
   .cr-price {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+  }
+
+  .cr-change {
+    font-size: 0.65rem;
+    padding: 3px 5px;
   }
 
   .price-table {
@@ -785,6 +802,36 @@ body.dark .price-table th {
   .search-btn {
     padding: 7px 10px;
     font-size: 0.7rem;
+  }
+
+  .crop-row-header,
+  .crop-row {
+    grid-template-columns: 1.3fr 0.8fr 0.8fr 55px;
+    padding: 8px;
+    gap: 4px;
+    font-size: 0.7rem;
+  }
+
+  .cr-name {
+    font-size: 0.72rem;
+    line-height: 1.25;
+  }
+
+  .cr-price {
+    font-size: 0.75rem;
+  }
+
+  .cr-unit {
+    font-size: 0.6rem;
+  }
+
+  .cr-msp {
+    font-size: 0.7rem;
+  }
+
+  .cr-change {
+    font-size: 0.62rem;
+    padding: 2px 4px;
   }
 
   .ticker-label {
@@ -832,7 +879,6 @@ body.dark .price-table th {
     padding: 10px;
     width: 100%;
     margin: 0;
-    overflow-x: hidden;
   }
 
   .search-filter-bar {
@@ -891,52 +937,54 @@ body.dark .price-table th {
     font-size: 0.65rem;
   }
 
-  /* ================================================
-     CRITICAL FIX: Mobile Layout - Name & Price Only
-     ================================================ */
-  
+  /* Mobile: All 4 columns with horizontal scroll */
   .crop-rows {
     width: 100%;
     max-width: 100vw;
-    overflow-x: hidden;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
     padding: 0;
     margin: 0;
   }
 
   .crop-row-header,
   .crop-row {
-    grid-template-columns: 1.5fr 1fr !important;
-    padding: 10px 8px;
-    gap: 6px;
+    grid-template-columns: 1.2fr 0.75fr 0.75fr 50px !important;
+    padding: 8px;
+    gap: 4px;
     width: 100%;
-    max-width: 100%;
+    min-width: fit-content;
     margin: 0;
-  }
-
-  /* Hide MSP & Change columns on mobile */
-  .crop-row .cr-msp,
-  .crop-row-header .col-msp,
-  .crop-row .cr-change,
-  .crop-row-header .col-change {
-    display: none !important;
+    font-size: 0.65rem;
   }
 
   .cr-name {
-    font-size: 0.78rem;
-    line-height: 1.3;
-    padding-right: 2px;
+    font-size: 0.7rem;
+    line-height: 1.2;
+    padding-right: 0;
     min-width: 0;
     word-break: break-word;
   }
 
   .cr-price {
-    font-size: 0.85rem;
+    font-size: 0.72rem;
     text-align: right;
   }
 
   .cr-unit {
-    font-size: 0.62rem;
+    font-size: 0.58rem;
     text-align: right;
+  }
+
+  .cr-msp {
+    font-size: 0.65rem;
+    text-align: right;
+  }
+
+  .cr-change {
+    font-size: 0.6rem;
+    padding: 2px 4px;
+    justify-content: center;
   }
 
   .chart-canvas-wrap {
@@ -989,7 +1037,6 @@ body.dark .price-table th {
     font-size: 0.75rem;
   }
 
-  /* Ensure table scrolls properly on mobile */
   .price-table {
     min-width: 450px;
   }
@@ -1025,17 +1072,30 @@ body.dark .price-table th {
 @media (max-width: 380px) {
   .crop-row-header,
   .crop-row {
-    grid-template-columns: 1.5fr 0.9fr !important;
-    padding: 8px;
+    grid-template-columns: 1.1fr 0.7fr 0.7fr 45px !important;
+    padding: 6px;
   }
 
   .cr-name {
-    font-size: 0.75rem;
+    font-size: 0.68rem;
     padding-right: 0;
   }
 
   .cr-price {
-    font-size: 0.8rem;
+    font-size: 0.68rem;
+  }
+
+  .cr-unit {
+    font-size: 0.55rem;
+  }
+
+  .cr-msp {
+    font-size: 0.62rem;
+  }
+
+  .cr-change {
+    font-size: 0.58rem;
+    padding: 1px 3px;
   }
 
   .search-btn {
