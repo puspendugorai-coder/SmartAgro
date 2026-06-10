@@ -576,6 +576,7 @@ window.stopKisanTyping = function () {
 
     function handleSpeakBtnAction(e) {
       e.stopPropagation();
+      const synth = window.speechSynthesis;
 
       // ── This button is active and speaking → PAUSE ──
       if (currentSpeakBtn === speakBtn && !speechPaused) {
@@ -584,13 +585,10 @@ window.stopKisanTyping = function () {
         speakBtn.classList.add('paused');
         speakBtn.innerHTML = '<i class="fas fa-play"></i>';
         speakBtn.title = 'Resume';
-
-        if (isMobile) {
-          // Native Audio.pause() works reliably
-          if (_mobileAudio && typeof _mobileAudio.pause === 'function') _mobileAudio.pause();
-        } else {
-          if (window.speechSynthesis) window.speechSynthesis.pause();
-        }
+        // Web Speech pause() works on desktop; on mobile it's unreliable
+        // but we still call it as best-effort — stopSpeaking/restart
+        // on resume is the reliable mobile path handled below.
+        if (synth) synth.pause();
         return;
       }
 
@@ -601,11 +599,12 @@ window.stopKisanTyping = function () {
         speakBtn.classList.add('speaking');
         speakBtn.innerHTML = '<i class="fas fa-pause"></i>';
         speakBtn.title = 'Pause';
-
         if (isMobile) {
-          if (_mobileAudio && typeof _mobileAudio.play === 'function') _mobileAudio.play().catch(() => {});
+          // Mobile: synth.resume() is unreliable — restart from beginning
+          // (pause/resume is best-effort on mobile Web Speech)
+          speakText(el.textContent, getAppLang(), speakBtn);
         } else {
-          if (window.speechSynthesis) window.speechSynthesis.resume();
+          if (synth) synth.resume();
         }
         return;
       }
@@ -681,47 +680,50 @@ function typeWriter(el, text, i, onComplete) {
   }
 
   /* ══════════════════════════════════════════════════════════
-     TEXT-TO-SPEECH  —  DUAL ENGINE
-     ┌─────────────────────────────────────────────────────┐
-     │  MOBILE  → Google Translate TTS audio endpoint      │
-     │            Supports ALL Indian languages natively.  │
-     │            No device voices needed.                 │
-     │  DESKTOP → Web Speech API (SpeechSynthesis)         │
-     └─────────────────────────────────────────────────────┘
+     TEXT-TO-SPEECH  —  Web Speech API, correctly configured
+     ────────────────────────────────────────────────────────
+     ROOT CAUSE OF PREVIOUS FAILURES:
+     Explicitly setting utter.voice overrides Android's Google
+     TTS service. When a language like Gujarati has no matching
+     voice in getVoices(), the override forces a Hindi/English
+     voice which can't read Gujarati script → silence.
+
+     CORRECT APPROACH:
+     • Set utter.lang to the right BCP-47 code.
+     • On MOBILE: do NOT set utter.voice at all.
+       Android Chrome delegates to the Google TTS system service
+       which handles ALL Indian languages server-side.
+     • On DESKTOP: set utter.voice only on an exact lang match.
   ══════════════════════════════════════════════════════════ */
 
-  /*
-   * Google Translate TTS language codes.
-   * These are the "tl" parameter values accepted by the translate_tts endpoint.
-   * Languages without a direct GT code fall back to their closest supported one.
-   */
-  const GT_TTS_LANG = {
-    en:   'en',
-    hi:   'hi',
-    bn:   'bn',
-    te:   'te',
-    mr:   'mr',
-    ta:   'ta',
-    gu:   'gu',
-    kn:   'kn',
-    ml:   'ml',
-    pa:   'pa',
-    or:   'or',
-    as:   'as',
-    ur:   'ur',
-    mai:  'hi',   // Maithili — no GT voice, Hindi is closest (Devanagari)
-    ne:   'ne',
-    sa:   'hi',   // Sanskrit — use Hindi (Devanagari)
-    kok:  'mr',   // Konkani — Marathi is closest
-    mni:  'bn',   // Meitei/Manipuri — Bengali script
-    bodo: 'hi',   // Bodo — Devanagari, use Hindi
-    doi:  'hi',   // Dogri — Devanagari, use Hindi
-    sat:  'hi',   // Santali — use Hindi
-    ks:   'ur',   // Kashmiri — Perso-Arabic, use Urdu
-    sd:   'ur',   // Sindhi — Perso-Arabic, use Urdu
+  /* BCP-47 lang tag for each app language code */
+  const TTS_LANG_TAG = {
+    en:   'en-IN',
+    hi:   'hi-IN',
+    bn:   'bn-IN',
+    te:   'te-IN',
+    mr:   'mr-IN',
+    ta:   'ta-IN',
+    gu:   'gu-IN',
+    kn:   'kn-IN',
+    ml:   'ml-IN',
+    pa:   'pa-IN',
+    or:   'or-IN',
+    as:   'as-IN',
+    ur:   'ur-PK',
+    mai:  'hi-IN',   // Maithili  → Hindi (Devanagari)
+    ne:   'ne-NP',
+    sa:   'hi-IN',   // Sanskrit  → Hindi
+    kok:  'mr-IN',   // Konkani   → Marathi
+    mni:  'bn-IN',   // Meitei    → Bengali script
+    bodo: 'hi-IN',   // Bodo      → Hindi
+    doi:  'hi-IN',   // Dogri     → Hindi
+    sat:  'hi-IN',   // Santali   → Hindi
+    ks:   'ur-PK',   // Kashmiri  → Urdu
+    sd:   'ur-PK',   // Sindhi    → Urdu
   };
 
-  /* Clean text before TTS — strip emoji, symbols, markdown */
+  /* Strip emoji, markdown symbols before speaking */
   function cleanForTTS(text) {
     return text
       .replace(/[\u{1F300}-\u{1FFFF}]/gu, '')
@@ -732,84 +734,19 @@ function typeWriter(el, text, i, onComplete) {
       .trim();
   }
 
-  /* ── Active Audio element for mobile TTS ── */
-  let _mobileAudio = null;
-
   /*
-   * Google Translate TTS splits long text into ≤200-char chunks
-   * (the endpoint has a hard limit). We queue the chunks and play
-   * them one after another.
-   */
-  function _chunkText(text, maxLen) {
-    maxLen = maxLen || 180; // stay safely under the 200-char limit
-    const chunks = [];
-    // Split on sentence-ending punctuation first, then on spaces
-    const sentences = text.match(/[^।|!|?|.|\n]+[।!?.\n]?/g) || [text];
-    let current = '';
-    for (const s of sentences) {
-      if ((current + s).length <= maxLen) {
-        current += s;
-      } else {
-        if (current) chunks.push(current.trim());
-        // If a single sentence is still too long, split by word
-        if (s.length > maxLen) {
-          const words = s.split(' ');
-          current = '';
-          for (const w of words) {
-            if ((current + ' ' + w).trim().length <= maxLen) {
-              current = (current + ' ' + w).trim();
-            } else {
-              if (current) chunks.push(current);
-              current = w;
-            }
-          }
-        } else {
-          current = s;
-        }
-      }
-    }
-    if (current.trim()) chunks.push(current.trim());
-    return chunks.filter(Boolean);
-  }
-
-  /*
-   * _playMobileChunks — plays an array of text chunks sequentially
-   * using the Google Translate TTS audio endpoint.
-   * Calls onDone() when all chunks finish or on error/stop.
-   */
-  function _playMobileChunks(chunks, gtLang, onDone) {
-    if (!chunks.length) { onDone(); return; }
-    let idx = 0;
-    let stopped = false;
-
-    function playNext() {
-      if (stopped || idx >= chunks.length) { if (!stopped) onDone(); return; }
-      const chunk = encodeURIComponent(chunks[idx++]);
-      const url   = 'https://translate.google.com/translate_tts?ie=UTF-8&tl='
-                  + gtLang + '&client=tw-ob&q=' + chunk;
-
-      const audio = new Audio();
-      audio.crossOrigin = 'anonymous';
-      _mobileAudio = audio;
-
-      audio.onended  = playNext;
-      audio.onerror  = () => { if (!stopped) onDone(); };
-      audio.src = url;
-      audio.play().catch(() => { if (!stopped) onDone(); });
-    }
-
-    // Expose a stop handle on the audio manager
-    _mobileAudio = { stop: () => { stopped = true; if (_mobileAudio && _mobileAudio.pause) _mobileAudio.pause(); } };
-    playNext();
-  }
-
-  /*
-   * speakText — main entry point.
-   * Mobile  → Google Translate TTS (Audio element, chunked)
-   * Desktop → Web Speech API
+   * speakText — single Web Speech API engine.
+   *
+   * MOBILE:  set utter.lang only, never utter.voice.
+   *          Android's Google TTS service reads the lang tag and
+   *          uses the correct language engine server-side.
+   *
+   * DESKTOP: set utter.lang, then utter.voice only on exact match.
    */
   function speakText(text, lang, speakBtn) {
-    stopSpeaking(); // cancel whatever is playing
+    if (!window.speechSynthesis) return;
+
+    window.speechSynthesis.cancel();
     resetSpeakBtnUI();
 
     const cleaned = cleanForTTS(text);
@@ -818,9 +755,10 @@ function typeWriter(el, text, i, onComplete) {
     mobileSpeechText   = cleaned;
     mobileSpeechOffset = 0;
 
+    const synth     = window.speechSynthesis;
+    const langTag   = TTS_LANG_TAG[lang] || 'hi-IN';
     const toggleBtn = document.getElementById('kisanToggleBtn');
 
-    // ── Button UI: show speaking state ──
     if (speakBtn) {
       currentSpeakBtn = speakBtn;
       speechPaused    = false;
@@ -829,73 +767,85 @@ function typeWriter(el, text, i, onComplete) {
       speakBtn.innerHTML = '<i class="fas fa-pause"></i>';
       speakBtn.title = 'Pause';
     }
-    if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-volume-up" style="color:#fff;font-size:1.3rem"></i><span class="kw-pulse"></span>';
+    if (toggleBtn) toggleBtn.innerHTML =
+      '<i class="fas fa-volume-up" style="color:#fff;font-size:1.3rem"></i><span class="kw-pulse"></span>';
 
     const onDone = () => {
       mobileSpeechText   = '';
       mobileSpeechOffset = 0;
-      if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
+      if (toggleBtn) toggleBtn.innerHTML =
+        '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
       resetSpeakBtnUI();
     };
 
-    if (isMobile) {
-      /* ── MOBILE PATH: Google Translate TTS ── */
-      const gtLang = GT_TTS_LANG[lang] || 'hi';
-      const chunks = _chunkText(cleaned);
-      _playMobileChunks(chunks, gtLang, onDone);
+    function doSpeak(voices) {
+      const utter  = new SpeechSynthesisUtterance(cleaned);
+      utter.lang   = langTag;
+      utter.rate   = 0.88;
+      utter.pitch  = 1.0;
+      utter.volume = 1.0;
 
-    } else {
-      /* ── DESKTOP PATH: Web Speech API ── */
-      if (!window.speechSynthesis) { onDone(); return; }
+      if (!isMobile && voices && voices.length) {
+        // Desktop only: set voice on exact language match
+        const base  = langTag.split('-')[0];
+        const match = voices.find(v => v.lang === langTag)
+                   || voices.find(v => v.lang.startsWith(base + '-'))
+                   || voices.find(v => v.lang.startsWith(base));
+        if (match) utter.voice = match;
+        // If no match, leave utter.voice unset (browser chooses)
+      }
+      // Mobile: utter.voice deliberately NOT set — Android Google TTS
+      // handles the language via its own service when only lang is set.
 
-      const doSpeak = (voices) => {
-        const utter = new SpeechSynthesisUtterance(cleaned);
-        utter.lang   = TTS_LANGS[lang] || 'hi-IN';
-        utter.rate   = 0.88;
-        utter.pitch  = 1.0;
-        utter.volume = 1.0;
-
-        // Best-effort voice matching for desktop
-        const ttsLang  = TTS_LANGS[lang] || 'hi-IN';
-        const baseLang = ttsLang.split('-')[0];
-        let best = voices.find(v => v.lang === ttsLang);
-        if (!best) best = voices.find(v => v.lang.startsWith(baseLang));
-        if (!best) best = voices.find(v => v.lang.startsWith('hi'));
-        if (!best && voices.length) best = voices[0];
-        if (best) utter.voice = best;
-
-        utter.onend   = onDone;
-        utter.onerror = (e) => { if (e.error !== 'interrupted') onDone(); };
-        window.speechSynthesis.speak(utter);
+      utter.onboundary = (e) => {
+        if (e.name === 'word') mobileSpeechOffset = e.charIndex || 0;
       };
+      utter.onend   = onDone;
+      utter.onerror = (e) => { if (e.error !== 'interrupted') onDone(); };
 
-      const voices = window.speechSynthesis.getVoices();
+      // Small delay on mobile after any prior cancel()
+      setTimeout(() => synth.speak(utter), isMobile ? 150 : 0);
+    }
+
+    if (isMobile) {
+      // No need to wait for voices — we're not using them
+      doSpeak(null);
+    } else {
+      const voices = synth.getVoices();
       if (voices.length > 0) {
         doSpeak(voices);
       } else {
-        window.speechSynthesis.onvoiceschanged = () => {
-          window.speechSynthesis.onvoiceschanged = null;
-          doSpeak(window.speechSynthesis.getVoices());
+        synth.onvoiceschanged = () => {
+          synth.onvoiceschanged = null;
+          doSpeak(synth.getVoices());
         };
+        // Safety fallback if event never fires
+        setTimeout(() => {
+          if (!synth.speaking) doSpeak(synth.getVoices());
+        }, 600);
       }
     }
   }
 
   function stopSpeaking() {
-    // Stop mobile Audio
-    if (_mobileAudio) {
-      if (typeof _mobileAudio.stop === 'function') _mobileAudio.stop();
-      else if (typeof _mobileAudio.pause === 'function') { _mobileAudio.pause(); _mobileAudio.src = ''; }
-      _mobileAudio = null;
-    }
-    // Stop Web Speech
     if (window.speechSynthesis) window.speechSynthesis.cancel();
-
     mobileSpeechText   = '';
     mobileSpeechOffset = 0;
-
     const toggleBtn = document.getElementById('kisanToggleBtn');
-    if (toggleBtn) toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
+    if (toggleBtn) toggleBtn.innerHTML =
+      '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
+  }
+
+  /* ── iOS audio context unlock on first touch ── */
+  if (isMobile) {
+    document.addEventListener('touchstart', function _iosUnlock() {
+      if (window.speechSynthesis) {
+        const u = new SpeechSynthesisUtterance('');
+        window.speechSynthesis.speak(u);
+        window.speechSynthesis.cancel();
+      }
+      document.removeEventListener('touchstart', _iosUnlock);
+    }, { once: true, passive: true });
   }
 
   /* ── Voice input ─────────────────────────── */
