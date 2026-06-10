@@ -204,11 +204,44 @@
   body.light-theme .kp-lang-opt{background:#f0fdf4;color:#374151;border-color:rgba(22,101,52,.2)}
   body.light-theme .kp-lang-picker{background:#f9fafb}
 
+  /* ── Per-message speaker button ── */
+  .kp-msg-footer{
+    display:flex;align-items:center;justify-content:flex-end;
+    margin-top:6px;gap:6px;
+  }
+  .kp-speak-btn{
+    background:none;border:1px solid rgba(74,222,128,.25);border-radius:50%;
+    width:28px;height:28px;min-width:28px;
+    display:flex;align-items:center;justify-content:center;
+    color:rgba(74,222,128,.7);cursor:pointer;font-size:.72rem;
+    transition:all .18s;flex-shrink:0;
+    -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+  }
+  .kp-speak-btn:hover,.kp-speak-btn:active{
+    background:rgba(74,222,128,.12);border-color:var(--green,#4ade80);
+    color:var(--green,#4ade80);transform:scale(1.12);
+  }
+  .kp-speak-btn.speaking{
+    background:rgba(74,222,128,.15);border-color:var(--green,#4ade80);
+    color:var(--green,#4ade80);animation:speakPulse .9s ease-in-out infinite;
+  }
+  .kp-speak-btn.paused{
+    background:rgba(248,190,0,.1);border-color:#fbbf24;color:#fbbf24;
+  }
+  @keyframes speakPulse{0%,100%{box-shadow:0 0 0 0 rgba(74,222,128,.35)}50%{box-shadow:0 0 0 5px rgba(74,222,128,0)}}
+  body.light-theme .kp-speak-btn{border-color:rgba(22,101,52,.25);color:rgba(22,101,52,.6)}
+  body.light-theme .kp-speak-btn:hover{background:rgba(22,101,52,.08);border-color:#166534;color:#166534}
+
   @media(max-width:600px){
-    #kisanPanel{width:calc(100vw - 24px);right:12px;bottom:80px;max-height:70vh}
+    #kisanPanel{width:calc(100vw - 24px);right:12px;bottom:80px;max-height:72vh}
     #kisanToggleBtn{bottom:16px;right:12px;width:50px;height:50px}
     #kisanHelpline{bottom:12px;left:12px;font-size:.7rem;padding:6px 10px}
     #kisanHelpline strong{display:none}
+    .kp-lang-options{grid-template-columns:1fr 1fr 1fr}
+    .kp-lang-opt{padding:7px 4px;font-size:.68rem}
+    .kp-speak-btn{width:32px;height:32px;min-width:32px;font-size:.8rem}
+    #kisanInput{font-size:.85rem;padding:9px 12px}
+    .kp-mic-btn,.kp-send-btn,.kp-stop-btn{width:38px;height:38px;font-size:.88rem}
   }`;
         document.head.appendChild(S);
 
@@ -221,6 +254,8 @@
         let langChosen = false;
         let chosenLang = null;
         let typingAborted = false;
+        let currentSpeakBtn = null; // tracks which message's speaker btn is active
+        let speechPaused = false; // tracks pause/play state
 
         /* ── Lang data ───────────────────────────── */
         const LANG_NAMES = {
@@ -239,6 +274,11 @@
             ur: 'اردو',
             mai: 'मैथिली',
             ne: 'नेपाली',
+            sa: 'संस्कृतम्',
+            kok: 'कोंकणी',
+            mni: 'মৈতৈলোন্',
+            bodo: 'बड़ो',
+            doi: 'डोगरी',
         };
 
         const GREETINGS = {
@@ -252,6 +292,16 @@
             kn: '🌾 ನಮಸ್ಕಾರ ರೈತ ಮಿತ್ರ! ನಾನು SmartAgro ಕಿಸಾನ್ ಸಹಾಯಕ. ಹವಾಮಾನ, ಬೆಳೆ, ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳ ಬಗ್ಗೆ ಕೇಳಿ.',
             ml: '🌾 നമസ്കാരം കർഷക സുഹൃത്തേ! ഞാൻ SmartAgro കിസാൻ അസിസ്റ്റന്റ്. കാലാവസ്ഥ, വിളകൾ, വിപണി വില ചോദിക്കൂ.',
             pa: '🌾 ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਕਿਸਾਨ ਵੀਰੇ! ਮੈਂ SmartAgro ਕਿਸਾਨ ਸਹਾਇਕ ਹਾਂ। ਮੌਸਮ, ਫਸਲ, ਮੰਡੀ ਭਾਅ ਬਾਰੇ ਪੁੱਛੋ।',
+            or: '🌾 ନମସ୍କାର କୃଷକ ବନ୍ଧୁ! ମୁଁ SmartAgro କିସାନ ସହାୟକ। ଆବହାୱା, ଫସଲ, ବଜାର ମୂଲ୍ୟ ବିଷୟରେ ପଚାରନ୍ତୁ।',
+            as: '🌾 নমস্কাৰ কৃষক বন্ধু! মই SmartAgro কিষান সহায়ক। বতৰ, শস্য, বজাৰ মূল্য বা চৰকাৰী আঁচনিৰ বিষয়ে সুধিব।',
+            ur: '🌾 السلام علیکم کسان دوست! میں SmartAgro کسان مددگار ہوں۔ موسم، فصل، منڈی بھاؤ کے بارے میں پوچھیں۔',
+            mai: '🌾 प्रणाम किसान भाई! हम SmartAgro किसान सहायक छी। मौसम, फसल, बाजार भाव के बारे में पूछू।',
+            ne: '🌾 नमस्ते किसान साथी! म SmartAgro किसान सहायक हुँ। मौसम, बाली, बजार मूल्य वा सरकारी योजनाबारे सोध्नुस्।',
+            sa: '🌾 नमस्ते कृषक मित्र! अहं SmartAgro किसान सहायकः अस्मि। कृषि, वायुमण्डलं, विपणनमूल्यं च पृच्छतु।',
+            kok: '🌾 नमस्कार शेतकारी दोस्ता! हांव SmartAgro किसान सहाय्यक. हवामान, पीक, बाजारभाव विशीं विचार.',
+            mni: '🌾 নমস্কার চাষী নুংশিজবা! ঐ SmartAgro কিসান হেল্পার নি। য়াম্না চাউখৎলবা বিউজেট বিষয়দা হায়বিয়ু।',
+            bodo: '🌾 नमस्कार खेती आरो! आं SmartAgro किसान सहायक। मौसम, खेती, बाजार बिफान बिलाइ दिन्थि।',
+            doi: '🌾 नमस्ते किसान भाई! मैं SmartAgro किसान सहायक आं। मौसम, फसल, बजार भाव बारे पुच्छो।',
         };
 
         const LANG_QUESTION = {
@@ -272,14 +322,21 @@
             ml: 'ml-IN',
             pa: 'pa-IN',
             or: 'or-IN',
+            as: 'as-IN',
             ur: 'ur-PK',
+            mai: 'hi-IN',
             ne: 'ne-NP',
+            sa: 'hi-IN',
+            kok: 'mr-IN',
+            mni: 'bn-IN',
+            bodo: 'hi-IN',
+            doi: 'hi-IN',
         };
         // TTS language codes — Indian accent preferred
         const TTS_LANGS = {
             en: 'en-IN',
             hi: 'hi-IN',
-            bn: 'bn-BD',
+            bn: 'bn-IN',
             te: 'te-IN',
             mr: 'mr-IN',
             ta: 'ta-IN',
@@ -299,7 +356,6 @@
             mni: 'bn-BD',
             bodo: 'hi-IN',
             doi: 'hi-IN',
-            sa: 'hi-IN',
         };
 
         /* ── Helpers ─────────────────────────────── */
@@ -395,12 +451,12 @@
   };
 
   /* ── Stop typing ─────────────────────────── */
-  window.stopKisanTyping = function () {
+window.stopKisanTyping = function () {
     typingAborted = true;
     isBusy        = false;
     hideStopBtn();
     stopSpeaking();
-  };
+};
 
   /* ── Send message ────────────────────────── */
   window.sendKisanMessage = async function () {
@@ -430,9 +486,14 @@
         'english':'en','hindi':'hi','bengali':'bn','telugu':'te',
         'marathi':'mr','tamil':'ta','gujarati':'gu','kannada':'kn',
         'malayalam':'ml','punjabi':'pa','odia':'or','assamese':'as',
-        'urdu':'ur','nepali':'ne','हिंदी':'hi','हिन्दी':'hi',
-        'বাংলা':'bn','తెలుగు':'te','मराठी':'mr','தமிழ்':'ta',
-        'ગુજરાતી':'gu','ಕನ್ನಡ':'kn','മലയാളം':'ml','ਪੰਜਾਬੀ':'pa',
+        'urdu':'ur','nepali':'ne','maithili':'mai','sanskrit':'sa',
+        'konkani':'kok','manipuri':'mni','meitei':'mni','bodo':'bodo',
+        'dogri':'doi','santhali':'sat','kashmiri':'ks','sindhi':'sd',
+        'हिंदी':'hi','हिन्दी':'hi','বাংলা':'bn','తెలుగు':'te',
+        'मराठी':'mr','தமிழ்':'ta','ગુજરાતી':'gu','ಕನ್ನಡ':'kn',
+        'മലയാളം':'ml','ਪੰਜਾਬੀ':'pa','ଓଡ଼ିଆ':'or','অসমীয়া':'as',
+        'اردو':'ur','मैथिली':'mai','संस्कृत':'sa','कोंकणी':'kok',
+        'डोगरी':'doi','سنڌي':'sd','كٲشُر':'ks',
       };
       for (const [kw, code] of Object.entries(langKeywords)) {
         if (msgLower.includes(kw)) {
@@ -483,38 +544,94 @@
   }
 
   function appendBot(text, animate) {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'kp-msg-wrapper';
+    wrapper.style.cssText = 'display:flex;flex-direction:column;align-self:flex-start;max-width:85%';
+
     const el = document.createElement('div');
     el.className = 'kp-msg bot';
-    getMsgs().appendChild(el);
+    el.style.maxWidth = '100%';
+
+    // Speaker button row
+    const footer = document.createElement('div');
+    footer.className = 'kp-msg-footer';
+
+    const speakBtn = document.createElement('button');
+    speakBtn.className = 'kp-speak-btn';
+    speakBtn.title = 'Listen';
+    speakBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+    speakBtn.setAttribute('aria-label', 'Play / Pause voice');
+
+    speakBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const synth = window.speechSynthesis;
+    if (!synth) return;
+
+    // This button is the active one and currently speaking → pause
+    if (currentSpeakBtn === speakBtn && synth.speaking && !synth.paused && !speechPaused) {
+        synth.pause();
+        speechPaused = true;
+        speakBtn.classList.remove('speaking');
+        speakBtn.classList.add('paused');
+        speakBtn.innerHTML = '<i class="fas fa-play"></i>';
+        speakBtn.title = 'Resume';
+        return;
+    }
+
+    // This button is the active one and paused → resume
+    if (currentSpeakBtn === speakBtn && (synth.paused || speechPaused)) {
+        synth.resume();
+        speechPaused = false;
+        speakBtn.classList.remove('paused');
+        speakBtn.classList.add('speaking');
+        speakBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        speakBtn.title = 'Pause';
+        return;
+    }
+
+    // New message — cancel previous, start fresh
+    speakText(el.textContent, getAppLang(), speakBtn);
+});
+
+    footer.appendChild(speakBtn);
+    wrapper.appendChild(el);
+    wrapper.appendChild(footer);
+    getMsgs().appendChild(wrapper);
     scrollBot();
+
+   // Inside appendBot(), replace the animate block:
     if (animate) {
-      typingAborted = false;
-      showStopBtn();
-      typeWriter(el, text, 0);
-      // Speak after short delay so typewriter starts first
-      setTimeout(() => speakText(text, getAppLang()), 400);
+        typingAborted = false;
+        showStopBtn();
+        typeWriter(el, text, 0, () => {
+            // Speak only after typing animation ends
+            speakText(text, getAppLang(), speakBtn);
+        });
     } else {
-      el.textContent = text;
-      scrollBot();
+        el.textContent = text;
+        scrollBot();
     }
   }
 
-  function typeWriter(el, text, i) {
+ // Replace typeWriter function:
+function typeWriter(el, text, i, onComplete) {
     if (typingAborted) {
-      el.textContent = text; // show full text immediately on stop
-      typingAborted  = false;
-      hideStopBtn();
-      scrollBot();
-      return;
+        el.textContent = text;
+        typingAborted  = false;
+        hideStopBtn();
+        scrollBot();
+        if (onComplete) onComplete();
+        return;
     }
     if (i < text.length) {
-      el.textContent += text[i];
-      scrollBot();
-      setTimeout(() => typeWriter(el, text, i + 1), 18);
+        el.textContent += text[i];
+        scrollBot();
+        setTimeout(() => typeWriter(el, text, i + 1, onComplete), 18);
     } else {
-      hideStopBtn();
+        hideStopBtn();
+        if (onComplete) onComplete();
     }
-  }
+}
 
   function showTyping() {
     const id = 'kp-typing-' + Date.now();
@@ -531,71 +648,119 @@
     const el = document.getElementById(id);
     if (el) el.remove();
   }
-  /* ── Text-to-Speech ──────────────────────── */
-  function speakText(text, lang) {
+  /* ── Reset any active speaker button to default ── */
+  function resetSpeakBtnUI() {
+    if (currentSpeakBtn) {
+      currentSpeakBtn.classList.remove('speaking', 'paused');
+      currentSpeakBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+      currentSpeakBtn.title = 'Listen';
+    }
+    currentSpeakBtn = null;
+    speechPaused = false;
+  }
+
+  /* ── Text-to-Speech ──────────────────────────── */
+  function speakText(text, lang, speakBtn) {
     if (!window.speechSynthesis) return;
 
-    // Cancel any ongoing speech
     window.speechSynthesis.cancel();
+    resetSpeakBtnUI();
 
-    // Clean text — remove emojis and special chars for cleaner speech
     const cleaned = text
-      .replace(/[\u{1F300}-\u{1FFFF}]/gu, '')
-      .replace(/[⚠️✓•→]/g, '')
-      .replace(/\*/g, '')
-      .trim();
+        .replace(/[\u{1F300}-\u{1FFFF}]/gu, '')
+        .replace(/[⚠️✓•→]/g, '')
+        .replace(/\*/g, '')
+        .trim();
 
     if (!cleaned) return;
 
     const utter = new SpeechSynthesisUtterance(cleaned);
-    utter.lang  = TTS_LANGS[lang] || 'hi-IN';
-    utter.rate  = 0.92;   // slightly slower — easier to understand
+    // Robust lang fallback
+    utter.lang = TTS_LANGS[lang] || 'hi-IN';
+    utter.rate  = 0.88;
     utter.pitch = 1.0;
     utter.volume = 1.0;
 
-    // Try to find an Indian voice for the language
-    const voices = window.speechSynthesis.getVoices();
-    const preferred = voices.find(v =>
-      v.lang === utter.lang && (v.name.includes('India') || v.name.includes('IN'))
-    ) || voices.find(v =>
-      v.lang.startsWith(utter.lang.split('-')[0])
-    );
-    if (preferred) utter.voice = preferred;
+    // Update button immediately
+    if (speakBtn) {
+        currentSpeakBtn = speakBtn;
+        speechPaused = false;
+        speakBtn.classList.add('speaking');
+        speakBtn.innerHTML = '<i class="fas fa-pause"></i>';
+        speakBtn.title = 'Pause';
+    }
 
-    // Show speaker icon on toggle button while speaking
     const toggleBtn = document.getElementById('kisanToggleBtn');
     if (toggleBtn) {
-      toggleBtn.innerHTML = '<i class="fas fa-volume-up" style="color:#fff;font-size:1.3rem"></i><span class="kw-pulse"></span>';
+        toggleBtn.innerHTML = '<i class="fas fa-volume-up" style="color:#fff;font-size:1.3rem"></i><span class="kw-pulse"></span>';
     }
 
-    utter.onend = () => {
-      if (toggleBtn) {
-        toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
-      }
+    const onDone = () => {
+        if (toggleBtn) {
+            toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
+        }
+        resetSpeakBtnUI();
     };
-    utter.onerror = () => {
-      if (toggleBtn) {
-        toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
-      }
-    };
+    utter.onend   = onDone;
+    utter.onerror = onDone;
 
-    // Voices may not be loaded yet on first call
-    if (voices.length === 0) {
-      window.speechSynthesis.onvoiceschanged = () => {
-        const v2 = window.speechSynthesis.getVoices();
-        const p2 = v2.find(v =>
-          v.lang === utter.lang && (v.name.includes('India') || v.name.includes('IN'))
-        ) || v2.find(v => v.lang.startsWith(utter.lang.split('-')[0]));
-        if (p2) utter.voice = p2;
+    function findBestVoice(voices, langCode) {
+    const ttsLang = TTS_LANGS[langCode] || langCode;
+    const baseLang = ttsLang.split('-')[0]; // e.g. "bn" from "bn-IN"
+
+    // Priority 1: exact lang match + Indian/preferred accent
+    let v = voices.find(v =>
+        v.lang === ttsLang &&
+        (v.name.includes('India') || v.name.includes('IN') || v.name.toLowerCase().includes('bengali') || v.name.toLowerCase().includes('bangla'))
+    );
+    // Priority 2: exact lang match, any voice
+    if (!v) v = voices.find(v => v.lang === ttsLang);
+    // Priority 3: same base language, avoid wrong scripts
+    //   For Bengali (bn), explicitly block Assamese (as-IN) fallback
+    if (!v) {
+        v = voices.find(v => {
+            if (!v.lang.startsWith(baseLang + '-')) return false;
+            // Block Assamese from being used for Bengali
+            if (baseLang === 'bn' && (v.lang === 'as-IN' || v.name.toLowerCase().includes('assamese'))) return false;
+            return true;
+        });
+    }
+    // Priority 4: base lang loose match (still block Assamese for Bengali)
+    if (!v) {
+        v = voices.find(v => {
+            if (!v.lang.startsWith(baseLang)) return false;
+            if (baseLang === 'bn' && (v.lang === 'as-IN' || v.name.toLowerCase().includes('assamese'))) return false;
+            return true;
+        });
+    }
+    // Priority 5: Hindi fallback for unsupported Indian languages
+    if (!v) v = voices.find(v => v.lang === 'hi-IN' || v.lang === 'hi');
+    // Priority 6: any available voice
+    if (!v && voices.length > 0) v = voices[0];
+    return v;
+}
+
+    function doSpeak() {
+        const voices = window.speechSynthesis.getVoices();
+        const best = findBestVoice(voices, lang);
+        if (best) utter.voice = best;
         window.speechSynthesis.speak(utter);
-      };
-    } else {
-      window.speechSynthesis.speak(utter);
     }
-  }
+
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length === 0) {
+        window.speechSynthesis.onvoiceschanged = () => {
+            window.speechSynthesis.onvoiceschanged = null;
+            doSpeak();
+        };
+    } else {
+        doSpeak();
+    }
+}
 
   function stopSpeaking() {
     if (window.speechSynthesis) window.speechSynthesis.cancel();
+    resetSpeakBtnUI();
     const toggleBtn = document.getElementById('kisanToggleBtn');
     if (toggleBtn) {
       toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
