@@ -1,5 +1,5 @@
 {
-  "name": "SmartAgro",
+  "name": "SmartAgro - Smart Farming",
   "short_name": "SmartAgro",
   "description": "AI-powered farming intelligence for Indian farmers",
   "start_url": "/",
@@ -11,14 +11,18 @@
     {
       "src": "/static/images/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/static/images/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ],
-  "categories": ["agriculture", "productivity"],
-  "lang": "en-IN"
+  "categories": ["agriculture", "productivity", "utilities"],
+  "lang": "en-IN",
+  "dir": "ltr",
+  "prefer_related_applications": false
 }
