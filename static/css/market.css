@@ -428,6 +428,7 @@ body.dark .city-card-header {
   background: var(--bg-2);
   width: 100%;
   min-width: fit-content;
+  text-align: center;
 }
 
 .crop-row {
@@ -461,13 +462,14 @@ body.dark .city-card-header {
   line-height: 1.35;
   min-width: 0;
   padding-right: 4px;
+  text-align: left;
 }
 
 .cr-price {
   font-size: 0.9rem;
   font-weight: 700;
   color: var(--text);
-  text-align: right;
+  text-align: center;
 }
 
 .cr-unit {
@@ -475,14 +477,14 @@ body.dark .city-card-header {
   color: var(--text-2);
   display: block;
   margin-top: 1px;
-  text-align: right;
+  text-align: center;
   font-weight: 500;
 }
 
 .cr-msp {
   font-size: 0.78rem;
   color: var(--text-2);
-  text-align: right;
+  text-align: center;
   font-weight: 500;
 }
 
@@ -640,7 +642,7 @@ body.dark .city-card-header {
   background: var(--amber-light);
   color: var(--amber);
   font-weight: 700;
-  text-align: right;
+  text-align: center;
   border-bottom: 1px solid var(--border);
   white-space: nowrap;
   font-size: 0.7rem;
@@ -658,7 +660,7 @@ body.dark .price-table th {
 .price-table td {
   padding: 8px 10px;
   border-bottom: 1px solid var(--border);
-  text-align: right;
+  text-align: center;
   color: var(--text);
   font-weight: 600;
 }
@@ -964,21 +966,22 @@ body.dark .price-table th {
     padding-right: 0;
     min-width: 0;
     word-break: break-word;
+    text-align: left;
   }
 
   .cr-price {
     font-size: 0.72rem;
-    text-align: right;
+    text-align: center;
   }
 
   .cr-unit {
     font-size: 0.58rem;
-    text-align: right;
+    text-align: center;
   }
 
   .cr-msp {
     font-size: 0.65rem;
-    text-align: right;
+    text-align: center;
   }
 
   .cr-change {
@@ -1079,18 +1082,22 @@ body.dark .price-table th {
   .cr-name {
     font-size: 0.68rem;
     padding-right: 0;
+    text-align: left;
   }
 
   .cr-price {
     font-size: 0.68rem;
+    text-align: center;
   }
 
   .cr-unit {
     font-size: 0.55rem;
+    text-align: center;
   }
 
   .cr-msp {
     font-size: 0.62rem;
+    text-align: center;
   }
 
   .cr-change {
