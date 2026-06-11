@@ -11,12 +11,12 @@ app = Flask(__name__)
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
 GROQ_API_KEY        = os.getenv("GROQ_API_KEY", "")
 KINDWISE_API_KEY    = os.getenv("KINDWISE_API_KEY", "")
-RAPIDAPI_KEY        = os.getenv("RAPIDAPI_KEY", "")
+DATAGOV_API_KEY     = os.getenv("DATAGOV_API_KEY", "")
 
-print(f"[SmartAgro] Weather  : {'OK' if OPENWEATHER_API_KEY else 'MISSING'}")
-print(f"[SmartAgro] Groq     : {'OK' if GROQ_API_KEY else 'MISSING'}")
-print(f"[SmartAgro] Kindwise : {'OK' if KINDWISE_API_KEY else 'MISSING'}")
-print(f"[SmartAgro] RapidAPI : {'OK' if RAPIDAPI_KEY else 'MISSING'}")
+print(f"[SmartAgro] Weather : {'OK' if OPENWEATHER_API_KEY else 'MISSING'}")
+print(f"[SmartAgro] Groq    : {'OK' if GROQ_API_KEY else 'MISSING'}")
+print(f"[SmartAgro] Kindwise: {'OK' if KINDWISE_API_KEY else 'MISSING'}")
+print(f"[SmartAgro] DataGov : {'OK' if DATAGOV_API_KEY else 'MISSING'}")
 
 @app.route("/")
 def index(): return render_template("index.html")
@@ -111,18 +111,18 @@ def get_season(month):
 
 def recommend_crops(temp, humidity, rain, season):
     all_crops = [
-        {"name":"Rice","temp_range":(20,38),"humidity_range":(70,100),"season":"Kharif (Monsoon)","water":"High","yield":"3-5 t/ha","profit":"45,000-65,000/ha","duration":"90-150 days","description":"Best for high humidity and warm weather"},
-        {"name":"Wheat","temp_range":(10,25),"humidity_range":(40,65),"season":"Rabi (Winter)","water":"Medium","yield":"4-6 t/ha","profit":"50,000-75,000/ha","duration":"100-150 days","description":"Cool dry winters, most popular rabi crop"},
-        {"name":"Maize","temp_range":(18,35),"humidity_range":(50,80),"season":"Kharif (Monsoon)","water":"Medium","yield":"5-8 t/ha","profit":"40,000-60,000/ha","duration":"80-110 days","description":"Versatile crop for warm humid weather"},
-        {"name":"Cotton","temp_range":(25,40),"humidity_range":(40,70),"season":"Kharif (Monsoon)","water":"Medium","yield":"2-3 t/ha","profit":"60,000-90,000/ha","duration":"150-180 days","description":"Hot dry spells with moderate rain"},
-        {"name":"Tomato","temp_range":(18,30),"humidity_range":(60,80),"season":"Zaid (Summer)","water":"Medium","yield":"20-40 t/ha","profit":"80,000-1,50,000/ha","duration":"60-80 days","description":"High value crop for moderate climates"},
-        {"name":"Sugarcane","temp_range":(24,38),"humidity_range":(75,90),"season":"Kharif (Monsoon)","water":"Very High","yield":"70-100 t/ha","profit":"70,000-1,00,000/ha","duration":"300-360 days","description":"Hot climate and heavy rainfall needed"},
-        {"name":"Soybean","temp_range":(20,32),"humidity_range":(60,80),"season":"Kharif (Monsoon)","water":"Medium","yield":"2-3 t/ha","profit":"35,000-55,000/ha","duration":"90-120 days","description":"Nitrogen-fixing legume for warm monsoon"},
-        {"name":"Mustard","temp_range":(10,25),"humidity_range":(40,60),"season":"Rabi (Winter)","water":"Low","yield":"1-2 t/ha","profit":"25,000-40,000/ha","duration":"90-110 days","description":"Cool weather oil seed crop"},
-        {"name":"Onion","temp_range":(13,28),"humidity_range":(50,75),"season":"Rabi (Winter)","water":"Medium","yield":"15-25 t/ha","profit":"50,000-1,00,000/ha","duration":"100-120 days","description":"High demand vegetable with good income"},
-        {"name":"Potato","temp_range":(10,22),"humidity_range":(60,80),"season":"Rabi (Winter)","water":"Medium","yield":"20-30 t/ha","profit":"40,000-80,000/ha","duration":"70-90 days","description":"Cool weather staple with high yield"},
-        {"name":"Chilli","temp_range":(20,35),"humidity_range":(60,80),"season":"Zaid (Summer)","water":"Medium","yield":"6-10 t/ha","profit":"60,000-1,20,000/ha","duration":"90-120 days","description":"Warm climate spice with high market value"},
-        {"name":"Groundnut","temp_range":(22,36),"humidity_range":(50,75),"season":"Kharif (Monsoon)","water":"Medium","yield":"1.5-3 t/ha","profit":"30,000-55,000/ha","duration":"90-130 days","description":"Warm season oilseed crop"},
+        {"name":"Rice","icon":"🌾","temp_range":(20,38),"humidity_range":(70,100),"season":"Kharif (Monsoon)","water":"High","yield":"3-5 t/ha","profit":"45,000-65,000/ha","duration":"90-150 days","description":"Best for high humidity and warm weather","soil":"Clay loam","fertilizer":"NPK 120:60:60 kg/ha"},
+        {"name":"Wheat","icon":"🌿","temp_range":(10,25),"humidity_range":(40,65),"season":"Rabi (Winter)","water":"Medium","yield":"4-6 t/ha","profit":"50,000-75,000/ha","duration":"100-150 days","description":"Cool dry winters, most popular rabi crop","soil":"Loam","fertilizer":"NPK 120:60:40 kg/ha"},
+        {"name":"Maize","icon":"🌽","temp_range":(18,35),"humidity_range":(50,80),"season":"Kharif (Monsoon)","water":"Medium","yield":"5-8 t/ha","profit":"40,000-60,000/ha","duration":"80-110 days","description":"Versatile crop for warm humid weather","soil":"Sandy loam","fertilizer":"NPK 150:75:75 kg/ha"},
+        {"name":"Cotton","icon":"Cotton","temp_range":(25,40),"humidity_range":(40,70),"season":"Kharif (Monsoon)","water":"Medium","yield":"2-3 t/ha","profit":"60,000-90,000/ha","duration":"150-180 days","description":"Hot dry spells with moderate rain","soil":"Black cotton soil","fertilizer":"NPK 90:45:45 kg/ha"},
+        {"name":"Tomato","icon":"Tomato","temp_range":(18,30),"humidity_range":(60,80),"season":"Zaid (Summer)","water":"Medium","yield":"20-40 t/ha","profit":"80,000-1,50,000/ha","duration":"60-80 days","description":"High value crop for moderate climates","soil":"Sandy loam","fertilizer":"NPK 100:60:60 kg/ha"},
+        {"name":"Sugarcane","icon":"Sugarcane","temp_range":(24,38),"humidity_range":(75,90),"season":"Kharif (Monsoon)","water":"Very High","yield":"70-100 t/ha","profit":"70,000-1,00,000/ha","duration":"300-360 days","description":"Hot climate and heavy rainfall needed","soil":"Deep loam","fertilizer":"NPK 250:80:100 kg/ha"},
+        {"name":"Soybean","icon":"Soybean","temp_range":(20,32),"humidity_range":(60,80),"season":"Kharif (Monsoon)","water":"Medium","yield":"2-3 t/ha","profit":"35,000-55,000/ha","duration":"90-120 days","description":"Nitrogen-fixing legume for warm monsoon","soil":"Well-drained loam","fertilizer":"NPK 30:60:40 kg/ha"},
+        {"name":"Mustard","icon":"Mustard","temp_range":(10,25),"humidity_range":(40,60),"season":"Rabi (Winter)","water":"Low","yield":"1-2 t/ha","profit":"25,000-40,000/ha","duration":"90-110 days","description":"Cool weather oil seed crop","soil":"Sandy loam","fertilizer":"NPK 80:40:40 kg/ha"},
+        {"name":"Onion","icon":"Onion","temp_range":(13,28),"humidity_range":(50,75),"season":"Rabi (Winter)","water":"Medium","yield":"15-25 t/ha","profit":"50,000-1,00,000/ha","duration":"100-120 days","description":"High demand vegetable with good income","soil":"Sandy loam","fertilizer":"NPK 100:50:50 kg/ha"},
+        {"name":"Potato","icon":"Potato","temp_range":(10,22),"humidity_range":(60,80),"season":"Rabi (Winter)","water":"Medium","yield":"20-30 t/ha","profit":"40,000-80,000/ha","duration":"70-90 days","description":"Cool weather staple with high yield","soil":"Sandy loam","fertilizer":"NPK 120:80:100 kg/ha"},
+        {"name":"Chilli","icon":"Chilli","temp_range":(20,35),"humidity_range":(60,80),"season":"Zaid (Summer)","water":"Medium","yield":"6-10 t/ha","profit":"60,000-1,20,000/ha","duration":"90-120 days","description":"Warm climate spice with high market value","soil":"Sandy loam","fertilizer":"NPK 100:50:50 kg/ha"},
+        {"name":"Groundnut","icon":"Groundnut","temp_range":(22,36),"humidity_range":(50,75),"season":"Kharif (Monsoon)","water":"Medium","yield":"1.5-3 t/ha","profit":"30,000-55,000/ha","duration":"90-130 days","description":"Warm season oilseed crop","soil":"Sandy loam","fertilizer":"NPK 25:50:25 kg/ha"},
     ]
     scored = []
     for crop in all_crops:
@@ -139,15 +139,15 @@ def recommend_crops(temp, humidity, rain, season):
 
 def get_pesticide_guide(crops):
     guides = {
-        "Rice":     [{"pest":"Brown Plant Hopper","pesticide":"Imidacloprid 17.8 SL","dose":"125 ml/ha","eco":False},
-                     {"pest":"Leaf folder","pesticide":"Neem Oil 5%","dose":"2.5 L/ha","eco":True}],
-        "Wheat":    [{"pest":"Aphids","pesticide":"Dimethoate 30 EC","dose":"1 L/ha","eco":False},
-                     {"pest":"Yellow rust","pesticide":"Propiconazole 25 EC","dose":"500 ml/ha","eco":False}],
-        "Maize":    [{"pest":"Fall Armyworm","pesticide":"Spinetoram 11.7 SC","dose":"450 ml/ha","eco":False}],
-        "Cotton":   [{"pest":"Bollworm","pesticide":"Chlorpyriphos 20 EC","dose":"2.5 ml/L","eco":False},
-                     {"pest":"Whitefly","pesticide":"Neem Oil 5%","dose":"5 ml/L","eco":True}],
-        "Tomato":   [{"pest":"Early Blight","pesticide":"Mancozeb 75 WP","dose":"2.5 g/L","eco":False}],
-        "Onion":    [{"pest":"Thrips","pesticide":"Spinosad 45 SC","dose":"0.5 ml/L","eco":False}],
+        "Rice":     [{"pest":"Brown Plant Hopper","pesticide":"Imidacloprid 17.8 SL","dose":"125 ml/ha","timing":"At 30 & 60 days","eco":False},
+                     {"pest":"Leaf folder","pesticide":"Neem Oil 5%","dose":"2.5 L/ha","timing":"At first sign","eco":True}],
+        "Wheat":    [{"pest":"Aphids","pesticide":"Dimethoate 30 EC","dose":"1 L/ha","timing":"At tillering","eco":False},
+                     {"pest":"Yellow rust","pesticide":"Propiconazole 25 EC","dose":"500 ml/ha","timing":"At boot leaf","eco":False}],
+        "Maize":    [{"pest":"Fall Armyworm","pesticide":"Spinetoram 11.7 SC","dose":"450 ml/ha","timing":"7-10 days after","eco":False}],
+        "Cotton":   [{"pest":"Bollworm","pesticide":"Chlorpyriphos 20 EC","dose":"2.5 ml/L","timing":"At boll formation","eco":False},
+                     {"pest":"Whitefly","pesticide":"Neem Oil 5%","dose":"5 ml/L","timing":"Every 7 days","eco":True}],
+        "Tomato":   [{"pest":"Early Blight","pesticide":"Mancozeb 75 WP","dose":"2.5 g/L","timing":"Every 7-10 days","eco":False}],
+        "Onion":    [{"pest":"Thrips","pesticide":"Spinosad 45 SC","dose":"0.5 ml/L","timing":"At 30 & 60 days","eco":False}],
     }
     result = []
     for crop in crops:
@@ -159,26 +159,26 @@ def get_soil_tips(season, temp, humidity):
     tips = []
     if season == "Kharif (Monsoon)":
         tips = [
-            {"icon":"water","title":"Drainage Important","tip":"Ensure field drainage channels are open to prevent waterlogging during heavy rains."},
-            {"icon":"leaf","title":"Green Manure","tip":"Grow Dhaincha or Sunhemp as green manure before main crop to improve soil nitrogen."},
-            {"icon":"flask","title":"Soil Testing","tip":"Test soil pH before sowing. Most crops need pH 6.0-7.5. Apply lime if acidic."},
+            {"icon":"💧","title":"Drainage Important","tip":"Ensure field drainage channels are open to prevent waterlogging during heavy rains."},
+            {"icon":"🌱","title":"Green Manure","tip":"Grow Dhaincha or Sunhemp as green manure before main crop to improve soil nitrogen."},
+            {"icon":"🧪","title":"Soil Testing","tip":"Test soil pH before sowing. Most crops need pH 6.0-7.5. Apply lime if acidic."},
         ]
     elif season == "Rabi (Winter)":
         tips = [
-            {"icon":"temp","title":"Deep Ploughing","tip":"Deep ploughing 20-25 cm exposes soil to winter cold, killing pests and weeds."},
-            {"icon":"pill","title":"Phosphorus Application","tip":"Apply DAP at sowing time for strong root development in cool weather."},
-            {"icon":"grain","title":"Residue Management","tip":"Incorporate kharif crop residues into soil to improve organic matter."},
+            {"icon":"🌡️","title":"Deep Ploughing","tip":"Do deep ploughing 20-25 cm to expose soil to winter cold, killing pests and weeds."},
+            {"icon":"💊","title":"Phosphorus Application","tip":"Apply DAP at sowing time for strong root development in cool weather."},
+            {"icon":"🌾","title":"Residue Management","tip":"Incorporate crop residues from kharif into soil to improve organic matter."},
         ]
     else:
         tips = [
-            {"icon":"drop","title":"Mulching Essential","tip":"Apply mulch around plants to retain soil moisture in summer heat."},
-            {"icon":"sun","title":"Early Morning Irrigation","tip":"Irrigate early morning or evening to reduce evaporation losses."},
-            {"icon":"atom","title":"Micronutrients","tip":"Apply zinc sulphate 25 kg/ha for summer crops — deficiency is common in hot weather."},
+            {"icon":"💦","title":"Mulching Essential","tip":"Apply mulch around plants to retain soil moisture in summer heat."},
+            {"icon":"🌅","title":"Early Morning Irrigation","tip":"Irrigate in early morning or evening to reduce evaporation losses."},
+            {"icon":"🧬","title":"Micronutrients","tip":"Apply zinc sulphate 25 kg/ha for summer crops — deficiency common in hot weather."},
         ]
     if humidity > 80:
-        tips.append({"icon":"mushroom","title":"Fungal Disease Alert","tip":"High humidity — apply preventive fungicide spray on susceptible crops."})
+        tips.append({"icon":"🍄","title":"Fungal Disease Alert","tip":"High humidity — apply preventive fungicide spray on susceptible crops."})
     if temp > 38:
-        tips.append({"icon":"fire","title":"Heat Stress Warning","tip":"Temperature above 38C — increase irrigation frequency and apply shade nets."})
+        tips.append({"icon":"🌡️","title":"Heat Stress Warning","tip":"Temperature above 38 degrees — increase irrigation frequency and apply shade nets."})
     return tips
 
 # ── Kindwise Diagnosis ───────────────────────────────────
@@ -225,7 +225,7 @@ def parse_kindwise(kw):
         prev   = treat.get("prevention", [])
         eco = [{"remedy": str(r), "method": "Apply on affected area", "frequency": "Every 7 days", "effectiveness": max(60, 85 - i*10)} for i, r in enumerate(bio[:3])]
         if not eco:
-            eco = [{"remedy": "Neem oil spray", "method": "5ml per litre water spray on leaves", "frequency": "Every 5-7 days", "effectiveness": 75}]
+            eco = [{"remedy": "Neem oil spray", "method": "5ml per litre water, spray on leaves", "frequency": "Every 5-7 days", "effectiveness": 75}]
         return {
             "disease":           top.get("name", "Unknown Disease"),
             "confidence":        conf,
@@ -279,179 +279,141 @@ def get_alerts():
     description = data.get("description", "").lower()
     alerts_list = []
     if temp > 40:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"fa-temperature-full","title":"Extreme Heat","message":"Temperature above 40C. Crops may wilt and soil loses moisture fast.","action":"Irrigate every 4-5 hours. Provide shade netting."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"🌡️","title":"Extreme Heat","message":"Temperature above 40C. Crops may wilt and soil loses moisture fast.","action":"Irrigate every 4-5 hours. Provide shade netting."})
     if temp < 5:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"fa-snowflake","title":"Frost Warning","message":"Very cold temperature. Frost can destroy crops overnight.","action":"Cover crops with cloth. Use sprinkler irrigation at night."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"Cold","title":"Frost Warning","message":"Very cold temperature. Frost can destroy crops overnight.","action":"Cover crops with cloth. Use sprinkler irrigation at night."})
     if humidity > 85:
-        alerts_list.append({"type":"warning","category":"Disease","icon":"fa-cloud-rain","title":"Fungal Disease Risk","message":"Humidity above 85 percent — blight and rust risk very high.","action":"Spray Mancozeb 75 WP at 2.5 g/L immediately."})
+        alerts_list.append({"type":"warning","category":"Disease","icon":"Fungal","title":"Fungal Disease Risk","message":"Humidity above 85 percent — blight and rust risk very high.","action":"Spray Mancozeb 75 WP at 2.5 g/L immediately."})
     if wind_speed > 50:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"fa-wind","title":"Strong Winds","message":"Strong winds can lodge tall crops like maize and wheat.","action":"Avoid spraying. Support tall crops with stakes."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"Wind","title":"Strong Winds","message":"Strong winds can lodge tall crops like maize and wheat.","action":"Avoid spraying. Support tall crops with stakes."})
     if rain > 50:
-        alerts_list.append({"type":"warning","category":"Weather","icon":"fa-cloud-showers-heavy","title":"Heavy Rainfall","message":"Excess rain may cause waterlogging and root rot.","action":"Open drainage channels. Stop irrigation."})
+        alerts_list.append({"type":"warning","category":"Weather","icon":"Rain","title":"Heavy Rainfall","message":"Excess rain may cause waterlogging and root rot.","action":"Open drainage channels. Stop irrigation."})
     if "storm" in description or "thunder" in description:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"fa-bolt","title":"Thunderstorm","message":"Risk of lightning and hail damage to crops.","action":"Stay indoors. Secure farm equipment."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"Storm","title":"Thunderstorm","message":"Risk of lightning and hail damage to crops.","action":"Stay indoors. Secure farm equipment."})
     if 25 <= temp <= 35 and humidity > 70:
-        alerts_list.append({"type":"warning","category":"Pest","icon":"fa-bug","title":"Aphid and Whitefly Risk","message":"Warm humid conditions — aphids multiplying fast.","action":"Spray Neem oil 5 ml/L at dusk."})
+        alerts_list.append({"type":"warning","category":"Pest","icon":"Bug","title":"Aphid and Whitefly Risk","message":"Warm humid conditions — aphids multiplying fast.","action":"Spray Neem oil 5 ml/L at dusk."})
     if temp > 30 and humidity < 50:
-        alerts_list.append({"type":"warning","category":"Pest","icon":"fa-spider","title":"Spider Mite Alert","message":"Hot dry conditions — mites spreading rapidly.","action":"Apply Abamectin 1.8 EC at 0.5 ml/L."})
+        alerts_list.append({"type":"warning","category":"Pest","icon":"Mite","title":"Spider Mite Alert","message":"Hot dry conditions — mites spreading rapidly.","action":"Apply Abamectin 1.8 EC at 0.5 ml/L."})
     harmful = []
     if temp > 38: harmful.append("Wheat")
     if humidity > 85 and rain > 20: harmful.append("Cotton")
     if temp < 10: harmful.append("Rice")
     if harmful:
-        alerts_list.append({"type":"info","category":"Crop Advisory","icon":"fa-seedling","title":"Crops at Risk","message":f"Avoid growing: {', '.join(harmful)} in current weather.","action":"Consider alternate crops better suited to current conditions."})
+        alerts_list.append({"type":"info","category":"Crop Advisory","icon":"Crop","title":"Crops at Risk","message":f"Avoid growing: {', '.join(harmful)} in current weather.","action":"Consider alternate crops better suited to current conditions."})
     return jsonify({"alerts": alerts_list, "total": len(alerts_list)})
 
-# ── Market Prices — RapidAPI India Mandi Price ───────────
+# ── Market Prices — with data.gov.in real data ───────────
+BASE_PRICES = {
+    "Rice":2300,"Wheat":2275,"Maize":2090,"Cotton":7121,
+    "Soybean":4892,"Mustard":5650,"Groundnut":6377,"Onion":1800,
+    "Potato":1200,"Tomato":2500,"Chilli":8000,"Sugarcane":3150,
+    "Arhar":7550,"Moong":8682,"Urad":7400,
+}
 MSP_PRICES = {
     "Rice":2300,"Wheat":2275,"Maize":2090,"Cotton":7121,
     "Soybean":4892,"Mustard":5650,"Groundnut":6377,"Onion":1700,
     "Potato":1000,"Tomato":2000,"Chilli":7500,"Sugarcane":3050,
     "Arhar":7550,"Moong":8682,"Urad":7400,
-    "Paddy":2300,
+}
+CITIES = ["Delhi","Mumbai","Kolkata","Chennai","Hyderabad","Pune","Ahmedabad",
+          "Lucknow","Jaipur","Bhopal","Patna","Nagpur","Indore","Surat","Kanpur",
+          "Coimbatore","Visakhapatnam","Bhubaneswar","Guwahati","Amritsar"]
+CITY_FACTORS = {
+    "Delhi":1.05,"Mumbai":1.08,"Kolkata":1.02,"Chennai":1.06,"Hyderabad":1.04,
+    "Pune":1.07,"Ahmedabad":1.03,"Lucknow":0.98,"Jaipur":1.01,"Bhopal":0.97,
+    "Patna":0.96,"Nagpur":1.02,"Indore":1.00,"Surat":1.04,"Kanpur":0.99,
+    "Coimbatore":1.05,"Visakhapatnam":1.03,"Bhubaneswar":0.98,"Guwahati":1.01,"Amritsar":1.00,
 }
 
-# Cache so we don't hit API on every request
-_market_cache = {"data": None, "time": None}
-CACHE_MINUTES = 60  # refresh every 60 minutes
+# Cache for real data
+_market_cache = {"data": None, "date": None}
 
-def fetch_rapidapi_mandi():
-    """Fetch live data from India Mandi Price RapidAPI"""
-    if not RAPIDAPI_KEY:
-        print("[Market] No RAPIDAPI_KEY set")
+def fetch_real_mandi_data():
+    """Fetch real data from data.gov.in Agmarknet API"""
+    if not DATAGOV_API_KEY:
         return None
     try:
-        headers = {
-            "x-rapidapi-host": "india-mandi-price-api.p.rapidapi.com",
-            "x-rapidapi-key":  RAPIDAPI_KEY,
-            "Content-Type":    "application/json"
-        }
-        resp = requests.get(
-            "https://india-mandi-price-api.p.rapidapi.com/api/mandi/prices",
-            headers=headers,
-            timeout=15
+        today = datetime.now().strftime("%d/%m/%Y")
+        url = (
+            "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070"
+            f"?api-key={DATAGOV_API_KEY}"
+            f"&format=json&limit=500"
+            f"&filters[Arrival_Date]={today}"
         )
-        print(f"[RapidAPI] Status: {resp.status_code}")
+        resp = requests.get(url, timeout=15)
         if resp.status_code != 200:
-            print(f"[RapidAPI] Error body: {resp.text[:300]}")
+            return None
+        records = resp.json().get("records", [])
+        if not records:
             return None
 
-        raw = resp.json()
-        print(f"[RapidAPI] Got {len(raw) if isinstance(raw, list) else 'unknown'} records")
-
-        # Parse response into our format
-        # Response format: list of {crop, state, market/district, modal_price, min_price, max_price, date}
-        if not isinstance(raw, list) or len(raw) == 0:
-            return None
-
-        # Group by market/city
+        # Build market data from real records
         markets = {}
-        for r in raw:
-            # Try different field names the API might use
-            city = (r.get("market") or r.get("Market") or
-                    r.get("district") or r.get("District") or
-                    r.get("mandi") or r.get("Mandi") or "").strip()
-            commodity = (r.get("commodity") or r.get("Commodity") or
-                         r.get("crop") or r.get("Crop") or "").strip()
-            modal = r.get("modal_price") or r.get("Modal_Price") or r.get("modalPrice") or 0
-            min_p = r.get("min_price")   or r.get("Min_Price")   or r.get("minPrice")   or 0
-            max_p = r.get("max_price")   or r.get("Max_Price")   or r.get("maxPrice")   or 0
+        for r in records:
+            city = r.get("Market", "").strip()
+            commodity = r.get("Commodity", "").strip()
+            modal_price = r.get("Modal_Price", 0)
+            min_price   = r.get("Min_Price", 0)
+            max_price   = r.get("Max_Price", 0)
 
-            if not city or not commodity or not modal:
+            if not city or not commodity or not modal_price:
                 continue
 
-            try:
-                modal = float(str(modal).replace(",", ""))
-                min_p = float(str(min_p).replace(",", ""))
-                max_p = float(str(max_p).replace(",", ""))
-            except:
-                continue
-
-            # Normalize commodity names
+            # Normalize commodity name to match our crops
             crop_map = {
-                "Paddy":"Rice","Rice":"Rice","Wheat":"Wheat","Maize":"Maize",
-                "Cotton":"Cotton","Soyabean":"Soybean","Soybean":"Soybean",
-                "Mustard":"Mustard","Rapeseed":"Mustard","Onion":"Onion",
-                "Potato":"Potato","Tomato":"Tomato","Chilli":"Chilli",
-                "Green Chilli":"Chilli","Dry Chilli":"Chilli",
-                "Groundnut":"Groundnut","Sugarcane":"Sugarcane",
-                "Arhar":"Arhar","Tur":"Arhar","Red Gram":"Arhar",
-                "Moong":"Moong","Green Gram":"Moong",
-                "Urad":"Urad","Black Gram":"Urad",
+                "Paddy": "Rice", "Rice": "Rice",
+                "Wheat": "Wheat", "Maize": "Maize",
+                "Cotton": "Cotton", "Soyabean": "Soybean", "Soybean": "Soybean",
+                "Mustard": "Mustard", "Onion": "Onion", "Potato": "Potato",
+                "Tomato": "Tomato", "Chilli": "Chilli",
+                "Groundnut": "Groundnut", "Sugarcane": "Sugarcane",
+                "Arhar": "Arhar", "Tur": "Arhar",
+                "Moong": "Moong", "Urad": "Urad",
             }
             crop_name = crop_map.get(commodity, commodity)
-            msp = MSP_PRICES.get(crop_name, int(modal))
 
             if city not in markets:
                 markets[city] = []
 
-            # Check if crop already added for this city — keep highest modal price
-            existing = next((c for c in markets[city] if c["crop"] == crop_name), None)
-            if existing:
-                if modal > existing["price"]:
-                    existing["price"]     = int(modal)
-                    existing["min_price"] = int(min_p)
-                    existing["max_price"] = int(max_p)
-                continue
-
-            change = round(((modal - msp) / msp) * 100, 1) if msp else 0
+            msp = MSP_PRICES.get(crop_name, int(modal_price))
             markets[city].append({
-                "crop":        crop_name,
-                "price":       int(modal),
-                "min_price":   int(min_p),
-                "max_price":   int(max_p),
-                "msp":         msp,
-                "above_msp":   modal >= msp,
-                "unit":        "quintal",
-                "change":      change,
-                "demand":      "Very High" if modal > msp * 1.1 else "High" if modal > msp else "Medium" if modal > msp * 0.9 else "Low",
-                "source":      "live"
+                "crop":       crop_name,
+                "price":      int(modal_price),
+                "min_price":  int(min_price),
+                "max_price":  int(max_price),
+                "msp":        msp,
+                "above_msp":  int(modal_price) >= msp,
+                "unit":       "quintal",
+                "change":     round(((int(modal_price) - msp) / msp) * 100, 1),
+                "weekly_change": round(((int(modal_price) - msp) / msp) * 2, 1),
+                "demand":     "Very High" if int(modal_price) > msp * 1.1 else "High" if int(modal_price) > msp else "Medium",
+                "source":     "live"
             })
-
-        if not markets:
-            return None
-
-        print(f"[RapidAPI] Parsed {len(markets)} cities")
-        return markets
-
+        return markets if markets else None
     except Exception as e:
-        print(f"[RapidAPI] Exception: {e}")
+        print(f"[DataGov error] {e}")
         return None
 
-def get_fallback_markets():
-    """MSP-based hardcoded fallback"""
-    BASE = {
-        "Rice":2300,"Wheat":2275,"Maize":2090,"Cotton":7121,
-        "Soybean":4892,"Mustard":5650,"Groundnut":6377,"Onion":1800,
-        "Potato":1200,"Tomato":2500,"Chilli":8000,"Sugarcane":3150,
-        "Arhar":7550,"Moong":8682,"Urad":7400,
-    }
-    CITIES = ["Delhi","Mumbai","Kolkata","Chennai","Hyderabad","Pune",
-              "Ahmedabad","Lucknow","Jaipur","Bhopal","Patna","Nagpur",
-              "Indore","Amritsar","Kanpur","Guwahati","Bhubaneswar",
-              "Visakhapatnam","Coimbatore","Surat"]
-    FACTORS = {
-        "Delhi":1.05,"Mumbai":1.08,"Kolkata":1.02,"Chennai":1.06,"Hyderabad":1.04,
-        "Pune":1.07,"Ahmedabad":1.03,"Lucknow":0.98,"Jaipur":1.01,"Bhopal":0.97,
-        "Patna":0.96,"Nagpur":1.02,"Indore":1.00,"Amritsar":1.00,"Kanpur":0.99,
-        "Guwahati":1.01,"Bhubaneswar":0.98,"Visakhapatnam":1.03,"Coimbatore":1.05,"Surat":1.04,
-    }
+def get_hardcoded_markets():
+    """Fallback hardcoded MSP-based prices"""
     seed = int(datetime.now().strftime("%Y%m%d"))
     rng  = random.Random(seed)
     markets = {}
     for city in CITIES:
-        f = FACTORS.get(city, 1.0)
-        crops = []
-        for crop, base in BASE.items():
-            price  = int(base * f * rng.uniform(0.94, 1.06))
+        factor = CITY_FACTORS.get(city, 1.0)
+        crops  = []
+        for crop, base in BASE_PRICES.items():
+            price  = int(base * factor * rng.uniform(0.94, 1.06))
+            change = round(rng.uniform(-4.0, 4.0), 2)
+            rng2   = random.Random(seed - 7)
+            last   = int(base * factor * rng2.uniform(0.94, 1.06))
+            weekly = round(((price - last) / last) * 100, 1)
             msp    = MSP_PRICES.get(crop, base)
-            change = round(((price - msp) / msp) * 100, 1)
             crops.append({
-                "crop": crop, "price": price,
-                "min_price": int(price * 0.95), "max_price": int(price * 1.05),
-                "msp": msp, "above_msp": price >= msp,
-                "unit": "quintal", "change": change,
-                "demand": "Very High" if price > msp*1.1 else "High" if price > msp else "Medium" if price > msp*0.9 else "Low",
+                "crop": crop, "price": price, "msp": msp,
+                "above_msp": price >= msp, "unit": "quintal",
+                "change": change, "weekly_change": weekly,
+                "demand": "Very High" if change > 2 else "High" if change > 0 else "Medium" if change > -2 else "Low",
                 "source": "indicative"
             })
         markets[city] = crops
@@ -460,25 +422,24 @@ def get_fallback_markets():
 @app.route("/api/market")
 def get_market_data():
     global _market_cache
-    now = datetime.now()
+    today = datetime.now().strftime("%Y-%m-%d")
 
-    # Use cache if fresh
-    if (_market_cache["data"] and _market_cache["time"] and
-            (now - _market_cache["time"]).seconds < CACHE_MINUTES * 60):
-        markets     = _market_cache["data"]
-        data_source = _market_cache.get("source", "cached")
+    # Use cache if same day
+    if _market_cache["date"] == today and _market_cache["data"]:
+        markets = _market_cache["data"]
+        data_source = "live"
     else:
-        live = fetch_rapidapi_mandi()
-        if live and len(live) >= 3:
-            markets     = live
+        # Try real data first
+        real = fetch_real_mandi_data()
+        if real and len(real) >= 3:
+            markets = real
             data_source = "live"
-            _market_cache = {"data": live, "time": now, "source": "live"}
-            print(f"[Market] LIVE data — {len(live)} cities")
+            _market_cache = {"data": real, "date": today}
+            print(f"[Market] Using REAL data.gov.in data — {len(real)} cities")
         else:
-            markets     = get_fallback_markets()
+            markets = get_hardcoded_markets()
             data_source = "indicative"
-            _market_cache = {"data": markets, "time": now, "source": "indicative"}
-            print("[Market] FALLBACK data")
+            print(f"[Market] Using HARDCODED fallback data")
 
     location = request.args.get("location", "").strip().lower()
     if location:
@@ -487,8 +448,7 @@ def get_market_data():
     return jsonify({
         "markets":     markets,
         "locations":   list(markets.keys()),
-        "data_source": data_source,
-        "last_updated": now.strftime("%d %b %Y, %I:%M %p")
+        "data_source": data_source
     })
 
 # ── Chat ─────────────────────────────────────────────────
@@ -510,15 +470,16 @@ def chat():
     system_prompt = f"""You are SmartAgro Assistant — expert AI for Indian farmers.
 
 CRITICAL: Detect the language of the user message and reply in EXACTLY that same language.
-- Hindi message → reply in Hindi Devanagari script
+- Hindi message → reply in Hindi (Devanagari)
 - Bengali message → reply in Bengali script
 - Tamil → Tamil script, Telugu → Telugu script, etc.
-- English → English. Never mix languages.
+- English → English
+- Never mix languages
 
 {weather_ctx}
 
 You know about: crop diseases, weather, mandi prices, government schemes (PM-KISAN Rs 6000/year, Fasal Bima Yojana, Kisan Credit Card, Soil Health Card), fertilizers, pesticides, irrigation, soil health.
-Kisan helpline: 1800-180-1551 toll free.
+Kisan helpline: 1800-180-1551 (toll free).
 Keep answers SHORT and PRACTICAL. Use simple words. Be encouraging."""
 
     messages = [{"role": "system", "content": system_prompt}]
@@ -530,8 +491,7 @@ Keep answers SHORT and PRACTICAL. Use simple words. Be encouraging."""
         resp = requests.post(
             "https://api.groq.com/openai/v1/chat/completions",
             headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
-            json={"model": "llama-3.3-70b-versatile", "messages": messages,
-                  "temperature": 0.7, "max_tokens": 500},
+            json={"model": "llama-3.3-70b-versatile", "messages": messages, "temperature": 0.7, "max_tokens": 500},
             timeout=30)
         if resp.status_code == 200:
             reply = resp.json()["choices"][0]["message"]["content"].strip()
