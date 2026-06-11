@@ -5,8 +5,8 @@
 ═══════════════════════════════════════════════ */
 (function() {
 
-        /* ── Inject HTML ─────────────────────────── */
-        document.body.insertAdjacentHTML('beforeend', `
+    /* ── Inject HTML ─────────────────────────── */
+    document.body.insertAdjacentHTML('beforeend', `
   <div id="kisanWidget">
     <div id="kisanToggleBtn" onclick="toggleKisan()" title="Kisan Helper">
       <i class="fas fa-microphone-alt"></i>
@@ -51,17 +51,21 @@
     <span>Kisan Helpline: <strong>1800-180-1551</strong></span>
   </a>`);
 
-        /* ── Styles ──────────────────────────────── */
-        const S = document.createElement('style');
-        S.textContent = `
+    /* ── Styles ──────────────────────────────── */
+    const S = document.createElement('style');
+    S.textContent = `
   #kisanToggleBtn{
-    position:fixed;bottom:28px;right:28px;width:58px;height:58px;
+    position:fixed;
+    bottom:calc(28px + env(safe-area-inset-bottom, 0px));
+    right:calc(28px + env(safe-area-inset-right, 0px));
+    width:58px;height:58px;
     border-radius:50%;background:linear-gradient(135deg,#166534,#22c55e);
     box-shadow:0 4px 24px rgba(74,222,128,.45);display:flex;
     align-items:center;justify-content:center;cursor:pointer;z-index:9999;
     transition:transform .2s,box-shadow .2s;
+    -webkit-tap-highlight-color:transparent;touch-action:manipulation;
   }
-  #kisanToggleBtn:hover{transform:scale(1.1);box-shadow:0 6px 32px rgba(74,222,128,.6)}
+  #kisanToggleBtn:hover,#kisanToggleBtn:active{transform:scale(1.1);box-shadow:0 6px 32px rgba(74,222,128,.6)}
   #kisanToggleBtn i{font-size:1.45rem;color:#fff;pointer-events:none}
   .kw-pulse{
     position:absolute;top:-3px;right:-3px;width:13px;height:13px;
@@ -71,12 +75,16 @@
   @keyframes kwp{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.6);opacity:.4}}
 
   #kisanPanel{
-    position:fixed;bottom:100px;right:28px;width:340px;
-    max-height:75vh;
+    position:fixed;
+    bottom:calc(100px + env(safe-area-inset-bottom, 0px));
+    right:calc(28px + env(safe-area-inset-right, 0px));
+    width:min(340px, calc(100vw - 24px));
+    max-height:min(75vh, calc(100dvh - 130px));
     background:var(--card,#111a12);border:1px solid rgba(74,222,128,.25);
     border-radius:20px;box-shadow:0 8px 48px rgba(0,0,0,.5);
     display:flex;flex-direction:column;z-index:9998;
     animation:panelIn .25s cubic-bezier(.34,1.56,.64,1);
+    overflow:hidden;
   }
   #kisanPanel.kp-hidden{display:none!important}
   @keyframes panelIn{from{transform:scale(.85) translateY(20px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
@@ -104,22 +112,35 @@
   /* ── Lang picker — scrollable so it never overflows ── */
   .kp-lang-picker{
     padding:10px 12px;display:flex;flex-direction:column;gap:8px;
-    flex-shrink:0;max-height:260px;overflow-y:auto;
+    flex-shrink:0;max-height:min(260px, 40vh);overflow-y:auto;
     border-bottom:1px solid rgba(74,222,128,.1);
   }
   .kp-lang-picker::-webkit-scrollbar{width:3px}
   .kp-lang-picker::-webkit-scrollbar-thumb{background:rgba(74,222,128,.2);border-radius:2px}
   .kp-lang-picker p{font-size:.78rem;color:var(--text-2,#a7c4a8);text-align:center;margin:0;flex-shrink:0}
-  .kp-lang-options{display:grid;grid-template-columns:1fr 1fr;gap:5px}
+  .kp-lang-options{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px}
   .kp-lang-opt{
-    padding:6px 8px;border-radius:7px;font-size:.72rem;font-weight:600;
+    padding:8px 6px;border-radius:7px;font-size:.72rem;font-weight:600;
     background:var(--bg-3,#1a2a1c);border:1px solid rgba(74,222,128,.2);
     color:var(--text-2,#a7c4a8);cursor:pointer;transition:all .15s;text-align:center;
+    min-height:40px;display:flex;align-items:center;justify-content:center;
+    -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+    position:relative;overflow:hidden;
   }
-  .kp-lang-opt:hover{background:rgba(74,222,128,.1);border-color:var(--green,#4ade80);color:var(--green,#4ade80)}
+  .kp-lang-opt:hover,.kp-lang-opt:active{
+    background:rgba(74,222,128,.1);border-color:var(--green,#4ade80);
+    color:var(--green,#4ade80);
+  }
+  .kp-lang-opt.kl-speaking{
+    background:rgba(74,222,128,.18);border-color:var(--green,#4ade80);
+    color:var(--green,#4ade80);
+    animation:klSpeak .7s ease-in-out infinite alternate;
+  }
+  @keyframes klSpeak{from{box-shadow:0 0 0 0 rgba(74,222,128,0)}to{box-shadow:0 0 0 4px rgba(74,222,128,.25)}}
   .kp-lang-skip{
     font-size:.7rem;color:var(--text-3,#6b8c6d);text-align:center;
     cursor:pointer;text-decoration:underline;margin-top:2px;flex-shrink:0;
+    padding:4px;-webkit-tap-highlight-color:transparent;
   }
   .kp-lang-skip:hover{color:var(--green,#4ade80)}
 
@@ -185,7 +206,10 @@
   .kp-stop-btn:hover{background:rgba(248,113,113,.3);transform:scale(1.08)}
 
   #kisanHelpline{
-    position:fixed;bottom:20px;left:20px;display:flex;align-items:center;gap:8px;
+    position:fixed;
+    bottom:calc(20px + env(safe-area-inset-bottom, 0px));
+    left:calc(20px + env(safe-area-inset-left, 0px));
+    display:flex;align-items:center;gap:8px;
     background:var(--card,#111a12);border:1px solid rgba(74,222,128,.25);
     border-radius:50px;padding:8px 16px;font-size:.78rem;color:var(--text-2,#a7c4a8);
     text-decoration:none;z-index:9997;transition:border-color .2s,transform .2s,box-shadow .2s;
@@ -233,727 +257,722 @@
   body.light-theme .kp-speak-btn:hover{background:rgba(22,101,52,.08);border-color:#166534;color:#166534}
 
   @media(max-width:600px){
-    #kisanPanel{width:calc(100vw - 24px);right:12px;bottom:80px;max-height:72vh}
-    #kisanToggleBtn{bottom:16px;right:12px;width:50px;height:50px}
-    #kisanHelpline{bottom:12px;left:12px;font-size:.7rem;padding:6px 10px}
+    #kisanPanel{
+      width:calc(100vw - 20px);
+      right:calc(10px + env(safe-area-inset-right, 0px));
+      left:calc(10px + env(safe-area-inset-left, 0px));
+      bottom:calc(80px + env(safe-area-inset-bottom, 0px));
+      max-height:min(72vh, calc(100dvh - 110px));
+      border-radius:16px;
+    }
+    #kisanToggleBtn{
+      bottom:calc(16px + env(safe-area-inset-bottom, 0px));
+      right:calc(12px + env(safe-area-inset-right, 0px));
+      width:52px;height:52px;
+    }
+    #kisanHelpline{
+      bottom:calc(12px + env(safe-area-inset-bottom, 0px));
+      left:calc(12px + env(safe-area-inset-left, 0px));
+      font-size:.7rem;padding:6px 10px;
+    }
     #kisanHelpline strong{display:none}
     .kp-lang-options{grid-template-columns:1fr 1fr 1fr}
-    .kp-lang-opt{padding:7px 4px;font-size:.68rem}
-    .kp-speak-btn{width:32px;height:32px;min-width:32px;font-size:.8rem}
-    #kisanInput{font-size:.85rem;padding:9px 12px}
-    .kp-mic-btn,.kp-send-btn,.kp-stop-btn{width:38px;height:38px;font-size:.88rem}
+    .kp-lang-opt{padding:9px 4px;font-size:.7rem;min-height:44px}
+    .kp-speak-btn{width:36px;height:36px;min-width:36px;font-size:.85rem}
+    #kisanInput{font-size:16px;padding:9px 12px} /* 16px prevents iOS zoom */
+    .kp-mic-btn,.kp-send-btn,.kp-stop-btn{width:42px;height:42px;font-size:.9rem}
+    .kp-header{padding:10px 12px}
+    .kp-close,.kp-newchat-btn{width:32px;height:32px;font-size:.85rem}
   }`;
-        document.head.appendChild(S);
+    document.head.appendChild(S);
 
-        /* ── State ───────────────────────────────── */
-        let chatHistory = [];
-        let isOpen = false;
-        let isBusy = false;
-        let recognition = null;
-        let isRecording = false;
-        let langChosen = false;
-        let chosenLang = null;
-        let typingAborted = false;
-        let currentSpeakBtn = null; // tracks which message's speaker btn is active
-        let speechPaused = false; // tracks pause/play state
-        let mobileSpeechText = ''; // full text currently being spoken (mobile)
-        let mobileSpeechOffset = 0; // character offset for mobile resume
+    /* ── State ───────────────────────────────── */
+    let chatHistory = [];
+    let isOpen = false;
+    let isBusy = false;
+    let recognition = null;
+    let isRecording = false;
+    let langChosen = false;
+    let chosenLang = null;
+    let typingAborted = false;
+    let currentSpeakBtn = null; // tracks which message's speaker btn is active
+    let speechPaused = false; // tracks pause/play state
 
-        /* ── Mobile detection ───────────────────────── */
-        const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent) ||
-            ('ontouchstart' in window && navigator.maxTouchPoints > 1);
+    /* ── Lang data ───────────────────────────── */
+    const LANG_NAMES = {
+        en: 'English',
+        hi: 'हिन्दी',
+        bn: 'বাংলা',
+        te: 'తెలుగు',
+        mr: 'मराठी',
+        ta: 'தமிழ்',
+        gu: 'ગુજરાતી',
+        kn: 'ಕನ್ನಡ',
+        ml: 'മലയാളം',
+        pa: 'ਪੰਜਾਬੀ',
+        or: 'ଓଡ଼ିଆ',
+        as: 'অসমীয়া',
+        ur: 'اردو',
+        mai: 'मैथिली',
+        ne: 'नेपाली',
+        sa: 'संस्कृतम्',
+        kok: 'कोंकणी',
+        mni: 'মৈতৈলোন্',
+        bodo: 'बड़ो',
+        doi: 'डोगरी',
+    };
 
-        /* ── Lang data ───────────────────────────── */
-        const LANG_NAMES = {
-            en: 'English',
-            hi: 'हिन्दी',
-            bn: 'বাংলা',
-            te: 'తెలుగు',
-            mr: 'मराठी',
-            ta: 'தமிழ்',
-            gu: 'ગુજરાતી',
-            kn: 'ಕನ್ನಡ',
-            ml: 'മലയാളം',
-            pa: 'ਪੰਜਾਬੀ',
-            or: 'ଓଡ଼ିଆ',
-            as: 'অসমীয়া',
-            ur: 'اردو',
-            mai: 'मैथिली',
-            ne: 'नेपाली',
-            sa: 'संस्कृतम्',
-            kok: 'कोंकणी',
-            mni: 'মৈতৈলোন্',
-            bodo: 'बड़ो',
-            doi: 'डोगरी',
-        };
+    const GREETINGS = {
+        en: '🌾 Hello farmer friend! I\'m SmartAgro Kisan Helper. Ask me anything about crops, weather, market prices, or government schemes like PM-KISAN.',
+        hi: '🌾 नमस्ते किसान भाई! मैं SmartAgro किसान सहायक हूं। आप मुझसे मौसम, फसल, बाजार भाव या सरकारी योजनाओं के बारे में पूछ सकते हैं।',
+        bn: '🌾 নমস্কার কৃষক বন্ধু! আমি SmartAgro কিষান সহায়ক। আবহাওয়া, ফসল, বাজার মূল্য বা সরকারি প্রকল্প সম্পর্কে জিজ্ঞেস করুন।',
+        te: '🌾 నమస్కారం రైతు మిత్రమా! నేను SmartAgro కిసాన్ హెల్పర్. వాతావరణం, పంటలు, మార్కెట్ ధరలు గురించి అడగండి.',
+        mr: '🌾 नमस्कार शेतकरी मित्रा! मी SmartAgro किसान सहाय्यक आहे। हवामान, पीक, बाजारभाव किंवा सरकारी योजनांबद्दल विचारा.',
+        ta: '🌾 வணக்கம் விவசாயி நண்பரே! நான் SmartAgro கிசான் உதவியாளர். வானிலை, பயிர்கள், சந்தை விலைகள் பற்றி கேளுங்கள்.',
+        gu: '🌾 નમસ્તે ખેડૂત મિત્ર! હું SmartAgro કિસાન સહાયક છું. હવામાન, પાક, બજાર ભાવ વિશે પૂછો.',
+        kn: '🌾 ನಮಸ್ಕಾರ ರೈತ ಮಿತ್ರ! ನಾನು SmartAgro ಕಿಸಾನ್ ಸಹಾಯಕ. ಹವಾಮಾನ, ಬೆಳೆ, ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳ ಬಗ್ಗೆ ಕೇಳಿ.',
+        ml: '🌾 നമസ്കാരം കർഷക സുഹൃത്തേ! ഞാൻ SmartAgro കിസാൻ അസിസ്റ്റന്റ്. കാലാവസ്ഥ, വിളകൾ, വിപണി വില ചോദിക്കൂ.',
+        pa: '🌾 ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਕਿਸਾਨ ਵੀਰੇ! ਮੈਂ SmartAgro ਕਿਸਾਨ ਸਹਾਇਕ ਹਾਂ। ਮੌਸਮ, ਫਸਲ, ਮੰਡੀ ਭਾਅ ਬਾਰੇ ਪੁੱਛੋ।',
+        or: '🌾 ନମସ୍କାର କୃଷକ ବନ୍ଧୁ! ମୁଁ SmartAgro କିସାନ ସହାୟକ। ଆବହାୱା, ଫସଲ, ବଜାର ମୂଲ୍ୟ ବିଷୟରେ ପଚାରନ୍ତୁ।',
+        as: '🌾 নমস্কাৰ কৃষক বন্ধু! মই SmartAgro কিষান সহায়ক। বতৰ, শস্য, বজাৰ মূল্য বা চৰকাৰী আঁচনিৰ বিষয়ে সুধিব।',
+        ur: '🌾 السلام علیکم کسان دوست! میں SmartAgro کسان مددگار ہوں۔ موسم، فصل، منڈی بھاؤ کے بارے میں پوچھیں۔',
+        mai: '🌾 प्रणाम किसान भाई! हम SmartAgro किसान सहायक छी। मौसम, फसल, बाजार भाव के बारे में पूछू।',
+        ne: '🌾 नमस्ते किसान साथी! म SmartAgro किसान सहायक हुँ। मौसम, बाली, बजार मूल्य वा सरकारी योजनाबारे सोध्नुस्।',
+        sa: '🌾 नमस्ते कृषक मित्र! अहं SmartAgro किसान सहायकः अस्मि। कृषि, वायुमण्डलं, विपणनमूल्यं च पृच्छतु।',
+        kok: '🌾 नमस्कार शेतकारी दोस्ता! हांव SmartAgro किसान सहाय्यक. हवामान, पीक, बाजारभाव विशीं विचार.',
+        mni: '🌾 নমস্কার চাষী নুংশিজবা! ঐ SmartAgro কিসান হেল্পার নি। য়াম্না চাউখৎলবা বিউজেট বিষয়দা হায়বিয়ু।',
+        bodo: '🌾 नमस्कार खेती आरो! आं SmartAgro किसान सहायक। मौसम, खेती, बाजार बिफान बिलाइ दिन्थि।',
+        doi: '🌾 नमस्ते किसान भाई! मैं SmartAgro किसान सहायक आं। मौसम, फसल, बजार भाव बारे पुच्छो।',
+    };
 
-        const GREETINGS = {
-            en: '🌾 Hello farmer friend! I\'m SmartAgro Kisan Helper. Ask me anything about crops, weather, market prices, or government schemes like PM-KISAN.',
-            hi: '🌾 नमस्ते किसान भाई! मैं SmartAgro किसान सहायक हूं। आप मुझसे मौसम, फसल, बाजार भाव या सरकारी योजनाओं के बारे में पूछ सकते हैं।',
-            bn: '🌾 নমস্কার কৃষক বন্ধু! আমি SmartAgro কিষান সহায়ক। আবহাওয়া, ফসল, বাজার মূল্য বা সরকারি প্রকল্প সম্পর্কে জিজ্ঞেস করুন।',
-            te: '🌾 నమస్కారం రైతు మిత్రమా! నేను SmartAgro కిసాన్ హెల్పర్. వాతావరణం, పంటలు, మార్కెట్ ధరలు గురించి అడగండి.',
-            mr: '🌾 नमस्कार शेतकरी मित्रा! मी SmartAgro किसान सहाय्यक आहे। हवामान, पीक, बाजारभाव किंवा सरकारी योजनांबद्दल विचारा.',
-            ta: '🌾 வணக்கம் விவசாயி நண்பரே! நான் SmartAgro கிசான் உதவியாளர். வானிலை, பயிர்கள், சந்தை விலைகள் பற்றி கேளுங்கள்.',
-            gu: '🌾 નમસ્તે ખેડૂત મિત્ર! હું SmartAgro કિસાન સહાયક છું. હવામાન, પાક, બજાર ભાવ વિશે પૂછો.',
-            kn: '🌾 ನಮಸ್ಕಾರ ರೈತ ಮಿತ್ರ! ನಾನು SmartAgro ಕಿಸಾನ್ ಸಹಾಯಕ. ಹವಾಮಾನ, ಬೆಳೆ, ಮಾರುಕಟ್ಟೆ ಬೆಲೆಗಳ ಬಗ್ಗೆ ಕೇಳಿ.',
-            ml: '🌾 നമസ്കാരം കർഷക സുഹൃത്തേ! ഞാൻ SmartAgro കിസാൻ അസിസ്റ്റന്റ്. കാലാവസ്ഥ, വിളകൾ, വിപണി വില ചോദിക്കൂ.',
-            pa: '🌾 ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਕਿਸਾਨ ਵੀਰੇ! ਮੈਂ SmartAgro ਕਿਸਾਨ ਸਹਾਇਕ ਹਾਂ। ਮੌਸਮ, ਫਸਲ, ਮੰਡੀ ਭਾਅ ਬਾਰੇ ਪੁੱਛੋ।',
-            or: '🌾 ନମସ୍କାର କୃଷକ ବନ୍ଧୁ! ମୁଁ SmartAgro କିସାନ ସହାୟକ। ଆବହାୱା, ଫସଲ, ବଜାର ମୂଲ୍ୟ ବିଷୟରେ ପଚାରନ୍ତୁ।',
-            as: '🌾 নমস্কাৰ কৃষক বন্ধু! মই SmartAgro কিষান সহায়ক। বতৰ, শস্য, বজাৰ মূল্য বা চৰকাৰী আঁচনিৰ বিষয়ে সুধিব।',
-            ur: '🌾 السلام علیکم کسان دوست! میں SmartAgro کسان مددگار ہوں۔ موسم، فصل، منڈی بھاؤ کے بارے میں پوچھیں۔',
-            mai: '🌾 प्रणाम किसान भाई! हम SmartAgro किसान सहायक छी। मौसम, फसल, बाजार भाव के बारे में पूछू।',
-            ne: '🌾 नमस्ते किसान साथी! म SmartAgro किसान सहायक हुँ। मौसम, बाली, बजार मूल्य वा सरकारी योजनाबारे सोध्नुस्।',
-            sa: '🌾 नमस्ते कृषक मित्र! अहं SmartAgro किसान सहायकः अस्मि। कृषि, वायुमण्डलं, विपणनमूल्यं च पृच्छतु।',
-            kok: '🌾 नमस्कार शेतकारी दोस्ता! हांव SmartAgro किसान सहाय्यक. हवामान, पीक, बाजारभाव विशीं विचार.',
-            mni: '🌾 নমস্কার চাষী নুংশিজবা! ঐ SmartAgro কিসান হেল্পার নি। য়াম্না চাউখৎলবা বিউজেট বিষয়দা হায়বিয়ু।',
-            bodo: '🌾 नमस्कार खेती आरो! आं SmartAgro किसान सहायक। मौसम, खेती, बाजार बिफान बिलाइ दिन्थि।',
-            doi: '🌾 नमस्ते किसान भाई! मैं SmartAgro किसान सहायक आं। मौसम, फसल, बजार भाव बारे पुच्छो।',
-        };
+    const LANG_QUESTION = {
+        en: 'Which language do you prefer for answers?',
+        hi: 'आप किस भाषा में जवाब चाहते हैं?',
+        default: 'Which language? / आप कौन सी भाषा चाहते हैं?',
+    };
 
-        const LANG_QUESTION = {
-            en: 'Which language do you prefer for answers?',
-            hi: 'आप किस भाषा में जवाब चाहते हैं?',
-            default: 'Which language? / आप कौन सी भाषा चाहते हैं?',
-        };
+    const VOICE_LANGS = {
+        en: 'en-IN',
+        hi: 'hi-IN',
+        bn: 'bn-IN',
+        te: 'te-IN',
+        mr: 'mr-IN',
+        ta: 'ta-IN',
+        gu: 'gu-IN',
+        kn: 'kn-IN',
+        ml: 'ml-IN',
+        pa: 'pa-IN',
+        or: 'or-IN',
+        as: 'as-IN',
+        ur: 'ur-PK',
+        mai: 'hi-IN',
+        ne: 'ne-NP',
+        sa: 'hi-IN',
+        kok: 'mr-IN',
+        mni: 'bn-IN',
+        bodo: 'hi-IN',
+        doi: 'hi-IN',
+    };
+    // TTS language codes — Indian accent preferred
+    const TTS_LANGS = {
+        en: 'en-IN',
+        hi: 'hi-IN',
+        bn: 'bn-IN',
+        te: 'te-IN',
+        mr: 'mr-IN',
+        ta: 'ta-IN',
+        gu: 'gu-IN',
+        kn: 'kn-IN',
+        ml: 'ml-IN',
+        pa: 'pa-IN',
+        or: 'or-IN',
+        as: 'as-IN',
+        ur: 'ur-PK',
+        mai: 'hi-IN',
+        ne: 'ne-NP',
+        sat: 'hi-IN',
+        ks: 'ur-PK',
+        sd: 'ur-PK',
+        kok: 'mr-IN',
+        mni: 'bn-BD',
+        bodo: 'hi-IN',
+        doi: 'hi-IN',
+    };
 
-        const VOICE_LANGS = {
-            en: 'en-IN',
-            hi: 'hi-IN',
-            bn: 'bn-IN',
-            te: 'te-IN',
-            mr: 'mr-IN',
-            ta: 'ta-IN',
-            gu: 'gu-IN',
-            kn: 'kn-IN',
-            ml: 'ml-IN',
-            pa: 'pa-IN',
-            or: 'or-IN',
-            as: 'as-IN',
-            ur: 'ur-PK',
-            mai: 'hi-IN',
-            ne: 'ne-NP',
-            sa: 'hi-IN',
-            kok: 'mr-IN',
-            mni: 'bn-IN',
-            bodo: 'hi-IN',
-            doi: 'hi-IN',
-        };
-        // TTS language codes — Indian accent preferred
-        const TTS_LANGS = {
-            en: 'en-IN',
-            hi: 'hi-IN',
-            bn: 'bn-IN',
-            te: 'te-IN',
-            mr: 'mr-IN',
-            ta: 'ta-IN',
-            gu: 'gu-IN',
-            kn: 'kn-IN',
-            ml: 'ml-IN',
-            pa: 'pa-IN',
-            or: 'or-IN',
-            as: 'as-IN',
-            ur: 'ur-PK',
-            mai: 'hi-IN',
-            ne: 'ne-NP',
-            sat: 'hi-IN',
-            ks: 'ur-PK',
-            sd: 'ur-PK',
-            kok: 'mr-IN',
-            mni: 'bn-BD',
-            bodo: 'hi-IN',
-            doi: 'hi-IN',
-        };
+    /* ── Helpers ─────────────────────────────── */
+    function getMsgs() { return document.getElementById('kisanMessages'); }
 
-        /* ── Helpers ─────────────────────────────── */
-        function getMsgs() { return document.getElementById('kisanMessages'); }
+    function getInput() { return document.getElementById('kisanInput'); }
 
-        function getInput() { return document.getElementById('kisanInput'); }
+    function scrollBot() { const m = getMsgs(); if (m) m.scrollTop = m.scrollHeight; }
 
-        function scrollBot() { const m = getMsgs(); if (m) m.scrollTop = m.scrollHeight; }
+    function getAppLang() { return chosenLang || localStorage.getItem('agrosmart_lang') || 'en'; }
 
-        function getAppLang() { return chosenLang || localStorage.getItem('agrosmart_lang') || 'en'; }
-
-        function updateSubLabel(lang) {
-            const el = document.getElementById('kisanLangLabel');
-            if (el) el.textContent = 'Answering in ' + (LANG_NAMES[lang] || lang.toUpperCase());
-        }
-
-        function showStopBtn() {
-            const b = document.getElementById('kisanStopBtn');
-            if (b) b.style.display = 'flex';
-        }
-
-        function hideStopBtn() {
-            const b = document.getElementById('kisanStopBtn');
-            if (b) b.style.display = 'none';
-        }
-
-        /* ── Toggle ──────────────────────────────── */
-        window.toggleKisan = function() {
-            const panel = document.getElementById('kisanPanel');
-            isOpen = !isOpen;
-            panel.classList.toggle('kp-hidden', !isOpen);
-            if (!isOpen) stopSpeaking();
-            if (isOpen) {
-                if (chatHistory.length === 0 && !langChosen) showLangPicker();
-                setTimeout(() => { const i = getInput(); if (i) i.focus(); }, 300);
-            }
-        };
-
-        /* ── Language Picker ─────────────────────── */
-        function showLangPicker() {
-            // Remove existing picker first
-            const old = document.getElementById('kisanLangPicker');
-            if (old) old.remove();
-
-            const appLang = localStorage.getItem('agrosmart_lang') || 'en';
-            const q = LANG_QUESTION[appLang] || LANG_QUESTION.default;
-
-            const picker = document.createElement('div');
-            picker.className = 'kp-lang-picker';
-            picker.id = 'kisanLangPicker';
-            picker.innerHTML = `
-      <p>${q}</p>
-      <div class="kp-lang-options">
-        ${Object.entries(LANG_NAMES).map(([code, name]) =>
-          `<div class="kp-lang-opt" onclick="pickKisanLang('${code}')">${name}</div>`
-        ).join('')}
-      </div>
-      <div class="kp-lang-skip" onclick="pickKisanLang('${appLang}')">
-        Skip — use app language (${LANG_NAMES[appLang] || appLang})
-      </div>`;
-
-    const inputBar = document.querySelector('.kp-input-bar');
-    if (inputBar && inputBar.parentNode) {
-      inputBar.parentNode.insertBefore(picker, inputBar);
-    }
-  }
-
-  window.pickKisanLang = function (code) {
-    chosenLang  = code;
-    langChosen  = true;
-    const picker = document.getElementById('kisanLangPicker');
-    if (picker) picker.remove();
-    updateSubLabel(code);
-    const greet = GREETINGS[code] || GREETINGS.en;
-    appendBot(greet, true);
-  };
-
-  /* ── New Chat ────────────────────────────── */
-  window.newKisanChat = function () {
-    stopSpeaking();
-    chatHistory   = [];
-    langChosen    = false;
-    chosenLang    = null;
-    typingAborted = true;
-    isBusy        = false;
-    const msgs = getMsgs();
-    if (msgs) msgs.innerHTML = '';
-    hideStopBtn();
-    const picker = document.getElementById('kisanLangPicker');
-    if (picker) picker.remove();
-    showLangPicker();
-    updateSubLabel(localStorage.getItem('agrosmart_lang') || 'en');
-  };
-
-  /* ── Stop typing ─────────────────────────── */
-window.stopKisanTyping = function () {
-    typingAborted = true;
-    isBusy        = false;
-    hideStopBtn();
-    stopSpeaking();
-};
-
-  /* ── Send message ────────────────────────── */
-  window.sendKisanMessage = async function () {
-    const input = getInput();
-    const text  = (input ? input.value : '').trim();
-    if (!text || isBusy) return;
-    if (input) input.value = '';
-
-    // Auto-pick app lang if user types without choosing
-    if (!langChosen) {
-      langChosen = true;
-      chosenLang = localStorage.getItem('agrosmart_lang') || 'en';
-      const picker = document.getElementById('kisanLangPicker');
-      if (picker) picker.remove();
-      updateSubLabel(chosenLang);
+    function updateSubLabel(lang) {
+        const el = document.getElementById('kisanLangLabel');
+        if (el) el.textContent = 'Answering in ' + (LANG_NAMES[lang] || lang.toUpperCase());
     }
 
-    appendUser(text);
-    chatHistory.push({ role: 'user', content: text });
-    isBusy = true;
-    const tid = showTyping();
-
-    try {
-      // Detect language change keywords in message
-      const msgLower = text.toLowerCase();
-      const langKeywords = {
-        'english':'en','hindi':'hi','bengali':'bn','telugu':'te',
-        'marathi':'mr','tamil':'ta','gujarati':'gu','kannada':'kn',
-        'malayalam':'ml','punjabi':'pa','odia':'or','assamese':'as',
-        'urdu':'ur','nepali':'ne','maithili':'mai','sanskrit':'sa',
-        'konkani':'kok','manipuri':'mni','meitei':'mni','bodo':'bodo',
-        'dogri':'doi','santhali':'sat','kashmiri':'ks','sindhi':'sd',
-        'हिंदी':'hi','हिन्दी':'hi','বাংলা':'bn','తెలుగు':'te',
-        'मराठी':'mr','தமிழ்':'ta','ગુજરાતી':'gu','ಕನ್ನಡ':'kn',
-        'മലയാളം':'ml','ਪੰਜਾਬੀ':'pa','ଓଡ଼ିଆ':'or','অসমীয়া':'as',
-        'اردو':'ur','मैथिली':'mai','संस्कृत':'sa','कोंकणी':'kok',
-        'डोगरी':'doi','سنڌي':'sd','كٲشُر':'ks',
-      };
-      for (const [kw, code] of Object.entries(langKeywords)) {
-        if (msgLower.includes(kw)) {
-          chosenLang = code;
-          updateSubLabel(code);
-          break;
-        }
-      }
-
-      const lang = getAppLang();
-      const res  = await fetch('/api/chat', {
-        method:  'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body:    JSON.stringify({ messages: chatHistory, lang })
-      });
-
-      removeTyping(tid);
-
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        appendBot('⚠️ Server error: ' + (err.error || res.status) + '. Please try again.', false);
-        isBusy = false;
-        return;
-      }
-
-      const data = await res.json();
-      if (data.reply) {
-        chatHistory.push({ role: 'assistant', content: data.reply });
-        appendBot(data.reply, true);
-      } else {
-        appendBot('⚠️ ' + (data.error || 'No response received.'), false);
-      }
-    } catch (e) {
-      removeTyping(tid);
-      appendBot('⚠️ Connection error. Check your internet.', false);
-      console.error('[KisanHelper]', e);
+    function showStopBtn() {
+        const b = document.getElementById('kisanStopBtn');
+        if (b) b.style.display = 'flex';
     }
-    isBusy = false;
-  };
 
-  /* ── Message renderers ───────────────────── */
-  function appendUser(text) {
-    const el = document.createElement('div');
-    el.className = 'kp-msg user';
-    el.textContent = text;
-    getMsgs().appendChild(el);
-    scrollBot();
-  }
+    function hideStopBtn() {
+        const b = document.getElementById('kisanStopBtn');
+        if (b) b.style.display = 'none';
+    }
 
-  function appendBot(text, animate) {
-    const wrapper = document.createElement('div');
-    wrapper.className = 'kp-msg-wrapper';
-    wrapper.style.cssText = 'display:flex;flex-direction:column;align-self:flex-start;max-width:85%';
+    /* ── Toggle ──────────────────────────────── */
+    window.toggleKisan = function() {
+        const panel = document.getElementById('kisanPanel');
+        isOpen = !isOpen;
+        panel.classList.toggle('kp-hidden', !isOpen);
+        if (!isOpen) stopSpeaking();
+        if (isOpen) {
+            if (chatHistory.length === 0 && !langChosen) showLangPicker();
+            setTimeout(() => { const i = getInput(); if (i) i.focus(); }, 300);
+        }
+    };
 
-    const el = document.createElement('div');
-    el.className = 'kp-msg bot';
-    el.style.maxWidth = '100%';
+    /* ── Language Picker ─────────────────────── */
+    /* Speaks the language name in that language's voice when hovered/tapped */
+    function speakLangName(code, name, btn) {
+        if (!window.speechSynthesis) return;
+        window.speechSynthesis.cancel();
 
-    // Speaker button row
-    const footer = document.createElement('div');
-    footer.className = 'kp-msg-footer';
+        // Clear any previously speaking lang button
+        document.querySelectorAll('.kp-lang-opt.kl-speaking').forEach(el => el.classList.remove('kl-speaking'));
 
-    const speakBtn = document.createElement('button');
-    speakBtn.className = 'kp-speak-btn';
-    speakBtn.title = 'Listen';
-    speakBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-    speakBtn.setAttribute('aria-label', 'Play / Pause voice');
+        const utter = new SpeechSynthesisUtterance(name);
+        utter.lang = TTS_LANGS[code] || VOICE_LANGS[code] || 'hi-IN';
+        utter.rate = 0.9;
+        utter.pitch = 1.0;
+        utter.volume = 1.0;
 
-    speakBtn.addEventListener('click', handleSpeakBtnAction);
-    speakBtn.addEventListener('touchstart', function(e) {
-      e.preventDefault();
-      handleSpeakBtnAction(e);
-    }, { passive: false });
+        if (btn) btn.classList.add('kl-speaking');
+        utter.onend = () => { if (btn) btn.classList.remove('kl-speaking'); };
+        utter.onerror = () => { if (btn) btn.classList.remove('kl-speaking'); };
 
-    function handleSpeakBtnAction(e) {
-      e.stopPropagation();
-      const synth = window.speechSynthesis;
+        function doSpeakLang() {
+            const voices = window.speechSynthesis.getVoices();
+            const ttsLang = TTS_LANGS[code] || VOICE_LANGS[code] || 'hi-IN';
+            const baseLang = ttsLang.split('-')[0];
+            let v = voices.find(v => v.lang === ttsLang);
+            if (!v) v = voices.find(v => v.lang.startsWith(baseLang + '-'));
+            if (!v) v = voices.find(v => v.lang.startsWith(baseLang));
+            if (!v && voices.length > 0) v = voices[0];
+            if (v) utter.voice = v;
+            window.speechSynthesis.speak(utter);
+        }
 
-      // ── Active and speaking → PAUSE ──
-      if (currentSpeakBtn === speakBtn && !speechPaused) {
-        speechPaused = true;
-        speakBtn.classList.remove('speaking');
-        speakBtn.classList.add('paused');
-        speakBtn.innerHTML = '<i class="fas fa-play"></i>';
-        speakBtn.title = 'Resume';
-        _stopKeepalive();
-        if (synth) synth.pause();
-        return;
-      }
-
-      // ── Active and paused → RESUME ──
-      if (currentSpeakBtn === speakBtn && speechPaused) {
-        speechPaused = false;
-        speakBtn.classList.remove('paused');
-        speakBtn.classList.add('speaking');
-        speakBtn.innerHTML = '<i class="fas fa-pause"></i>';
-        speakBtn.title = 'Pause';
-        if (isMobile) {
-          // Mobile synth.resume() unreliable — restart full text from gesture
-          speakText(el.textContent, getAppLang(), speakBtn);
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length === 0) {
+            window.speechSynthesis.onvoiceschanged = () => {
+                window.speechSynthesis.onvoiceschanged = null;
+                doSpeakLang();
+            };
         } else {
-          if (synth) synth.resume();
+            doSpeakLang();
         }
-        return;
-      }
-
-      // ── New message → start speaking ──
-      speakText(el.textContent, getAppLang(), speakBtn);
     }
 
-    footer.appendChild(speakBtn);
-    wrapper.appendChild(el);
-    wrapper.appendChild(footer);
-    getMsgs().appendChild(wrapper);
-    scrollBot();
+    function showLangPicker() {
+        // Remove existing picker first
+        const old = document.getElementById('kisanLangPicker');
+        if (old) old.remove();
 
-   // Inside appendBot(), replace the animate block:
-    if (animate) {
-        typingAborted = false;
-        showStopBtn();
-        typeWriter(el, text, 0, () => {
-            // Auto-speak removed: calling speak() inside a setTimeout/callback
-            // breaks Android's user-gesture requirement → silent failure.
-            // User taps the speaker button to listen.
+        const appLang = localStorage.getItem('agrosmart_lang') || 'en';
+        const q = LANG_QUESTION[appLang] || LANG_QUESTION.default;
+
+        const picker = document.createElement('div');
+        picker.className = 'kp-lang-picker';
+        picker.id = 'kisanLangPicker';
+
+        const label = document.createElement('p');
+        label.textContent = q;
+        picker.appendChild(label);
+
+        const grid = document.createElement('div');
+        grid.className = 'kp-lang-options';
+
+        Object.entries(LANG_NAMES).forEach(([code, name]) => {
+            const btn = document.createElement('div');
+            btn.className = 'kp-lang-opt';
+            btn.textContent = name;
+            btn.setAttribute('role', 'button');
+            btn.setAttribute('aria-label', name);
+            btn.setAttribute('tabindex', '0');
+
+            let speakTimer = null;
+
+            // Desktop: speak on mouseenter (with tiny delay to avoid accidental triggers)
+            btn.addEventListener('mouseenter', () => {
+                speakTimer = setTimeout(() => speakLangName(code, name, btn), 150);
+            });
+            btn.addEventListener('mouseleave', () => {
+                if (speakTimer) { clearTimeout(speakTimer);
+                    speakTimer = null; }
+            });
+
+            // Mobile: speak immediately on touchstart, then pick on touchend (no scroll)
+            let touchMoved = false;
+            btn.addEventListener('touchstart', (e) => {
+                touchMoved = false;
+                speakLangName(code, name, btn);
+            }, { passive: true });
+            btn.addEventListener('touchmove', () => { touchMoved = true; }, { passive: true });
+            btn.addEventListener('touchend', (e) => {
+                if (!touchMoved) {
+                    e.preventDefault();
+                    // Small delay so speech starts before the picker is removed
+                    setTimeout(() => pickKisanLang(code), 300);
+                }
+            });
+
+            // Click (desktop / keyboard)
+            btn.addEventListener('click', () => pickKisanLang(code));
+            btn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') pickKisanLang(code); });
+
+            grid.appendChild(btn);
         });
-    } else {
-        el.textContent = text;
-        scrollBot();
-    }
-  }
 
- // Replace typeWriter function:
-function typeWriter(el, text, i, onComplete) {
-    if (typingAborted) {
-        el.textContent = text;
-        typingAborted  = false;
+        picker.appendChild(grid);
+
+        const skip = document.createElement('div');
+        skip.className = 'kp-lang-skip';
+        skip.textContent = `Skip — use app language (${LANG_NAMES[appLang] || appLang})`;
+        skip.addEventListener('click', () => pickKisanLang(appLang));
+        picker.appendChild(skip);
+
+
+
+        const inputBar = document.querySelector('.kp-input-bar');
+        if (inputBar && inputBar.parentNode) {
+            inputBar.parentNode.insertBefore(picker, inputBar);
+        }
+    }
+
+    window.pickKisanLang = function(code) {
+        // Stop any language-preview speech
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        document.querySelectorAll('.kp-lang-opt.kl-speaking').forEach(el => el.classList.remove('kl-speaking'));
+
+        chosenLang = code;
+        langChosen = true;
+        const picker = document.getElementById('kisanLangPicker');
+        if (picker) picker.remove();
+        updateSubLabel(code);
+        const greet = GREETINGS[code] || GREETINGS.en;
+        appendBot(greet, true);
+    };
+
+    /* ── New Chat ────────────────────────────── */
+    window.newKisanChat = function() {
+        stopSpeaking();
+        chatHistory = [];
+        langChosen = false;
+        chosenLang = null;
+        typingAborted = true;
+        isBusy = false;
+        const msgs = getMsgs();
+        if (msgs) msgs.innerHTML = '';
         hideStopBtn();
-        scrollBot();
-        if (onComplete) onComplete();
-        return;
-    }
-    if (i < text.length) {
-        el.textContent += text[i];
-        scrollBot();
-        setTimeout(() => typeWriter(el, text, i + 1, onComplete), 18);
-    } else {
+        const picker = document.getElementById('kisanLangPicker');
+        if (picker) picker.remove();
+        showLangPicker();
+        updateSubLabel(localStorage.getItem('agrosmart_lang') || 'en');
+    };
+
+    /* ── Stop typing ─────────────────────────── */
+    window.stopKisanTyping = function() {
+        typingAborted = true;
+        isBusy = false;
         hideStopBtn();
-        if (onComplete) onComplete();
-    }
-}
-
-  function showTyping() {
-    const id = 'kp-typing-' + Date.now();
-    const el = document.createElement('div');
-    el.className = 'kp-msg bot';
-    el.id = id;
-    el.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
-    getMsgs().appendChild(el);
-    scrollBot();
-    return id;
-  }
-
-  function removeTyping(id) {
-    const el = document.getElementById(id);
-    if (el) el.remove();
-  }
-  /* ── Reset any active speaker button to default ── */
-  function resetSpeakBtnUI() {
-    if (currentSpeakBtn) {
-      currentSpeakBtn.classList.remove('speaking', 'paused');
-      currentSpeakBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
-      currentSpeakBtn.title = 'Listen';
-    }
-    currentSpeakBtn = null;
-    speechPaused = false;
-  }
-
-  /* ══════════════════════════════════════════════════════════
-     TEXT-TO-SPEECH  — Mobile-Safe Multi-Language Engine
-     ──────────────────────────────────────────────────────
-     ROOT CAUSE of "only English/Bengali work on mobile":
-
-     Problem 1 — Wrong voice object forced on mobile.
-       Android/iOS require utter.lang ONLY. Setting utter.voice
-       to a desktop-found object silently breaks non-installed
-       languages; the engine ignores the lang tag.
-
-     Problem 2 — Single utterance too long for mobile WebKit.
-       iOS Safari / older Android Chrome silently cut off long
-       utterances (~200–300 chars). Fix: chunk text into
-       sentences ≤ 200 chars and queue them sequentially.
-
-     Problem 3 — Gesture chain broken by async.
-       ANY setTimeout / Promise before synth.speak() breaks
-       Android's user-gesture requirement → silent failure.
-       First chunk must be spoken synchronously in the handler.
-
-     Problem 4 — Android Chrome stalls after ~15 s.
-       Workaround: pause()/resume() keepalive ping every 10 s.
-
-     FIX STRATEGY:
-     1. Split text into sentence chunks ≤ 200 chars.
-     2. Speak chunk[0] synchronously (gesture chain intact).
-     3. Queue remaining chunks via utter.onend (safe — gesture
-        requirement only applies to the FIRST speak() call).
-     4. Voice selection: mobile → lang tag only, no voice obj.
-        Desktop → best matching voice from cached list.
-     5. Fallback lang chain: exact → base lang → 'en-US'.
-     6. Keepalive timer for Android stall bug.
-  ══════════════════════════════════════════════════════════ */
-
-  /* BCP-47 primary tags + ordered fallback chains per app language.
-     Fallbacks let Android TTS find *something* installed even when
-     the ideal locale voice is missing.                            */
-  const TTS_LANG_TAG = {
-    en:   'en-IN',  hi:   'hi-IN',  bn:   'bn-IN',
-    te:   'te-IN',  mr:   'mr-IN',  ta:   'ta-IN',
-    gu:   'gu-IN',  kn:   'kn-IN',  ml:   'ml-IN',
-    pa:   'pa-IN',  or:   'or-IN',  as:   'as-IN',
-    ur:   'ur-PK',  ne:   'ne-NP',
-    mai:  'hi-IN',  sa:   'hi-IN',  kok:  'mr-IN',
-    mni:  'bn-BD',  bodo: 'hi-IN',  doi:  'hi-IN',
-    sat:  'hi-IN',  ks:   'ur-PK',  sd:   'ur-PK',
-  };
-
-  /* Fallback lang chain: if primary tag has no voice, try these in order */
-  const TTS_FALLBACK = {
-    'te-IN': ['te-IN','te','hi-IN','hi','en-IN','en-US'],
-    'ta-IN': ['ta-IN','ta','hi-IN','hi','en-IN','en-US'],
-    'gu-IN': ['gu-IN','gu','hi-IN','hi','en-IN','en-US'],
-    'kn-IN': ['kn-IN','kn','hi-IN','hi','en-IN','en-US'],
-    'ml-IN': ['ml-IN','ml','hi-IN','hi','en-IN','en-US'],
-    'pa-IN': ['pa-IN','pa','hi-IN','hi','en-IN','en-US'],
-    'or-IN': ['or-IN','or','hi-IN','hi','en-IN','en-US'],
-    'as-IN': ['as-IN','as','bn-IN','bn','en-IN','en-US'],
-    'mr-IN': ['mr-IN','mr','hi-IN','hi','en-IN','en-US'],
-    'bn-IN': ['bn-IN','bn-BD','bn','en-IN','en-US'],
-    'bn-BD': ['bn-BD','bn-IN','bn','en-IN','en-US'],
-    'hi-IN': ['hi-IN','hi','en-IN','en-US'],
-    'ur-PK': ['ur-PK','ur','hi-IN','hi','en-IN','en-US'],
-    'ne-NP': ['ne-NP','ne','hi-IN','hi','en-IN','en-US'],
-    'en-IN': ['en-IN','en-GB','en-US','en'],
-  };
-
-  /* Eagerly cache voices — must be ready before user taps */
-  let _cachedVoices = [];
-  function _loadVoices() {
-    const v = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
-    if (v.length) _cachedVoices = v;
-  }
-  if (window.speechSynthesis) {
-    _loadVoices();
-    window.speechSynthesis.onvoiceschanged = _loadVoices;
-  }
-
-  /* Strip emoji and markdown so TTS engines don't read symbols aloud */
-  function cleanForTTS(text) {
-    return text
-      .replace(/[\u{1F300}-\u{1FFFF}]/gu, '')
-      .replace(/[\u2600-\u27BF]/g, '')
-      .replace(/[⚠️✓•→★☆]/g, '')
-      .replace(/\*/g, '')
-      .replace(/#{1,6}\s/g, '')
-      .replace(/\s{2,}/g, ' ')
-      .trim();
-  }
-
-  /*
-   * splitIntoChunks — split text at sentence boundaries into
-   * pieces ≤ maxLen chars. Prevents iOS/Android silent cutoff
-   * on long utterances.
-   */
-  function splitIntoChunks(text, maxLen) {
-    maxLen = maxLen || 180;
-    // Split on sentence-ending punctuation (including Devanagari danda ।)
-    const sentences = text.match(/[^.!?।\n]+[.!?।\n]*/g) || [text];
-    const chunks = [];
-    let current = '';
-    for (const s of sentences) {
-      if ((current + s).length > maxLen && current.length) {
-        chunks.push(current.trim());
-        current = s;
-      } else {
-        current += s;
-      }
-    }
-    if (current.trim()) chunks.push(current.trim());
-    return chunks.filter(Boolean);
-  }
-
-  /*
-   * bestVoiceForTag — find the best available voice for a lang tag.
-   * On mobile we skip this and rely on lang tag alone (more reliable).
-   * Returns null if nothing suitable found.
-   */
-  function bestVoiceForTag(langTag) {
-    if (!_cachedVoices.length) return null;
-    const chain = TTS_FALLBACK[langTag] || [langTag, langTag.split('-')[0], 'en-IN', 'en-US'];
-    for (const tag of chain) {
-      const base = tag.split('-')[0];
-      const v = _cachedVoices.find(v => v.lang === tag)
-             || _cachedVoices.find(v => v.lang.startsWith(base + '-'))
-             || _cachedVoices.find(v => v.lang.startsWith(base));
-      if (v) return v;
-    }
-    return null;
-  }
-
-  /* Keepalive timer ref — prevents Android Chrome 15-s stall */
-  let _ttsKeepalive = null;
-  function _startKeepalive() {
-    _stopKeepalive();
-    _ttsKeepalive = setInterval(() => {
-      const s = window.speechSynthesis;
-      if (s && s.speaking && !s.paused) { s.pause(); s.resume(); }
-    }, 10000);
-  }
-  function _stopKeepalive() {
-    if (_ttsKeepalive) { clearInterval(_ttsKeepalive); _ttsKeepalive = null; }
-  }
-
-  /*
-   * speakText — MUST be called synchronously inside a user gesture
-   * handler (click / touchstart). No setTimeout, no Promise wrapper.
-   *
-   * Strategy:
-   *  - Split text into sentence chunks
-   *  - Speak chunk[0] synchronously (preserves gesture chain)
-   *  - Chain remaining chunks via utter.onend
-   */
-  function speakText(text, lang, speakBtn) {
-    const synth = window.speechSynthesis;
-    if (!synth) return;
-
-    synth.cancel();
-    _stopKeepalive();
-    resetSpeakBtnUI();
-
-    const cleaned = cleanForTTS(text);
-    if (!cleaned) return;
-
-    const langTag   = TTS_LANG_TAG[lang] || 'hi-IN';
-    const chunks    = splitIntoChunks(cleaned, 180);
-    const toggleBtn = document.getElementById('kisanToggleBtn');
-
-    /* Update UI immediately */
-    if (speakBtn) {
-      currentSpeakBtn = speakBtn;
-      speechPaused    = false;
-      speakBtn.classList.remove('paused');
-      speakBtn.classList.add('speaking');
-      speakBtn.innerHTML = '<i class="fas fa-pause"></i>';
-      speakBtn.title = 'Pause';
-    }
-    if (toggleBtn) toggleBtn.innerHTML =
-      '<i class="fas fa-volume-up" style="color:#fff;font-size:1.3rem"></i><span class="kw-pulse"></span>';
-
-    const onAllDone = () => {
-      _stopKeepalive();
-      if (toggleBtn) toggleBtn.innerHTML =
-        '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
-      resetSpeakBtnUI();
+        stopSpeaking();
     };
 
-    /* Build utterance for one chunk, chaining to next on end */
-    function speakChunk(index) {
-      if (index >= chunks.length) { onAllDone(); return; }
+    /* ── Send message ────────────────────────── */
+    window.sendKisanMessage = async function() {
+        const input = getInput();
+        const text = (input ? input.value : '').trim();
+        if (!text || isBusy) return;
+        if (input) input.value = '';
 
-      const utter   = new SpeechSynthesisUtterance(chunks[index]);
-      utter.lang    = langTag;
-      utter.rate    = 0.88;
-      utter.pitch   = 1.0;
-      utter.volume  = 1.0;
+        // Auto-pick app lang if user types without choosing
+        if (!langChosen) {
+            langChosen = true;
+            chosenLang = localStorage.getItem('agrosmart_lang') || 'en';
+            const picker = document.getElementById('kisanLangPicker');
+            if (picker) picker.remove();
+            updateSubLabel(chosenLang);
+        }
 
-      /*
-       * Voice selection:
-       * MOBILE  — do NOT set utter.voice. Forces Android/iOS TTS
-       *           to use utter.lang, which works for all installed
-       *           languages including regional Indian languages.
-       *           Setting a voice object overrides lang → breaks
-       *           non-English/Bengali on most devices.
-       * DESKTOP — pick best matching voice from cached list so
-       *           the correct accent/engine is selected.
-       */
-      if (!isMobile) {
-        const voice = bestVoiceForTag(langTag);
-        if (voice) utter.voice = voice;
-      }
+        appendUser(text);
+        chatHistory.push({ role: 'user', content: text });
+        isBusy = true;
+        const tid = showTyping();
 
-      utter.onend   = () => { if (!speechPaused) speakChunk(index + 1); };
-      utter.onerror = (e) => {
-        if (e.error === 'interrupted' || e.error === 'canceled') return;
-        // On error for this chunk, try next chunk rather than stopping
-        speakChunk(index + 1);
-      };
+        try {
+            // Detect language change keywords in message
+            const msgLower = text.toLowerCase();
+            const langKeywords = {
+                'english': 'en',
+                'hindi': 'hi',
+                'bengali': 'bn',
+                'telugu': 'te',
+                'marathi': 'mr',
+                'tamil': 'ta',
+                'gujarati': 'gu',
+                'kannada': 'kn',
+                'malayalam': 'ml',
+                'punjabi': 'pa',
+                'odia': 'or',
+                'assamese': 'as',
+                'urdu': 'ur',
+                'nepali': 'ne',
+                'maithili': 'mai',
+                'sanskrit': 'sa',
+                'konkani': 'kok',
+                'manipuri': 'mni',
+                'meitei': 'mni',
+                'bodo': 'bodo',
+                'dogri': 'doi',
+                'santhali': 'sat',
+                'kashmiri': 'ks',
+                'sindhi': 'sd',
+                'हिंदी': 'hi',
+                'हिन्दी': 'hi',
+                'বাংলা': 'bn',
+                'తెలుగు': 'te',
+                'मराठी': 'mr',
+                'தமிழ்': 'ta',
+                'ગુજરાતી': 'gu',
+                'ಕನ್ನಡ': 'kn',
+                'മലയാളം': 'ml',
+                'ਪੰਜਾਬੀ': 'pa',
+                'ଓଡ଼ିଆ': 'or',
+                'অসমীয়া': 'as',
+                'اردو': 'ur',
+                'मैथिली': 'mai',
+                'संस्कृत': 'sa',
+                'कोंकणी': 'kok',
+                'डोगरी': 'doi',
+                'سنڌي': 'sd',
+                'كٲشُر': 'ks',
+            };
+            for (const [kw, code] of Object.entries(langKeywords)) {
+                if (msgLower.includes(kw)) {
+                    chosenLang = code;
+                    updateSubLabel(code);
+                    break;
+                }
+            }
 
-      synth.speak(utter);
+            const lang = getAppLang();
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messages: chatHistory, lang })
+            });
+
+            removeTyping(tid);
+
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                appendBot('⚠️ Server error: ' + (err.error || res.status) + '. Please try again.', false);
+                isBusy = false;
+                return;
+            }
+
+            const data = await res.json();
+            if (data.reply) {
+                chatHistory.push({ role: 'assistant', content: data.reply });
+                appendBot(data.reply, true);
+            } else {
+                appendBot('⚠️ ' + (data.error || 'No response received.'), false);
+            }
+        } catch (e) {
+            removeTyping(tid);
+            appendBot('⚠️ Connection error. Check your internet.', false);
+            console.error('[KisanHelper]', e);
+        }
+        isBusy = false;
+    };
+
+    /* ── Message renderers ───────────────────── */
+    function appendUser(text) {
+        const el = document.createElement('div');
+        el.className = 'kp-msg user';
+        el.textContent = text;
+        getMsgs().appendChild(el);
+        scrollBot();
     }
 
-    /* Speak first chunk synchronously — MUST stay in gesture call stack */
-    speakChunk(0);
+    function appendBot(text, animate) {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'kp-msg-wrapper';
+        wrapper.style.cssText = 'display:flex;flex-direction:column;align-self:flex-start;max-width:85%';
 
-    /* Start keepalive after gesture (safe — Android stall bug workaround) */
-    _startKeepalive();
-  }
+        const el = document.createElement('div');
+        el.className = 'kp-msg bot';
+        el.style.maxWidth = '100%';
 
-  function stopSpeaking() {
-    _stopKeepalive();
-    if (window.speechSynthesis) window.speechSynthesis.cancel();
-    const toggleBtn = document.getElementById('kisanToggleBtn');
-    if (toggleBtn) toggleBtn.innerHTML =
-      '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
-  }
+        // Speaker button row
+        const footer = document.createElement('div');
+        footer.className = 'kp-msg-footer';
 
-  /* ── Voice input ─────────────────────────── */
-  window.toggleKisanMic = function () {
-    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SR) { alert('Voice input not supported. Please use Chrome.'); return; }
-    if (isRecording) { if (recognition) recognition.stop(); return; }
+        const speakBtn = document.createElement('button');
+        speakBtn.className = 'kp-speak-btn';
+        speakBtn.title = 'Listen';
+        speakBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+        speakBtn.setAttribute('aria-label', 'Play / Pause voice');
 
-    recognition = new SR();
-    recognition.lang = VOICE_LANGS[getAppLang()] || 'hi-IN';
-    recognition.continuous     = false;
-    recognition.interimResults = true;
+        speakBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            const synth = window.speechSynthesis;
+            if (!synth) return;
 
-    const btn = document.getElementById('kisanMicBtn');
-    recognition.onstart  = () => {
-      isRecording = true;
-      btn.classList.add('recording');
-      btn.innerHTML = '<i class="fas fa-stop"></i>';
+            // This button is the active one and currently speaking → pause
+            if (currentSpeakBtn === speakBtn && synth.speaking && !synth.paused && !speechPaused) {
+                synth.pause();
+                speechPaused = true;
+                speakBtn.classList.remove('speaking');
+                speakBtn.classList.add('paused');
+                speakBtn.innerHTML = '<i class="fas fa-play"></i>';
+                speakBtn.title = 'Resume';
+                return;
+            }
+
+            // This button is the active one and paused → resume
+            if (currentSpeakBtn === speakBtn && (synth.paused || speechPaused)) {
+                synth.resume();
+                speechPaused = false;
+                speakBtn.classList.remove('paused');
+                speakBtn.classList.add('speaking');
+                speakBtn.innerHTML = '<i class="fas fa-pause"></i>';
+                speakBtn.title = 'Pause';
+                return;
+            }
+
+            // New message — cancel previous, start fresh
+            speakText(el.textContent, getAppLang(), speakBtn);
+        });
+
+        footer.appendChild(speakBtn);
+        wrapper.appendChild(el);
+        wrapper.appendChild(footer);
+        getMsgs().appendChild(wrapper);
+        scrollBot();
+
+        // Inside appendBot(), replace the animate block:
+        if (animate) {
+            typingAborted = false;
+            showStopBtn();
+            typeWriter(el, text, 0, () => {
+                // Speak only after typing animation ends
+                speakText(text, getAppLang(), speakBtn);
+            });
+        } else {
+            el.textContent = text;
+            scrollBot();
+        }
+    }
+
+    // Replace typeWriter function:
+    function typeWriter(el, text, i, onComplete) {
+        if (typingAborted) {
+            el.textContent = text;
+            typingAborted = false;
+            hideStopBtn();
+            scrollBot();
+            if (onComplete) onComplete();
+            return;
+        }
+        if (i < text.length) {
+            el.textContent += text[i];
+            scrollBot();
+            setTimeout(() => typeWriter(el, text, i + 1, onComplete), 18);
+        } else {
+            hideStopBtn();
+            if (onComplete) onComplete();
+        }
+    }
+
+    function showTyping() {
+        const id = 'kp-typing-' + Date.now();
+        const el = document.createElement('div');
+        el.className = 'kp-msg bot';
+        el.id = id;
+        el.innerHTML = '<div class="typing-dots"><span></span><span></span><span></span></div>';
+        getMsgs().appendChild(el);
+        scrollBot();
+        return id;
+    }
+
+    function removeTyping(id) {
+        const el = document.getElementById(id);
+        if (el) el.remove();
+    }
+    /* ── Reset any active speaker button to default ── */
+    function resetSpeakBtnUI() {
+        if (currentSpeakBtn) {
+            currentSpeakBtn.classList.remove('speaking', 'paused');
+            currentSpeakBtn.innerHTML = '<i class="fas fa-volume-up"></i>';
+            currentSpeakBtn.title = 'Listen';
+        }
+        currentSpeakBtn = null;
+        speechPaused = false;
+    }
+
+    /* ── Text-to-Speech ──────────────────────────── */
+    function speakText(text, lang, speakBtn) {
+        if (!window.speechSynthesis) return;
+
+        window.speechSynthesis.cancel();
+        resetSpeakBtnUI();
+
+        const cleaned = text
+            .replace(/[\u{1F300}-\u{1FFFF}]/gu, '')
+            .replace(/[⚠️✓•→]/g, '')
+            .replace(/\*/g, '')
+            .trim();
+
+        if (!cleaned) return;
+
+        const utter = new SpeechSynthesisUtterance(cleaned);
+        // Robust lang fallback
+        utter.lang = TTS_LANGS[lang] || 'hi-IN';
+        utter.rate = 0.88;
+        utter.pitch = 1.0;
+        utter.volume = 1.0;
+
+        // Update button immediately
+        if (speakBtn) {
+            currentSpeakBtn = speakBtn;
+            speechPaused = false;
+            speakBtn.classList.add('speaking');
+            speakBtn.innerHTML = '<i class="fas fa-pause"></i>';
+            speakBtn.title = 'Pause';
+        }
+
+        const toggleBtn = document.getElementById('kisanToggleBtn');
+        if (toggleBtn) {
+            toggleBtn.innerHTML = '<i class="fas fa-volume-up" style="color:#fff;font-size:1.3rem"></i><span class="kw-pulse"></span>';
+        }
+
+        const onDone = () => {
+            if (toggleBtn) {
+                toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
+            }
+            resetSpeakBtnUI();
+        };
+        utter.onend = onDone;
+        utter.onerror = onDone;
+
+        function findBestVoice(voices, langCode) {
+            const ttsLang = TTS_LANGS[langCode] || langCode;
+            const baseLang = ttsLang.split('-')[0]; // e.g. "bn" from "bn-IN"
+
+            // Priority 1: exact lang match + Indian/preferred accent
+            let v = voices.find(v =>
+                v.lang === ttsLang &&
+                (v.name.includes('India') || v.name.includes('IN') || v.name.toLowerCase().includes('bengali') || v.name.toLowerCase().includes('bangla'))
+            );
+            // Priority 2: exact lang match, any voice
+            if (!v) v = voices.find(v => v.lang === ttsLang);
+            // Priority 3: same base language, avoid wrong scripts
+            //   For Bengali (bn), explicitly block Assamese (as-IN) fallback
+            if (!v) {
+                v = voices.find(v => {
+                    if (!v.lang.startsWith(baseLang + '-')) return false;
+                    // Block Assamese from being used for Bengali
+                    if (baseLang === 'bn' && (v.lang === 'as-IN' || v.name.toLowerCase().includes('assamese'))) return false;
+                    return true;
+                });
+            }
+            // Priority 4: base lang loose match (still block Assamese for Bengali)
+            if (!v) {
+                v = voices.find(v => {
+                    if (!v.lang.startsWith(baseLang)) return false;
+                    if (baseLang === 'bn' && (v.lang === 'as-IN' || v.name.toLowerCase().includes('assamese'))) return false;
+                    return true;
+                });
+            }
+            // Priority 5: Hindi fallback for unsupported Indian languages
+            if (!v) v = voices.find(v => v.lang === 'hi-IN' || v.lang === 'hi');
+            // Priority 6: any available voice
+            if (!v && voices.length > 0) v = voices[0];
+            return v;
+        }
+
+        function doSpeak() {
+            const voices = window.speechSynthesis.getVoices();
+            const best = findBestVoice(voices, lang);
+            if (best) utter.voice = best;
+            window.speechSynthesis.speak(utter);
+        }
+
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length === 0) {
+            window.speechSynthesis.onvoiceschanged = () => {
+                window.speechSynthesis.onvoiceschanged = null;
+                doSpeak();
+            };
+        } else {
+            doSpeak();
+        }
+    }
+
+    function stopSpeaking() {
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+        resetSpeakBtnUI();
+        const toggleBtn = document.getElementById('kisanToggleBtn');
+        if (toggleBtn) {
+            toggleBtn.innerHTML = '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
+        }
+    }
+
+    /* ── Voice input ─────────────────────────── */
+    window.toggleKisanMic = function() {
+        const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!SR) { alert('Voice input not supported. Please use Chrome.'); return; }
+        if (isRecording) { if (recognition) recognition.stop(); return; }
+
+        recognition = new SR();
+        recognition.lang = VOICE_LANGS[getAppLang()] || 'hi-IN';
+        recognition.continuous = false;
+        recognition.interimResults = true;
+
+        const btn = document.getElementById('kisanMicBtn');
+        recognition.onstart = () => {
+            isRecording = true;
+            btn.classList.add('recording');
+            btn.innerHTML = '<i class="fas fa-stop"></i>';
+        };
+        recognition.onresult = e => {
+            if (getInput()) getInput().value = Array.from(e.results).map(r => r[0].transcript).join('');
+        };
+        recognition.onend = () => {
+            isRecording = false;
+            btn.classList.remove('recording');
+            btn.innerHTML = '<i class="fas fa-microphone"></i>';
+            const val = getInput() ? getInput().value.trim() : '';
+            if (val) sendKisanMessage();
+        };
+        recognition.onerror = () => {
+            isRecording = false;
+            btn.classList.remove('recording');
+            btn.innerHTML = '<i class="fas fa-microphone"></i>';
+        };
+        recognition.start();
     };
-    recognition.onresult = e => {
-      if (getInput()) getInput().value = Array.from(e.results).map(r => r[0].transcript).join('');
-    };
-    recognition.onend    = () => {
-      isRecording = false;
-      btn.classList.remove('recording');
-      btn.innerHTML = '<i class="fas fa-microphone"></i>';
-      const val = getInput() ? getInput().value.trim() : '';
-      if (val) sendKisanMessage();
-    };
-    recognition.onerror  = () => {
-      isRecording = false;
-      btn.classList.remove('recording');
-      btn.innerHTML = '<i class="fas fa-microphone"></i>';
-    };
-    recognition.start();
-  };
 
-  /* ── Sync with app language toggle ──────── */
-  const _orig = window.setLanguage;
-  window.setLanguage = function (code) {
-    if (_orig) _orig(code);
-    if (!langChosen) updateSubLabel(code);
-  };
+    /* ── Sync with app language toggle ──────── */
+    const _orig = window.setLanguage;
+    window.setLanguage = function(code) {
+        if (_orig) _orig(code);
+        if (!langChosen) updateSubLabel(code);
+    };
 
 })();
