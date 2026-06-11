@@ -1,7 +1,10 @@
 /* ═══════════════════════════════════════════════
    kisan-helper.js — Kisan Helper Voice+Chat Widget
    Fixed: UI overlap, AI not responding, stop btn,
-          new chat btn, lang detection
+          new chat btn, lang detection,
+          mobile TTS (iOS/Android user-gesture fix),
+          all 20 languages speak on tap/hover,
+          voice loading race condition
 ═══════════════════════════════════════════════ */
 (function() {
 
@@ -390,7 +393,7 @@
         ur: 'ur-PK',
         mai: 'hi-IN',
         ne: 'ne-NP',
-        sat: 'hi-IN',
+        sa: 'hi-IN',
         ks: 'ur-PK',
         sd: 'ur-PK',
         kok: 'mr-IN',
@@ -436,118 +439,239 @@
     };
 
     /* ── Language Picker ─────────────────────── */
-    /* Speaks the language name in that language's voice when hovered/tapped */
+
+    /*
+     * voicesReady() — robust cross-platform voice loader
+     * iOS/Safari: getVoices() returns [] until 'voiceschanged' fires
+     * Android Chrome WebView: 'voiceschanged' sometimes never fires → poll fallback
+     * Returns a Promise<SpeechSynthesisVoice[]>
+     */
+    function voicesReady() {
+        return new Promise(function(resolve) {
+            var voices = window.speechSynthesis.getVoices();
+            if (voices.length > 0) { resolve(voices); return; }
+
+            var attempts = 0;
+            var maxAttempts = 20; // poll up to 2 seconds
+            var done = false;
+
+            function finish(v) {
+                if (done) return;
+                done = true;
+                resolve(v);
+            }
+
+            // Event-based (works on desktop, some mobile)
+            window.speechSynthesis.onvoiceschanged = function() {
+                window.speechSynthesis.onvoiceschanged = null;
+                finish(window.speechSynthesis.getVoices());
+            };
+
+            // Polling fallback (Android WebView, some iOS)
+            var poll = setInterval(function() {
+                attempts++;
+                var v = window.speechSynthesis.getVoices();
+                if (v.length > 0) { clearInterval(poll);
+                    finish(v); return; }
+                if (attempts >= maxAttempts) { clearInterval(poll);
+                    finish([]); }
+            }, 100);
+        });
+    }
+
+    /*
+     * bestVoiceForLang() — full priority chain, same logic as findBestVoice in speakText
+     * Works for ALL 20 languages including Maithili, Bodo, Dogri, Konkani, Manipuri
+     * (those fall back to Hindi/Bengali/Marathi gracefully)
+     */
+    function bestVoiceForLang(voices, code) {
+        var ttsLang = TTS_LANGS[code] || VOICE_LANGS[code] || 'hi-IN';
+        var base = ttsLang.split('-')[0];
+
+        // 1. Exact lang + Indian/preferred accent by name
+        var v = voices.find(function(x) {
+            return x.lang === ttsLang &&
+                (x.name.includes('India') || x.name.includes('IN') ||
+                    x.name.toLowerCase().includes(base));
+        });
+        // 2. Exact lang, any voice
+        if (!v) v = voices.find(function(x) { return x.lang === ttsLang; });
+        // 3. Same base lang region variant (block as-IN for bn)
+        if (!v) v = voices.find(function(x) {
+            if (!x.lang.startsWith(base + '-')) return false;
+            if (base === 'bn' && (x.lang === 'as-IN' || x.name.toLowerCase().includes('assamese'))) return false;
+            return true;
+        });
+        // 4. Loose base match
+        if (!v) v = voices.find(function(x) {
+            if (!x.lang.startsWith(base)) return false;
+            if (base === 'bn' && (x.lang === 'as-IN' || x.name.toLowerCase().includes('assamese'))) return false;
+            return true;
+        });
+        // 5. Hindi fallback for unsupported Indian scripts
+        if (!v) v = voices.find(function(x) { return x.lang === 'hi-IN' || x.lang === 'hi'; });
+        // 6. Any available voice — user will hear SOMETHING
+        if (!v && voices.length > 0) v = voices[0];
+        return v;
+    }
+
+    /*
+     * speakLangName() — must be called from a synchronous click/touchend handler
+     * so the browser treats it as a user-gesture for autoplay policy.
+     * We pre-load voices asynchronously but call .speak() inside the gesture handler.
+     */
     function speakLangName(code, name, btn) {
         if (!window.speechSynthesis) return;
-        window.speechSynthesis.cancel();
 
-        // Clear any previously speaking lang button
-        document.querySelectorAll('.kp-lang-opt.kl-speaking').forEach(el => el.classList.remove('kl-speaking'));
+        // Cancel any ongoing speech
+        try { window.speechSynthesis.cancel(); } catch (e) {}
 
-        const utter = new SpeechSynthesisUtterance(name);
+        // Clear previously highlighted button
+        document.querySelectorAll('.kp-lang-opt.kl-speaking')
+            .forEach(function(el) { el.classList.remove('kl-speaking'); });
+
+        var utter = new SpeechSynthesisUtterance(name);
         utter.lang = TTS_LANGS[code] || VOICE_LANGS[code] || 'hi-IN';
-        utter.rate = 0.9;
+        utter.rate = 0.88;
         utter.pitch = 1.0;
         utter.volume = 1.0;
 
         if (btn) btn.classList.add('kl-speaking');
-        utter.onend = () => { if (btn) btn.classList.remove('kl-speaking'); };
-        utter.onerror = () => { if (btn) btn.classList.remove('kl-speaking'); };
+        utter.onend = function() { if (btn) btn.classList.remove('kl-speaking'); };
+        utter.onerror = function() { if (btn) btn.classList.remove('kl-speaking'); };
 
-        function doSpeakLang() {
-            const voices = window.speechSynthesis.getVoices();
-            const ttsLang = TTS_LANGS[code] || VOICE_LANGS[code] || 'hi-IN';
-            const baseLang = ttsLang.split('-')[0];
-            let v = voices.find(v => v.lang === ttsLang);
-            if (!v) v = voices.find(v => v.lang.startsWith(baseLang + '-'));
-            if (!v) v = voices.find(v => v.lang.startsWith(baseLang));
-            if (!v && voices.length > 0) v = voices[0];
-            if (v) utter.voice = v;
-            window.speechSynthesis.speak(utter);
-        }
+        /*
+         * CRITICAL for iOS/Android: call .speak() synchronously first
+         * (satisfies user-gesture requirement), then set the best voice
+         * after voices are loaded. The utterance will already be queued.
+         */
+        window.speechSynthesis.speak(utter);
 
-        const voices = window.speechSynthesis.getVoices();
-        if (voices.length === 0) {
-            window.speechSynthesis.onvoiceschanged = () => {
-                window.speechSynthesis.onvoiceschanged = null;
-                doSpeakLang();
-            };
-        } else {
-            doSpeakLang();
-        }
+        // Upgrade voice once voices are ready (improves quality but not required)
+        voicesReady().then(function(voices) {
+            var best = bestVoiceForLang(voices, code);
+            if (best && !utter.voice) {
+                // Can only change voice before speech starts; try cancel + re-speak
+                // Only do this if not already speaking this utterance
+                if (!window.speechSynthesis.speaking) {
+                    utter.voice = best;
+                    window.speechSynthesis.speak(utter);
+                }
+            }
+        });
     }
 
     function showLangPicker() {
-        // Remove existing picker first
-        const old = document.getElementById('kisanLangPicker');
+        var old = document.getElementById('kisanLangPicker');
         if (old) old.remove();
 
-        const appLang = localStorage.getItem('agrosmart_lang') || 'en';
-        const q = LANG_QUESTION[appLang] || LANG_QUESTION.default;
+        var appLang = localStorage.getItem('agrosmart_lang') || 'en';
+        var q = LANG_QUESTION[appLang] || LANG_QUESTION.default;
 
-        const picker = document.createElement('div');
+        var picker = document.createElement('div');
         picker.className = 'kp-lang-picker';
         picker.id = 'kisanLangPicker';
 
-        const label = document.createElement('p');
+        var label = document.createElement('p');
         label.textContent = q;
         picker.appendChild(label);
 
-        const grid = document.createElement('div');
+        var grid = document.createElement('div');
         grid.className = 'kp-lang-options';
 
-        Object.entries(LANG_NAMES).forEach(([code, name]) => {
-            const btn = document.createElement('div');
+        Object.entries(LANG_NAMES).forEach(function(entry) {
+            var code = entry[0],
+                name = entry[1];
+
+            var btn = document.createElement('div');
             btn.className = 'kp-lang-opt';
             btn.textContent = name;
             btn.setAttribute('role', 'button');
             btn.setAttribute('aria-label', name);
             btn.setAttribute('tabindex', '0');
 
-            let speakTimer = null;
+            var speakTimer = null;
+            var isTouchDevice = false;
 
-            // Desktop: speak on mouseenter (with tiny delay to avoid accidental triggers)
-            btn.addEventListener('mouseenter', () => {
-                speakTimer = setTimeout(() => speakLangName(code, name, btn), 150);
+            /* ── Desktop: hover-to-preview ── */
+            btn.addEventListener('mouseenter', function() {
+                if (isTouchDevice) return; // suppress mouse events on touch devices
+                speakTimer = setTimeout(function() {
+                    speakLangName(code, name, btn);
+                }, 180);
             });
-            btn.addEventListener('mouseleave', () => {
+            btn.addEventListener('mouseleave', function() {
                 if (speakTimer) { clearTimeout(speakTimer);
                     speakTimer = null; }
             });
 
-            // Mobile: speak immediately on touchstart, then pick on touchend (no scroll)
-            let touchMoved = false;
-            btn.addEventListener('touchstart', (e) => {
-                touchMoved = false;
-                speakLangName(code, name, btn);
+            /* ── Mobile: touch-to-preview, release-to-pick ──
+             *
+             * iOS/Android autoplay policy: speechSynthesis.speak() MUST be called
+             * synchronously inside a touchend or click handler — NOT touchstart.
+             *
+             * Strategy:
+             *   touchstart  → mark that touch began, record position
+             *   touchmove   → if moved >10px, mark as scroll (don't act)
+             *   touchend    → if not a scroll: speak name, then pick after 600ms
+             *                 so user hears the name before the picker closes
+             *   click       → only fires on desktop (we prevent touchend default)
+             */
+            var touchStartX = 0,
+                touchStartY = 0,
+                touchScrolled = false;
+
+            btn.addEventListener('touchstart', function(e) {
+                isTouchDevice = true;
+                touchScrolled = false;
+                touchStartX = e.touches[0].clientX;
+                touchStartY = e.touches[0].clientY;
             }, { passive: true });
-            btn.addEventListener('touchmove', () => { touchMoved = true; }, { passive: true });
-            btn.addEventListener('touchend', (e) => {
-                if (!touchMoved) {
-                    e.preventDefault();
-                    // Small delay so speech starts before the picker is removed
-                    setTimeout(() => pickKisanLang(code), 300);
-                }
+
+            btn.addEventListener('touchmove', function(e) {
+                var dx = Math.abs(e.touches[0].clientX - touchStartX);
+                var dy = Math.abs(e.touches[0].clientY - touchStartY);
+                if (dx > 10 || dy > 10) touchScrolled = true;
+            }, { passive: true });
+
+            btn.addEventListener('touchend', function(e) {
+                if (touchScrolled) return; // user was scrolling, ignore
+                e.preventDefault(); // prevent ghost click
+
+                // Speak the language name (called from user-gesture = works on iOS/Android)
+                speakLangName(code, name, btn);
+
+                // Pick language after a short delay so the name plays first
+                setTimeout(function() { window.pickKisanLang(code); }, 650);
+            }, { passive: false });
+
+            /* Desktop click — also handles keyboard Enter */
+            btn.addEventListener('click', function() {
+                if (isTouchDevice) return; // already handled by touchend
+                speakLangName(code, name, btn);
+                setTimeout(function() { window.pickKisanLang(code); }, 650);
             });
 
-            // Click (desktop / keyboard)
-            btn.addEventListener('click', () => pickKisanLang(code));
-            btn.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') pickKisanLang(code); });
+            btn.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    speakLangName(code, name, btn);
+                    setTimeout(function() { window.pickKisanLang(code); }, 650);
+                }
+            });
 
             grid.appendChild(btn);
         });
 
         picker.appendChild(grid);
 
-        const skip = document.createElement('div');
+        var skip = document.createElement('div');
         skip.className = 'kp-lang-skip';
-        skip.textContent = `Skip — use app language (${LANG_NAMES[appLang] || appLang})`;
-        skip.addEventListener('click', () => pickKisanLang(appLang));
+        skip.textContent = 'Skip \u2014 use app language (' + (LANG_NAMES[appLang] || appLang) + ')';
+        skip.addEventListener('click', function() { window.pickKisanLang(appLang); });
         picker.appendChild(skip);
 
-
-
-        const inputBar = document.querySelector('.kp-input-bar');
+        var inputBar = document.querySelector('.kp-input-bar');
         if (inputBar && inputBar.parentNode) {
             inputBar.parentNode.insertBefore(picker, inputBar);
         }
@@ -829,7 +953,7 @@
     function speakText(text, lang, speakBtn) {
         if (!window.speechSynthesis) return;
 
-        window.speechSynthesis.cancel();
+        try { window.speechSynthesis.cancel(); } catch (e) {}
         resetSpeakBtnUI();
 
         const cleaned = text
@@ -841,13 +965,11 @@
         if (!cleaned) return;
 
         const utter = new SpeechSynthesisUtterance(cleaned);
-        // Robust lang fallback
         utter.lang = TTS_LANGS[lang] || 'hi-IN';
         utter.rate = 0.88;
         utter.pitch = 1.0;
         utter.volume = 1.0;
 
-        // Update button immediately
         if (speakBtn) {
             currentSpeakBtn = speakBtn;
             speechPaused = false;
@@ -870,57 +992,28 @@
         utter.onend = onDone;
         utter.onerror = onDone;
 
-        function findBestVoice(voices, langCode) {
-            const ttsLang = TTS_LANGS[langCode] || langCode;
-            const baseLang = ttsLang.split('-')[0]; // e.g. "bn" from "bn-IN"
-
-            // Priority 1: exact lang match + Indian/preferred accent
-            let v = voices.find(v =>
-                v.lang === ttsLang &&
-                (v.name.includes('India') || v.name.includes('IN') || v.name.toLowerCase().includes('bengali') || v.name.toLowerCase().includes('bangla'))
-            );
-            // Priority 2: exact lang match, any voice
-            if (!v) v = voices.find(v => v.lang === ttsLang);
-            // Priority 3: same base language, avoid wrong scripts
-            //   For Bengali (bn), explicitly block Assamese (as-IN) fallback
-            if (!v) {
-                v = voices.find(v => {
-                    if (!v.lang.startsWith(baseLang + '-')) return false;
-                    // Block Assamese from being used for Bengali
-                    if (baseLang === 'bn' && (v.lang === 'as-IN' || v.name.toLowerCase().includes('assamese'))) return false;
-                    return true;
-                });
-            }
-            // Priority 4: base lang loose match (still block Assamese for Bengali)
-            if (!v) {
-                v = voices.find(v => {
-                    if (!v.lang.startsWith(baseLang)) return false;
-                    if (baseLang === 'bn' && (v.lang === 'as-IN' || v.name.toLowerCase().includes('assamese'))) return false;
-                    return true;
-                });
-            }
-            // Priority 5: Hindi fallback for unsupported Indian languages
-            if (!v) v = voices.find(v => v.lang === 'hi-IN' || v.lang === 'hi');
-            // Priority 6: any available voice
-            if (!v && voices.length > 0) v = voices[0];
-            return v;
-        }
-
-        function doSpeak() {
-            const voices = window.speechSynthesis.getVoices();
-            const best = findBestVoice(voices, lang);
+        /*
+         * iOS/Android REQUIRE .speak() to be called synchronously inside a user gesture.
+         * We call it immediately (no voice set yet = browser default voice),
+         * then voicesReady() resolves and we cancel + re-speak with the best voice.
+         * If a voice is already available synchronously, we set it before first speak.
+         */
+        const immediateVoices = window.speechSynthesis.getVoices();
+        if (immediateVoices.length > 0) {
+            const best = bestVoiceForLang(immediateVoices, lang);
             if (best) utter.voice = best;
             window.speechSynthesis.speak(utter);
-        }
-
-        const voices = window.speechSynthesis.getVoices();
-        if (voices.length === 0) {
-            window.speechSynthesis.onvoiceschanged = () => {
-                window.speechSynthesis.onvoiceschanged = null;
-                doSpeak();
-            };
         } else {
-            doSpeak();
+            // Speak now (satisfies user gesture), upgrade voice when ready
+            window.speechSynthesis.speak(utter);
+            voicesReady().then(function(voices) {
+                var best = bestVoiceForLang(voices, lang);
+                if (best && !utter.voice && !window.speechSynthesis.speaking) {
+                    utter.voice = best;
+                    window.speechSynthesis.cancel();
+                    window.speechSynthesis.speak(utter);
+                }
+            });
         }
     }
 
