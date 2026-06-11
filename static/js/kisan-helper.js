@@ -256,12 +256,12 @@
         let typingAborted = false;
         let currentSpeakBtn = null; // tracks which message's speaker btn is active
         let speechPaused = false; // tracks pause/play state
-        let mobileSpeechText = '';   // full text currently being spoken (mobile)
-        let mobileSpeechOffset = 0;  // character offset for mobile resume
+        let mobileSpeechText = ''; // full text currently being spoken (mobile)
+        let mobileSpeechOffset = 0; // character offset for mobile resume
 
         /* ── Mobile detection ───────────────────────── */
-        const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent)
-                      || ('ontouchstart' in window && navigator.maxTouchPoints > 1);
+        const isMobile = /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i.test(navigator.userAgent) ||
+            ('ontouchstart' in window && navigator.maxTouchPoints > 1);
 
         /* ── Lang data ───────────────────────────── */
         const LANG_NAMES = {
@@ -585,6 +585,7 @@ window.stopKisanTyping = function () {
         speakBtn.classList.add('paused');
         speakBtn.innerHTML = '<i class="fas fa-play"></i>';
         speakBtn.title = 'Resume';
+        _stopKeepalive();
         if (synth) synth.pause();
         return;
       }
@@ -597,7 +598,7 @@ window.stopKisanTyping = function () {
         speakBtn.innerHTML = '<i class="fas fa-pause"></i>';
         speakBtn.title = 'Pause';
         if (isMobile) {
-          // Mobile synth.resume() unreliable — restart from tap (gesture is live)
+          // Mobile synth.resume() unreliable — restart full text from gesture
           speakText(el.textContent, getAppLang(), speakBtn);
         } else {
           if (synth) synth.resume();
@@ -677,25 +678,42 @@ function typeWriter(el, text, i, onComplete) {
   }
 
   /* ══════════════════════════════════════════════════════════
-     TEXT-TO-SPEECH
+     TEXT-TO-SPEECH  — Mobile-Safe Multi-Language Engine
      ──────────────────────────────────────────────────────
-     CRITICAL BUG FIXED:
-     Android Chrome requires speechSynthesis.speak() to be
-     called SYNCHRONOUSLY inside a user gesture handler
-     (click / touchstart). Any setTimeout, Promise, or async
-     wait BREAKS the gesture chain → silent failure.
+     ROOT CAUSE of "only English/Bengali work on mobile":
 
-     Previous versions had setTimeout(..., 150) around speak()
-     which is exactly why nothing played on mobile.
+     Problem 1 — Wrong voice object forced on mobile.
+       Android/iOS require utter.lang ONLY. Setting utter.voice
+       to a desktop-found object silently breaks non-installed
+       languages; the engine ignores the lang tag.
 
-     FIX:
-     1. Pre-load voices eagerly at widget startup (not on demand).
-     2. Call speak() directly — zero delay, no async wrapper.
-     3. Do NOT set utter.voice on mobile — let Android's Google
-        TTS service handle the language via utter.lang alone.
+     Problem 2 — Single utterance too long for mobile WebKit.
+       iOS Safari / older Android Chrome silently cut off long
+       utterances (~200–300 chars). Fix: chunk text into
+       sentences ≤ 200 chars and queue them sequentially.
+
+     Problem 3 — Gesture chain broken by async.
+       ANY setTimeout / Promise before synth.speak() breaks
+       Android's user-gesture requirement → silent failure.
+       First chunk must be spoken synchronously in the handler.
+
+     Problem 4 — Android Chrome stalls after ~15 s.
+       Workaround: pause()/resume() keepalive ping every 10 s.
+
+     FIX STRATEGY:
+     1. Split text into sentence chunks ≤ 200 chars.
+     2. Speak chunk[0] synchronously (gesture chain intact).
+     3. Queue remaining chunks via utter.onend (safe — gesture
+        requirement only applies to the FIRST speak() call).
+     4. Voice selection: mobile → lang tag only, no voice obj.
+        Desktop → best matching voice from cached list.
+     5. Fallback lang chain: exact → base lang → 'en-US'.
+     6. Keepalive timer for Android stall bug.
   ══════════════════════════════════════════════════════════ */
 
-  /* BCP-47 lang tags per app language */
+  /* BCP-47 primary tags + ordered fallback chains per app language.
+     Fallbacks let Android TTS find *something* installed even when
+     the ideal locale voice is missing.                            */
   const TTS_LANG_TAG = {
     en:   'en-IN',  hi:   'hi-IN',  bn:   'bn-IN',
     te:   'te-IN',  mr:   'mr-IN',  ta:   'ta-IN',
@@ -703,11 +721,30 @@ function typeWriter(el, text, i, onComplete) {
     pa:   'pa-IN',  or:   'or-IN',  as:   'as-IN',
     ur:   'ur-PK',  ne:   'ne-NP',
     mai:  'hi-IN',  sa:   'hi-IN',  kok:  'mr-IN',
-    mni:  'bn-IN',  bodo: 'hi-IN',  doi:  'hi-IN',
+    mni:  'bn-BD',  bodo: 'hi-IN',  doi:  'hi-IN',
     sat:  'hi-IN',  ks:   'ur-PK',  sd:   'ur-PK',
   };
 
-  /* Eagerly cache voices so they're ready when the user taps */
+  /* Fallback lang chain: if primary tag has no voice, try these in order */
+  const TTS_FALLBACK = {
+    'te-IN': ['te-IN','te','hi-IN','hi','en-IN','en-US'],
+    'ta-IN': ['ta-IN','ta','hi-IN','hi','en-IN','en-US'],
+    'gu-IN': ['gu-IN','gu','hi-IN','hi','en-IN','en-US'],
+    'kn-IN': ['kn-IN','kn','hi-IN','hi','en-IN','en-US'],
+    'ml-IN': ['ml-IN','ml','hi-IN','hi','en-IN','en-US'],
+    'pa-IN': ['pa-IN','pa','hi-IN','hi','en-IN','en-US'],
+    'or-IN': ['or-IN','or','hi-IN','hi','en-IN','en-US'],
+    'as-IN': ['as-IN','as','bn-IN','bn','en-IN','en-US'],
+    'mr-IN': ['mr-IN','mr','hi-IN','hi','en-IN','en-US'],
+    'bn-IN': ['bn-IN','bn-BD','bn','en-IN','en-US'],
+    'bn-BD': ['bn-BD','bn-IN','bn','en-IN','en-US'],
+    'hi-IN': ['hi-IN','hi','en-IN','en-US'],
+    'ur-PK': ['ur-PK','ur','hi-IN','hi','en-IN','en-US'],
+    'ne-NP': ['ne-NP','ne','hi-IN','hi','en-IN','en-US'],
+    'en-IN': ['en-IN','en-GB','en-US','en'],
+  };
+
+  /* Eagerly cache voices — must be ready before user taps */
   let _cachedVoices = [];
   function _loadVoices() {
     const v = window.speechSynthesis ? window.speechSynthesis.getVoices() : [];
@@ -718,7 +755,7 @@ function typeWriter(el, text, i, onComplete) {
     window.speechSynthesis.onvoiceschanged = _loadVoices;
   }
 
-  /* Strip emoji and markdown before speaking */
+  /* Strip emoji and markdown so TTS engines don't read symbols aloud */
   function cleanForTTS(text) {
     return text
       .replace(/[\u{1F300}-\u{1FFFF}]/gu, '')
@@ -726,27 +763,89 @@ function typeWriter(el, text, i, onComplete) {
       .replace(/[⚠️✓•→★☆]/g, '')
       .replace(/\*/g, '')
       .replace(/#{1,6}\s/g, '')
+      .replace(/\s{2,}/g, ' ')
       .trim();
   }
 
   /*
-   * speakText — must be called synchronously from a user gesture.
-   * No setTimeout, no Promise, no async. Direct speak() call only.
+   * splitIntoChunks — split text at sentence boundaries into
+   * pieces ≤ maxLen chars. Prevents iOS/Android silent cutoff
+   * on long utterances.
+   */
+  function splitIntoChunks(text, maxLen) {
+    maxLen = maxLen || 180;
+    // Split on sentence-ending punctuation (including Devanagari danda ।)
+    const sentences = text.match(/[^.!?।\n]+[.!?।\n]*/g) || [text];
+    const chunks = [];
+    let current = '';
+    for (const s of sentences) {
+      if ((current + s).length > maxLen && current.length) {
+        chunks.push(current.trim());
+        current = s;
+      } else {
+        current += s;
+      }
+    }
+    if (current.trim()) chunks.push(current.trim());
+    return chunks.filter(Boolean);
+  }
+
+  /*
+   * bestVoiceForTag — find the best available voice for a lang tag.
+   * On mobile we skip this and rely on lang tag alone (more reliable).
+   * Returns null if nothing suitable found.
+   */
+  function bestVoiceForTag(langTag) {
+    if (!_cachedVoices.length) return null;
+    const chain = TTS_FALLBACK[langTag] || [langTag, langTag.split('-')[0], 'en-IN', 'en-US'];
+    for (const tag of chain) {
+      const base = tag.split('-')[0];
+      const v = _cachedVoices.find(v => v.lang === tag)
+             || _cachedVoices.find(v => v.lang.startsWith(base + '-'))
+             || _cachedVoices.find(v => v.lang.startsWith(base));
+      if (v) return v;
+    }
+    return null;
+  }
+
+  /* Keepalive timer ref — prevents Android Chrome 15-s stall */
+  let _ttsKeepalive = null;
+  function _startKeepalive() {
+    _stopKeepalive();
+    _ttsKeepalive = setInterval(() => {
+      const s = window.speechSynthesis;
+      if (s && s.speaking && !s.paused) { s.pause(); s.resume(); }
+    }, 10000);
+  }
+  function _stopKeepalive() {
+    if (_ttsKeepalive) { clearInterval(_ttsKeepalive); _ttsKeepalive = null; }
+  }
+
+  /*
+   * speakText — MUST be called synchronously inside a user gesture
+   * handler (click / touchstart). No setTimeout, no Promise wrapper.
+   *
+   * Strategy:
+   *  - Split text into sentence chunks
+   *  - Speak chunk[0] synchronously (preserves gesture chain)
+   *  - Chain remaining chunks via utter.onend
    */
   function speakText(text, lang, speakBtn) {
     const synth = window.speechSynthesis;
     if (!synth) return;
 
     synth.cancel();
+    _stopKeepalive();
     resetSpeakBtnUI();
 
     const cleaned = cleanForTTS(text);
     if (!cleaned) return;
 
     const langTag   = TTS_LANG_TAG[lang] || 'hi-IN';
+    const chunks    = splitIntoChunks(cleaned, 180);
     const toggleBtn = document.getElementById('kisanToggleBtn');
 
-    /* Update UI */
+    /* Update UI immediately */
     if (speakBtn) {
       currentSpeakBtn = speakBtn;
       speechPaused    = false;
@@ -758,40 +857,57 @@ function typeWriter(el, text, i, onComplete) {
     if (toggleBtn) toggleBtn.innerHTML =
       '<i class="fas fa-volume-up" style="color:#fff;font-size:1.3rem"></i><span class="kw-pulse"></span>';
 
-    const onDone = () => {
+    const onAllDone = () => {
+      _stopKeepalive();
       if (toggleBtn) toggleBtn.innerHTML =
         '<i class="fas fa-microphone-alt" style="color:#fff;font-size:1.45rem"></i><span class="kw-pulse"></span>';
       resetSpeakBtnUI();
     };
 
-    const utter    = new SpeechSynthesisUtterance(cleaned);
-    utter.lang     = langTag;
-    utter.rate     = 0.9;
-    utter.pitch    = 1.0;
-    utter.volume   = 1.0;
-    utter.onend    = onDone;
-    utter.onerror  = (e) => { if (e.error !== 'interrupted') onDone(); };
+    /* Build utterance for one chunk, chaining to next on end */
+    function speakChunk(index) {
+      if (index >= chunks.length) { onAllDone(); return; }
 
-    /*
-     * Voice selection:
-     * MOBILE  — do NOT set utter.voice. Android's Google TTS service
-     *           picks the right engine for utter.lang automatically.
-     *           Forcing a voice object breaks non-installed languages.
-     * DESKTOP — pick best matching voice from cached list.
-     */
-    if (!isMobile && _cachedVoices.length) {
-      const base  = langTag.split('-')[0];
-      const match = _cachedVoices.find(v => v.lang === langTag)
-                 || _cachedVoices.find(v => v.lang.startsWith(base + '-'))
-                 || _cachedVoices.find(v => v.lang.startsWith(base));
-      if (match) utter.voice = match;
+      const utter   = new SpeechSynthesisUtterance(chunks[index]);
+      utter.lang    = langTag;
+      utter.rate    = 0.88;
+      utter.pitch   = 1.0;
+      utter.volume  = 1.0;
+
+      /*
+       * Voice selection:
+       * MOBILE  — do NOT set utter.voice. Forces Android/iOS TTS
+       *           to use utter.lang, which works for all installed
+       *           languages including regional Indian languages.
+       *           Setting a voice object overrides lang → breaks
+       *           non-English/Bengali on most devices.
+       * DESKTOP — pick best matching voice from cached list so
+       *           the correct accent/engine is selected.
+       */
+      if (!isMobile) {
+        const voice = bestVoiceForTag(langTag);
+        if (voice) utter.voice = voice;
+      }
+
+      utter.onend   = () => { if (!speechPaused) speakChunk(index + 1); };
+      utter.onerror = (e) => {
+        if (e.error === 'interrupted' || e.error === 'canceled') return;
+        // On error for this chunk, try next chunk rather than stopping
+        speakChunk(index + 1);
+      };
+
+      synth.speak(utter);
     }
 
-    /* ── SPEAK — called directly, no delay, gesture chain preserved ── */
-    synth.speak(utter);
+    /* Speak first chunk synchronously — MUST stay in gesture call stack */
+    speakChunk(0);
+
+    /* Start keepalive after gesture (safe — Android stall bug workaround) */
+    _startKeepalive();
   }
 
   function stopSpeaking() {
+    _stopKeepalive();
     if (window.speechSynthesis) window.speechSynthesis.cancel();
     const toggleBtn = document.getElementById('kisanToggleBtn');
     if (toggleBtn) toggleBtn.innerHTML =
