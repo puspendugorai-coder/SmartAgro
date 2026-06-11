@@ -1,193 +1,284 @@
-let allMarketData  = {};
-let marketChart    = null;
-let activeChartType = 'line';
-let activeFilter   = 'all';
+let allMarkets   = {};
+let chartInst    = null;
+let currentFilter = 'all';
+let currentSearch = '';
+let dataSource   = 'indicative';
 
-document.addEventListener('DOMContentLoaded', () => { loadMarkets(); setupSearch(); });
+document.addEventListener('DOMContentLoaded', loadMarket);
 
-async function loadMarkets() {
+async function loadMarket() {
   try {
     const res  = await fetch('/api/market');
     const data = await res.json();
-    allMarketData = data.markets || {};
-    document.getElementById('marketLoading').style.display='none';
-    document.getElementById('marketCitiesGrid').style.display='';
-    renderGrid(allMarketData);
-    buildTicker(allMarketData);
-    buildTable(allMarketData);
-    buildChart(allMarketData,'Delhi','line');
-  } catch(err) {
-    document.getElementById('marketLoading').innerHTML='<p style="color:var(--red)">Could not load prices. Please refresh.</p>';
+    allMarkets = data.markets || {};
+    dataSource = data.data_source || 'indicative';
+
+    const lastUpdated = data.last_updated || '';
+    updateSourceBadge(dataSource, lastUpdated);
+    buildTicker();
+    renderCitiesGrid(allMarkets);
+    buildPriceTable(allMarkets);
+    initChart(allMarkets);
+  } catch (e) {
+    console.error('[Market]', e);
+    document.getElementById('marketLoading').innerHTML =
+      '<p style="color:var(--red)">Could not load market data. Please refresh.</p>';
   }
 }
 
-function renderGrid(markets) {
-  const grid = document.getElementById('marketCitiesGrid');
-  const none = document.getElementById('noResults');
-  if (!grid) return;
-  const entries = Object.entries(markets);
-  if (!entries.length) { grid.style.display='none'; if(none) none.style.display=''; return; }
-  if (none) none.style.display='none';
-  grid.innerHTML = entries.map(([city,crops],ci) => {
-    let filtered = crops;
-    if (activeFilter==='Very High') filtered=crops.filter(c=>c.demand==='Very High');
-    else if (activeFilter==='rising') filtered=crops.filter(c=>c.change>0);
-    else if (activeFilter==='falling') filtered=crops.filter(c=>c.change<0);
-    if (!filtered.length) return '';
-    return `<div class="city-card" style="animation-delay:${ci*0.06}s">
-      <div class="city-card-header">
-        <div class="city-name"><i class="fas fa-location-dot"></i> ${city}</div>
-        <span class="city-count">${filtered.length} crops</span>
-      </div>
-      <div class="crop-rows">
-        <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 80px;padding:8px 16px;font-size:0.68rem;color:var(--text-3);font-weight:700;text-transform:uppercase;border-bottom:1px solid var(--border)">
-          <span>Crop</span><span>Mandi</span><span>MSP</span><span>Change</span>
-        </div>
-        ${filtered.map(crop=>`
-          <div class="crop-row">
-            <div class="cr-name">${crop.crop}</div>
-            <div>
-              <div class="cr-price ${crop.above_msp?'above-msp':'below-msp'}">₹${crop.price.toLocaleString('en-IN')}</div>
-              <div class="cr-unit">per quintal</div>
-            </div>
-            <div>
-              <div class="cr-msp">₹${crop.msp.toLocaleString('en-IN')}</div>
-              <div class="cr-unit">MSP</div>
-            </div>
-            <div class="cr-change ${crop.change>=0?'up':'down'}">
-              <i class="fas fa-arrow-${crop.change>=0?'up':'down'}"></i>
-              ${Math.abs(crop.change).toFixed(1)}%
-            </div>
-          </div>`).join('')}
-      </div>
-    </div>`;
-  }).join('');
-  setTimeout(()=>observeAnimations(),100);
+function updateSourceBadge(source, updated) {
+  const badge = document.getElementById('dataSourceBadge');
+  const time  = document.getElementById('lastUpdated');
+  if (badge) {
+    if (source === 'live') {
+      badge.textContent   = 'LIVE DATA';
+      badge.style.background = 'var(--green)';
+      badge.style.color      = '#fff';
+    } else {
+      badge.textContent   = 'INDICATIVE';
+      badge.style.background = 'var(--amber-light)';
+      badge.style.color      = 'var(--amber)';
+    }
+  }
+  if (time && updated) time.textContent = 'Updated: ' + updated;
 }
 
-async function searchLocation() {
-  const input = document.getElementById('locationSearch');
-  const query = input?.value.trim();
-  if (!query) { clearSearch(); return; }
-  document.getElementById('clearSearchBtn').style.display='flex';
-  try {
-    const res  = await fetch(`/api/market?location=${encodeURIComponent(query)}`);
-    const data = await res.json();
-    if (!data.markets||!Object.keys(data.markets).length) {
-      document.getElementById('marketCitiesGrid').style.display='none';
-      document.getElementById('noResults').style.display='';
-    } else {
-      allMarketData = data.markets;
-      renderGrid(data.markets);
-      buildTable(data.markets);
-      const first = data.locations[0];
-      if (first) buildChart(data.markets,first,activeChartType);
-      showToast(`Showing ${data.locations[0]}`, 'success');
-    }
-  } catch { showToast('Search failed.','error'); }
+/* ── Ticker ── */
+function buildTicker() {
+  const el = document.getElementById('tickerContent');
+  if (!el) return;
+  const items = [];
+  const cities = Object.keys(allMarkets).slice(0, 8);
+  cities.forEach(city => {
+    (allMarkets[city] || []).slice(0, 5).forEach(c => {
+      const dir   = c.change >= 0 ? '▲' : '▼';
+      const color = c.change >= 0 ? '#4ade80' : '#f87171';
+      items.push(`<span style="margin:0 18px">${city}: <b>${c.crop}</b> ₹${c.price.toLocaleString('en-IN')} <span style="color:${color}">${dir}${Math.abs(c.change)}%</span></span>`);
+    });
+  });
+  const content = items.join('') + items.join('');
+  el.innerHTML = content;
+}
+
+/* ── Render city cards ── */
+function renderCitiesGrid(markets) {
+  const loading = document.getElementById('marketLoading');
+  const grid    = document.getElementById('marketCitiesGrid');
+  const noRes   = document.getElementById('noResults');
+  if (!grid) return;
+
+  const cities = Object.keys(markets);
+  if (cities.length === 0) {
+    loading.style.display = 'none';
+    grid.style.display    = 'none';
+    noRes.style.display   = 'block';
+    return;
+  }
+
+  loading.style.display = 'none';
+  noRes.style.display   = 'none';
+  grid.style.display    = 'grid';
+
+  grid.innerHTML = cities.map((city, ci) => {
+    let crops = markets[city] || [];
+
+    // Apply filter
+    if (currentFilter === 'rising')  crops = crops.filter(c => c.change > 0);
+    if (currentFilter === 'falling') crops = crops.filter(c => c.change < 0);
+    if (currentFilter === 'Very High') crops = crops.filter(c => c.demand === 'Very High');
+    if (crops.length === 0) return '';
+
+    const cropsHtml = crops.map(c => {
+      const changeClass = c.change >= 0 ? 'up' : 'down';
+      const changeIcon  = c.change >= 0 ? '▲' : '▼';
+      const priceClass  = c.above_msp ? 'above-msp' : 'below-msp';
+      const sourceTag   = c.source === 'live'
+        ? '<span class="live-tag">LIVE</span>'
+        : '';
+      return `
+        <div class="crop-row">
+          <div class="cr-name">${c.crop}${sourceTag}</div>
+          <div>
+            <span class="cr-price ${priceClass}">₹${c.price.toLocaleString('en-IN')}</span>
+            <span class="cr-unit">/quintal</span>
+          </div>
+          <div class="cr-msp">MSP ₹${c.msp.toLocaleString('en-IN')}</div>
+          <div class="cr-change ${changeClass}">
+            ${changeIcon}${Math.abs(c.change)}%
+          </div>
+        </div>`;
+    }).join('');
+
+    if (!cropsHtml.trim()) return '';
+
+    return `
+      <div class="city-card" style="animation-delay:${ci*0.04}s">
+        <div class="city-card-header">
+          <div class="city-name">
+            <i class="fas fa-store"></i> ${city}
+          </div>
+          <div class="city-count">${crops.length} crops</div>
+        </div>
+        <div class="crop-rows">
+          <div class="crop-row-header">
+            <span>Crop</span><span>Price</span><span>MSP</span><span>Change</span>
+          </div>
+          ${cropsHtml}
+        </div>
+      </div>`;
+  }).join('');
+}
+
+/* ── Search ── */
+function searchLocation() {
+  currentSearch = (document.getElementById('locationSearch')?.value || '').trim().toLowerCase();
+  const btn     = document.getElementById('clearSearchBtn');
+  if (btn) btn.style.display = currentSearch ? 'flex' : 'none';
+
+  if (!currentSearch) {
+    renderCitiesGrid(allMarkets);
+    return;
+  }
+  const filtered = {};
+  Object.keys(allMarkets).forEach(city => {
+    if (city.toLowerCase().includes(currentSearch)) filtered[city] = allMarkets[city];
+  });
+  renderCitiesGrid(filtered);
+
+  const sub = document.getElementById('marketSubtitle');
+  if (sub) sub.textContent = Object.keys(filtered).length > 0
+    ? `Showing results for "${currentSearch}"`
+    : 'No markets found';
 }
 
 function clearSearch() {
-  const input=document.getElementById('locationSearch'); if(input) input.value='';
-  const cb=document.getElementById('clearSearchBtn'); if(cb) cb.style.display='none';
-  document.getElementById('noResults').style.display='none';
-  loadMarkets();
+  currentSearch = '';
+  const inp = document.getElementById('locationSearch');
+  if (inp) inp.value = '';
+  const btn = document.getElementById('clearSearchBtn');
+  if (btn) btn.style.display = 'none';
+  const sub = document.getElementById('marketSubtitle');
+  if (sub) sub.textContent = 'All major Indian markets';
+  renderCitiesGrid(allMarkets);
 }
 
-function setupSearch() {
-  const input=document.getElementById('locationSearch');
-  if (input) {
-    input.addEventListener('keydown',e=>{ if(e.key==='Enter') searchLocation(); });
-    input.addEventListener('input',()=>{ const cb=document.getElementById('clearSearchBtn'); if(cb) cb.style.display=input.value?'flex':'none'; });
-  }
-  const showAll=document.getElementById('showAllMarketsBtn');
-  if (showAll) showAll.addEventListener('click',clearSearch);
+document.addEventListener('DOMContentLoaded', () => {
+  const inp = document.getElementById('locationSearch');
+  if (inp) inp.addEventListener('keydown', e => { if (e.key === 'Enter') searchLocation(); });
+});
+
+/* ── Filter ── */
+function filterDemand(type, btn) {
+  currentFilter = type;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+  const toShow = currentSearch
+    ? Object.fromEntries(Object.entries(allMarkets).filter(([c]) => c.toLowerCase().includes(currentSearch)))
+    : allMarkets;
+  renderCitiesGrid(toShow);
 }
 
-function filterDemand(type,el) {
-  activeFilter=type;
-  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
-  if(el) el.classList.add('active');
-  renderGrid(allMarketData);
+/* ── Price Table ── */
+function buildPriceTable(markets) {
+  const body   = document.getElementById('priceTableBody');
+  if (!body) return;
+  const cities = ["Delhi","Mumbai","Kolkata","Patna","Lucknow","Jaipur","Bhopal","Indore","Amritsar","Hyderabad"];
+  const crops  = ["Rice","Wheat","Maize","Cotton","Soybean","Mustard","Onion","Potato","Tomato","Arhar","Moong","Urad"];
+
+  body.innerHTML = crops.map(crop => {
+    const cells = cities.map(city => {
+      const found = (markets[city] || []).find(c => c.crop === crop);
+      if (!found) return '<td class="not-available">—</td>';
+      const cls = found.above_msp ? 'above-msp' : 'below-msp';
+      return `<td class="${cls}">₹${found.price.toLocaleString('en-IN')}</td>`;
+    }).join('');
+    return `<tr><td><b>${crop}</b></td>${cells}</tr>`;
+  }).join('');
 }
 
-function buildTicker(markets) {
-  const content=document.getElementById('tickerContent');
-  if (!content) return;
-  const items=[];
-  Object.entries(markets).forEach(([city,crops])=>{
-    crops.slice(0,5).forEach(crop=>{
-      const sign=crop.change>=0?'▲':'▼';
-      const color=crop.change>=0?'#4ade80':'#f87171';
-      items.push(`<span style="margin:0 28px"><strong style="color:#e8f5e9">${crop.crop}</strong> <span style="color:var(--text-3)">(${city})</span> <strong style="color:var(--amber)">₹${crop.price.toLocaleString('en-IN')}</strong> <span style="color:${color}"> ${sign}${Math.abs(crop.change).toFixed(1)}%</span></span>`);
-    });
-  });
-  const html=items.join(' • ');
-  content.innerHTML=html+' • '+html;
-}
+/* ── Chart ── */
+let currentChartType = 'bar';
 
 function switchChart(type) {
-  activeChartType=type;
-  document.querySelectorAll('.chart-tab').forEach(t=>t.classList.remove('active'));
-  document.querySelector(`.chart-tab[onclick*="${type}"]`)?.classList.add('active');
-  buildChart(allMarketData,document.getElementById('chartCitySelect')?.value||'Delhi',type);
+  currentChartType = type;
+  document.querySelectorAll('.chart-tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  updateChart();
 }
 
 function updateChart() {
-  buildChart(allMarketData,document.getElementById('chartCitySelect')?.value||'Delhi',activeChartType);
-}
-
-function buildChart(markets,city,type) {
-  const canvas=document.getElementById('marketChart');
+  const city   = document.getElementById('chartCitySelect')?.value || 'Delhi';
+  const crops  = (allMarkets[city] || []).slice(0, 10);
+  const labels = crops.map(c => c.crop);
+  const prices = crops.map(c => c.price);
+  const msps   = crops.map(c => c.msp);
+  const colors = crops.map(c => c.above_msp ? 'rgba(45,106,79,0.75)' : 'rgba(193,18,31,0.75)');
+  const canvas  = document.getElementById('marketChart');
   if (!canvas) return;
-  const cityData=markets[city]||Object.values(markets)[0]||[];
-  if (marketChart) marketChart.destroy();
-  if (type==='line')      buildLine(canvas,cityData,city);
-  else if (type==='bar')  buildBar(canvas,cityData,city);
-  else if (type==='radar') buildRadar(canvas,cityData,city);
-}
+  if (chartInst) { chartInst.destroy(); chartInst = null; }
 
-function buildLine(canvas,cityData,city) {
-  const labels=[]; for(let i=29;i>=0;i--){const d=new Date();d.setDate(d.getDate()-i);labels.push(d.toLocaleDateString('en-IN',{day:'numeric',month:'short'}));}
-  const colors=['#4ade80','#fbbf24','#2dd4bf','#a78bfa'];
-  const datasets=cityData.slice(0,4).map((crop,idx)=>{
-    const base=crop.price, trend=crop.change/100;
-    return {label:crop.crop,data:labels.map((_,di)=>Math.round(base*(1-trend*(29-di)/29)+(Math.random()-0.5)*base*0.04)),borderColor:colors[idx],backgroundColor:colors[idx]+'18',borderWidth:2.5,tension:0.4,fill:idx===0,pointRadius:0,pointHoverRadius:5};
+  const isDark = document.body.classList.contains('dark');
+  const textColor  = isDark ? '#95d5b2' : '#2d6a4f';
+  const gridColor  = isDark ? 'rgba(82,183,136,0.12)' : 'rgba(45,106,79,0.1)';
+
+  chartInst = new Chart(canvas, {
+    type: currentChartType === 'radar' ? 'radar' : currentChartType,
+    data: {
+      labels,
+      datasets: [
+        {
+          label: `${city} Price (₹/quintal)`,
+          data: prices,
+          backgroundColor: colors,
+          borderColor: colors.map(c => c.replace('0.75','1')),
+          borderWidth: 2,
+          borderRadius: currentChartType === 'bar' ? 6 : 0,
+          fill: currentChartType === 'line',
+          tension: 0.4,
+          pointBackgroundColor: colors,
+        },
+        {
+          label: 'MSP (₹/quintal)',
+          data: msps,
+          backgroundColor: 'rgba(232,93,4,0.12)',
+          borderColor: 'rgba(232,93,4,0.7)',
+          borderWidth: 2,
+          borderDash: [5,5],
+          fill: false,
+          tension: 0.4,
+          type: currentChartType === 'radar' ? 'radar' : 'line',
+          pointRadius: currentChartType === 'bar' ? 0 : 4,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { color: textColor, font: { family: 'Poppins', size: 12 } } },
+        tooltip: {
+          callbacks: {
+            label: ctx => `₹${ctx.raw?.toLocaleString('en-IN')}/quintal`
+          }
+        }
+      },
+      scales: currentChartType !== 'radar' ? {
+        x: { ticks: { color: textColor, font: { family: 'Poppins', size: 11 } }, grid: { color: gridColor } },
+        y: {
+          ticks: {
+            color: textColor,
+            font: { family: 'Poppins', size: 11 },
+            callback: v => '₹' + v.toLocaleString('en-IN')
+          },
+          grid: { color: gridColor }
+        }
+      } : {
+        r: { ticks: { color: textColor }, grid: { color: gridColor }, pointLabels: { color: textColor } }
+      }
+    }
   });
-  marketChart=new Chart(canvas,{type:'line',data:{labels,datasets},options:chartOpts(`${city} — 30-Day Trend (₹/quintal)`)});
 }
 
-function buildBar(canvas,cityData,city) {
-  const colors=cityData.map(c=>c.change>=2?'rgba(74,222,128,0.75)':c.change<=-2?'rgba(248,113,113,0.75)':'rgba(251,191,36,0.75)');
-  marketChart=new Chart(canvas,{type:'bar',data:{labels:cityData.map(c=>c.crop),datasets:[{label:'Price (₹/quintal)',data:cityData.map(c=>c.price),backgroundColor:colors,borderRadius:6}]},options:chartOpts(`${city} — Current Prices`)});
-}
-
-function buildRadar(canvas,cityData,city) {
-  const dm={'Very High':100,'High':75,'Medium':50,'Low':25};
-  marketChart=new Chart(canvas,{type:'radar',data:{labels:cityData.map(c=>c.crop),datasets:[{label:'Demand',data:cityData.map(c=>dm[c.demand]||50),backgroundColor:'rgba(251,191,36,0.12)',borderColor:'rgba(251,191,36,0.7)',borderWidth:2,pointBackgroundColor:'#fbbf24',pointRadius:5}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:100,ticks:{color:'rgba(107,140,108,0.7)',backdropColor:'transparent'},grid:{color:'rgba(74,222,128,0.08)'},angleLines:{color:'rgba(74,222,128,0.1)'},pointLabels:{color:'#a7c4a8',font:{size:11}}}},plugins:{legend:{display:false}}}});
-}
-
-function chartOpts(title) {
-  return {responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},scales:{x:{grid:{color:'rgba(74,222,128,0.05)'},ticks:{color:'#6b8c6c',font:{size:10},maxTicksLimit:8}},y:{grid:{color:'rgba(74,222,128,0.06)'},ticks:{color:'#6b8c6c',callback:v=>'₹'+v.toLocaleString('en-IN')}}},plugins:{legend:{display:true,labels:{color:'#a7c4a8',font:{size:12},usePointStyle:true}},title:{display:true,text:title,color:'#a7c4a8',font:{size:13}},tooltip:{backgroundColor:'#0e1510',borderColor:'rgba(74,222,128,0.25)',borderWidth:1,titleColor:'#e8f5e9',bodyColor:'#a7c4a8',callbacks:{label:ctx=>` ${ctx.dataset.label}: ₹${ctx.raw.toLocaleString('en-IN')}`}}},animation:{duration:700}};
-}
-
-function buildTable(markets) {
-  const tbody=document.getElementById('priceTableBody');
-  if (!tbody) return;
-  const cities=Object.keys(markets).slice(0,10);
-  const cropSet=new Set(); Object.values(markets).forEach(crops=>crops.forEach(c=>cropSet.add(c.crop)));
-  const lookup={};
-  Object.entries(markets).forEach(([city,crops])=>{ lookup[city]={}; crops.forEach(c=>{lookup[city][c.crop]=c;}); });
-  tbody.innerHTML=[...cropSet].sort().map(crop=>{
-    const cells=cities.map(city=>{
-      const item=lookup[city]?.[crop];
-      if (!item) return '<td class="not-available">—</td>';
-      const color=item.change>=2?'#4ade80':item.change<=-2?'#f87171':'#e8f5e9';
-      const arrow=item.change>=0.5?'▲':item.change<=-0.5?'▼':'–';
-      return `<td style="color:${color}">₹${item.price.toLocaleString('en-IN')}<span style="font-size:0.65rem;opacity:0.7"> ${arrow}</span></td>`;
-    });
-    return `<tr><td>${crop}</td>${cells.join('')}</tr>`;
-  }).join('');
-  const thead=document.querySelector('.price-table thead tr');
-  if (thead) thead.innerHTML='<th>Crop</th>'+cities.map(c=>`<th>${c}</th>`).join('');
+function initChart(markets) {
+  updateChart();
 }
