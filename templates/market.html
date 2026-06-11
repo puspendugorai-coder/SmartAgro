@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
   <meta name="theme-color" content="#b45309"/>
   <link rel="manifest" href="/manifest.json"/>
   <title>SmartAgro – Mandi Prices</title>
@@ -11,15 +11,9 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    html, body {
-      width: 100%;
-      max-width: 100%;
-      overflow-x: hidden;
-    }
-  </style>
 </head>
 <body>
+
 <nav class="navbar" id="navbar">
   <div class="nav-brand">
     <div class="brand-icon"><i class="fas fa-seedling"></i></div>
@@ -34,7 +28,9 @@
   <div class="nav-actions">
     <button class="theme-toggle" id="themeToggle"><i class="fas fa-moon" id="themeIcon"></i></button>
     <div class="lang-selector" id="langSelector">
-      <button class="lang-btn" id="langBtn"><i class="fas fa-globe"></i><span id="currentLang">EN</span><i class="fas fa-chevron-down"></i></button>
+      <button class="lang-btn" id="langBtn">
+        <i class="fas fa-globe"></i><span id="currentLang">EN</span><i class="fas fa-chevron-down"></i>
+      </button>
       <div class="lang-dropdown" id="langDropdown">
         <div class="lang-search"><input type="text" placeholder="Search language..." id="langSearch"/></div>
         <div class="lang-list" id="langList"></div>
@@ -44,28 +40,39 @@
   </div>
 </nav>
 
-<div style="background:var(--amber-light);border-bottom:2px solid var(--amber);padding:8px 12px;text-align:center;font-size:0.75rem;color:var(--amber);font-weight:500;overflow:hidden">
-  <i class="fas fa-circle-info"></i> Prices are indicative based on MSP rates. Check your local mandi for exact rates. | Helpline: <strong>1800-180-1551</strong>
+<!-- Disclaimer banner -->
+<div id="marketDisclaimer" style="background:var(--amber-light);border-bottom:2px solid var(--amber);padding:8px 20px;text-align:center;font-size:0.78rem;color:var(--amber);font-weight:500">
+  <i class="fas fa-circle-info"></i>
+  <span id="disclaimerText">Prices are indicative based on MSP rates. Check your local mandi for exact rates.</span>
+  | Helpline: <strong>1800-180-1551</strong>
 </div>
 
-<section class="page-hero market-hero" style="position:relative;padding-bottom:60px">
-  <div class="hero-badge"><i class="fas fa-chart-line"></i> Live Prices</div>
+<section class="page-hero market-hero" style="position:relative;padding-bottom:52px">
+  <div class="hero-badge"><i class="fas fa-chart-line"></i> Mandi Prices</div>
   <h1 data-translate="market_hero_title">Mandi Prices Today</h1>
-  <p data-translate="market_hero_sub">15 crops · 20 cities · MSP comparison</p>
+  <p data-translate="market_hero_sub">15 crops across 20 Indian cities with MSP comparison</p>
   <div class="price-ticker">
     <div class="ticker-label"><i class="fas fa-satellite-dish"></i> LIVE</div>
-    <div class="ticker-track"><div class="ticker-content" id="tickerContent">Loading...</div></div>
+    <div class="ticker-track"><div class="ticker-content" id="tickerContent">Loading prices...</div></div>
   </div>
 </section>
 
 <section class="search-bar-section">
   <div class="container">
+    <div class="market-meta-bar">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span class="data-source-badge" id="dataSourceBadge">LOADING</span>
+        <span class="last-updated" id="lastUpdated"></span>
+      </div>
+    </div>
     <div class="search-filter-bar">
       <div class="search-box">
         <i class="fas fa-search"></i>
-        <input type="text" id="locationSearch" data-translate="search_placeholder" placeholder="Search city..."/>
+        <input type="text" id="locationSearch" data-translate="search_placeholder" placeholder="Search city (Delhi, Patna, Mumbai...)"/>
         <button class="search-btn" onclick="searchLocation()" data-translate="btn_search">Search</button>
-        <button class="clear-btn" id="clearSearchBtn" onclick="clearSearch()" style="display:none"><i class="fas fa-times"></i></button>
+        <button class="clear-btn" id="clearSearchBtn" onclick="clearSearch()" style="display:none">
+          <i class="fas fa-times"></i>
+        </button>
       </div>
       <div class="filter-chips">
         <button class="chip active" onclick="filterDemand('all',this)" data-translate="filter_all">All</button>
@@ -93,7 +100,7 @@
       <i class="fas fa-store-slash"></i>
       <h3>No markets found</h3>
       <p>Try: Delhi, Mumbai, Patna, Kolkata...</p>
-      <button class="btn-secondary" id="showAllMarketsBtn" onclick="clearSearch()">Show All</button>
+      <button class="btn-secondary" onclick="clearSearch()">Show All</button>
     </div>
   </div>
 </section>
@@ -103,14 +110,14 @@
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-chart-area"></i></div>
       <h2 data-translate="chart_title">Price Trend</h2>
-      <p data-translate="chart_sub">30-day price movement</p>
+      <p data-translate="chart_sub">Price vs MSP comparison by city</p>
     </div>
     <div class="chart-wrapper">
       <div class="chart-controls">
         <div class="chart-tabs">
-          <button class="chart-tab active" onclick="switchChart('line')">Trend</button>
-          <button class="chart-tab" onclick="switchChart('bar')">Compare</button>
-          <button class="chart-tab" onclick="switchChart('radar')">Demand</button>
+          <button class="chart-tab active" onclick="switchChart('bar')">Bar</button>
+          <button class="chart-tab" onclick="switchChart('line')">Line</button>
+          <button class="chart-tab" onclick="switchChart('radar')">Radar</button>
         </div>
         <div class="chart-city-select">
           <select id="chartCitySelect" onchange="updateChart()">
@@ -131,68 +138,16 @@
     <div class="section-header">
       <div class="section-tag"><i class="fas fa-table"></i></div>
       <h2 data-translate="table_title">Price Comparison</h2>
-      <p data-translate="table_sub">₹/quintal across major cities</p>
+      <p data-translate="table_sub">₹/quintal across cities — green = above MSP, red = below MSP</p>
     </div>
-    
-    <!-- City Selector -->
-    <div class="table-controls">
-      <label>Select Cities:</label>
-      <div class="table-city-selector" id="citySelectorContainer">
-        <div class="city-checkbox">
-          <input type="checkbox" id="delhi-check" value="Delhi" checked onchange="updatePriceTable()">
-          <label for="delhi-check">Delhi</label>
-        </div>
-        <div class="city-checkbox">
-          <input type="checkbox" id="mumbai-check" value="Mumbai" checked onchange="updatePriceTable()">
-          <label for="mumbai-check">Mumbai</label>
-        </div>
-        <div class="city-checkbox">
-          <input type="checkbox" id="kolkata-check" value="Kolkata" checked onchange="updatePriceTable()">
-          <label for="kolkata-check">Kolkata</label>
-        </div>
-        <div class="city-checkbox">
-          <input type="checkbox" id="patna-check" value="Patna" checked onchange="updatePriceTable()">
-          <label for="patna-check">Patna</label>
-        </div>
-        <div class="city-checkbox">
-          <input type="checkbox" id="lucknow-check" value="Lucknow" checked onchange="updatePriceTable()">
-          <label for="lucknow-check">Lucknow</label>
-        </div>
-        <div class="city-checkbox">
-          <input type="checkbox" id="hyderabad-check" value="Hyderabad" checked onchange="updatePriceTable()">
-          <label for="hyderabad-check">Hyderabad</label>
-        </div>
-      </div>
-    </div>
-
-    <!-- Legend -->
-    <div class="table-legend">
-      <div class="legend-item">
-        <div class="legend-icon legend-up">📈</div>
-        <span>Price Up</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-icon legend-down">📉</div>
-        <span>Price Down</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-icon legend-na">—</div>
-        <span>No Data</span>
-      </div>
-    </div>
-
-    <!-- Table -->
     <div class="table-wrapper">
       <table class="price-table" id="priceTable">
-        <thead id="priceTableHead">
+        <thead>
           <tr>
             <th>Crop</th>
-            <th class="city-col" data-city="Delhi">Delhi</th>
-            <th class="city-col" data-city="Mumbai">Mumbai</th>
-            <th class="city-col" data-city="Kolkata">Kolkata</th>
-            <th class="city-col" data-city="Patna">Patna</th>
-            <th class="city-col" data-city="Lucknow">Lucknow</th>
-            <th class="city-col" data-city="Hyderabad">Hyderabad</th>
+            <th>Delhi</th><th>Mumbai</th><th>Kolkata</th><th>Patna</th>
+            <th>Lucknow</th><th>Jaipur</th><th>Bhopal</th><th>Indore</th>
+            <th>Amritsar</th><th>Hyderabad</th>
           </tr>
         </thead>
         <tbody id="priceTableBody"></tbody>
@@ -203,7 +158,11 @@
 
 <footer class="footer">
   <div class="container">
-    <div class="footer-brand"><div class="brand-icon small"><i class="fas fa-seedling"></i></div><span>SmartAgro</span></div>
+    <div class="footer-brand">
+      <div class="brand-icon small"><i class="fas fa-seedling"></i></div>
+      <span>Smart<span style="color:rgba(255,255,255,0.65)">Agro</span></span>
+    </div>
+    <p data-translate="footer_text">Helping India's farmers with AI</p>
     <p class="footer-copy" data-translate="footer_copy">© 2025 SmartAgro. Made for Indian farmers.</p>
   </div>
 </footer>
@@ -221,25 +180,29 @@
 <a href="tel:18001801551" class="kisan-helpline">
   <button class="helpline-btn"><i class="fas fa-phone"></i> <span data-translate="helpline">Kisan Helpline</span></button>
 </a>
-<button class="chat-fab" id="chatFab" onclick="toggleChat()"><i class="fas fa-microphone"></i></button>
+
+<button class="chat-fab" id="chatFab" onclick="toggleChat()">
+  <i class="fas fa-microphone"></i>
+</button>
 <div class="chat-overlay" id="chatOverlay">
   <div class="chat-window" id="chatWindow">
     <div class="chat-header-full">
-      <div class="chat-header-icon-lg">🌾</div>
+      <div class="chat-header-icon-lg">K</div>
       <div class="chat-header-info">
         <h3 data-translate="chatbot_title">Kisan Helper</h3>
         <p data-translate="chatbot_sub">Ask in any language</p>
       </div>
       <div class="chat-header-actions">
-        <button class="chat-action-btn" onclick="clearChat()"><i class="fas fa-rotate-left"></i></button>
-        <button class="chat-action-btn" id="micBtn" onclick="startVoice()"><i class="fas fa-microphone"></i></button>
-        <button class="chat-action-btn" onclick="closeChat()"><i class="fas fa-times"></i></button>
+        <button class="chat-action-btn" onclick="clearChat()" title="Clear"><i class="fas fa-rotate-left"></i></button>
+        <button class="chat-action-btn" id="micBtn" onclick="startVoice()" title="Voice"><i class="fas fa-microphone"></i></button>
+        <button class="chat-action-btn" onclick="closeChat()" title="Close"><i class="fas fa-times"></i></button>
       </div>
     </div>
     <div class="chat-messages" id="chatMessages"></div>
     <div class="chat-input-area">
       <div class="chat-input-row">
-        <input type="text" id="chatInput" data-translate="chat_placeholder" placeholder="Type or speak..." onkeydown="handleChatKey(event)"/>
+        <input type="text" id="chatInput" data-translate="chat_placeholder"
+               placeholder="Type or speak..." onkeydown="handleChatKey(event)"/>
         <button class="chat-mic-btn" onclick="startVoice()"><i class="fas fa-microphone"></i></button>
         <button class="chat-send-btn" onclick="sendMessage()"><i class="fas fa-paper-plane"></i></button>
       </div>
@@ -253,34 +216,18 @@
 <script src="/static/js/market.js"></script>
 <script src="/static/js/chatbot.js"></script>
 <script>
-  document.getElementById('chatOverlay').addEventListener('click', function(e){
-    if(e.target === this) closeChat();
-  });
+document.getElementById('chatOverlay').addEventListener('click', function(e) {
+  if (e.target === this) closeChat();
+});
 
-  // Function to update price table based on selected cities
-  function updatePriceTable() {
-    const selectedCities = [];
-    document.querySelectorAll('.city-checkbox input:checked').forEach(checkbox => {
-      selectedCities.push(checkbox.value);
-    });
+// Update disclaimer based on data source
+document.addEventListener('DOMContentLoaded', () => {
+  // Will be updated by market.js after data loads
+});
 
-    // Hide/Show table headers based on selected cities
-    document.querySelectorAll('.price-table th.city-col').forEach(header => {
-      const city = header.getAttribute('data-city');
-      header.style.display = selectedCities.includes(city) ? '' : 'none';
-    });
-
-    // Hide/Show table cells based on selected cities
-    document.querySelectorAll('.price-table tbody tr').forEach(row => {
-      row.querySelectorAll('td').forEach((cell, index) => {
-        if (index === 0) return; // Skip first column (crop name)
-        const city = row.getAttribute('data-city-' + index);
-        if (city) {
-          cell.style.display = selectedCities.some((c, idx) => idx === index - 1) ? '' : 'none';
-        }
-      });
-    });
-  }
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/static/sw.js').catch(() => {});
+}
 </script>
 </body>
 </html>
