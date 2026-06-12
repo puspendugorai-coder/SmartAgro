@@ -17,7 +17,7 @@
 
 ### 🚀 Live Demo
 
-## 👉 [Click Here to Open the App](https://smartagro-1-4czz.onrender.com)
+## [![Click Here to Open 👉](https://img.shields.io/badge/Click%20Here%20to%20Open%20👉-Live%20Demo-FF6B6B?style=for-the-badge)](https://smartagro-1-4czz.onrender.com)
 
 > 📱 Open on mobile and tap **"Add to Home Screen"** to install as a native app!
 
