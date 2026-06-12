@@ -26,7 +26,7 @@ async function loadAlerts(lat,lon) {
     updateCounts(allAlerts);
     sessionStorage.setItem('alert_count',allAlerts.length);
     updateAlertBadge(allAlerts.length);
-    renderAlerts(allAlerts);
+    renderAlertsList(allAlerts);
     renderPestCalendar(curWeather);
     renderHarmfulSafe(curWeather);
     ['pestCalendarSection','harmfulSection'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.display='';});
