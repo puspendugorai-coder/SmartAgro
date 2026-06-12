@@ -45,15 +45,11 @@ function renderGrid(markets) {
         </div>
         ${filtered.map(crop=>`
           <div class="crop-row">
-            <div class="cr-name">${crop.crop}</div>
-            <div>
-              <div class="cr-price ${crop.above_msp?'above-msp':'below-msp'}">₹${crop.price.toLocaleString('en-IN')}</div>
-              <div class="cr-unit">per quintal</div>
-            </div>
-            <div>
-              <div class="cr-msp">₹${crop.msp.toLocaleString('en-IN')}</div>
-              <div class="cr-unit">MSP</div>
-            </div>
+          <div class="cr-name">${getCropName(crop.crop)}</div>
+          <div class="cr-price ${crop.above_msp?'above-msp':'below-msp'}">₹${crop.price.toLocaleString('en-IN')}</div>
+          <div class="cr-unit">${getMarketT('per_quintal')}</div>
+          <div class="cr-msp">₹${crop.msp.toLocaleString('en-IN')}</div>
+          <div class="cr-unit">${getMarketT('msp')}</div>
             <div class="cr-change ${crop.change>=0?'up':'down'}">
               <i class="fas fa-arrow-${crop.change>=0?'up':'down'}"></i>
               ${Math.abs(crop.change).toFixed(1)}%
