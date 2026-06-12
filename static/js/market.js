@@ -20,7 +20,6 @@ async function loadMarkets() {
     document.getElementById('marketLoading').innerHTML='<p style="color:var(--red)">Could not load prices. Please refresh.</p>';
   }
 }
-
 function renderGrid(markets) {
   const grid = document.getElementById('marketCitiesGrid');
   const none = document.getElementById('noResults');
@@ -41,18 +40,18 @@ function renderGrid(markets) {
       </div>
       <div class="crop-rows">
         <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 80px;padding:8px 16px;font-size:0.68rem;color:var(--text-3);font-weight:700;text-transform:uppercase;border-bottom:1px solid var(--border)">
-          <span>Crop</span><span>Mandi</span><span>MSP</span><span>Change</span>
+          <span>Crop</span><span>Mandi</span><span>${getMarketT('msp')}</span><span>Change</span>
         </div>
         ${filtered.map(crop=>`
           <div class="crop-row">
-            <div class="cr-name">${crop.crop}</div>
+            <div class="cr-name">${getCropName(crop.crop)}</div>
             <div>
               <div class="cr-price ${crop.above_msp?'above-msp':'below-msp'}">₹${crop.price.toLocaleString('en-IN')}</div>
-              <div class="cr-unit">per quintal</div>
+              <div class="cr-unit">${getMarketT('per_quintal')}</div>
             </div>
             <div>
               <div class="cr-msp">₹${crop.msp.toLocaleString('en-IN')}</div>
-              <div class="cr-unit">MSP</div>
+              <div class="cr-unit">${getMarketT('msp')}</div>
             </div>
             <div class="cr-change ${crop.change>=0?'up':'down'}">
               <i class="fas fa-arrow-${crop.change>=0?'up':'down'}"></i>
