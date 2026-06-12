@@ -9,6 +9,8 @@ const LANGUAGES = [
   {code:'gu', name:'ગુજરાતી (Gujarati)',  flag:'🇮🇳', label:'GU'},
   {code:'kn', name:'ಕನ್ನಡ (Kannada)',     flag:'🇮🇳', label:'KN'},
   {code:'ml', name:'മലയാളം (Malayalam)', flag:'🇮🇳', label:'ML'},
+  {code:'or', name:'ଓଡ଼ିଆ (Odia)',       flag:'🇮🇳', label:'OR'},
+  {code:'as', name:'অসমীয়া (Assamese)', flag:'🇮🇳', label:'AS'},
 ];
 
 // ── Crop name translations ──
@@ -23,6 +25,8 @@ const CROP_NAMES = {
   gu: {Rice:'ડાંગર/ચોખા',Wheat:'ઘઉં',Maize:'મકાઈ',Cotton:'કપાસ',Tomato:'ટામેટા',Sugarcane:'શેરડી',Soybean:'સોયાબીન',Mustard:'સરસવ',Onion:'ડુંગળી',Potato:'બટાકા',Chilli:'મરચા',Groundnut:'મગફળી',Arhar:'અરહર',Moong:'મગ',Urad:'અડદ'},
   kn: {Rice:'ಭತ್ತ/ಅಕ್ಕಿ',Wheat:'ಗೋಧಿ',Maize:'ಮೆಕ್ಕೆಜೋಳ',Cotton:'ಹತ್ತಿ',Tomato:'ಟೊಮ್ಯಾಟೊ',Sugarcane:'ಕಬ್ಬು',Soybean:'ಸೋಯಾಬೀನ್',Mustard:'ಸಾಸಿವೆ',Onion:'ಈರುಳ್ಳಿ',Potato:'ಆಲೂಗಡ್ಡೆ',Chilli:'ಮೆಣಸಿನಕಾಯಿ',Groundnut:'ಕಡಲೆಕಾಯಿ',Arhar:'ತೊಗರಿ',Moong:'ಹೆಸರು',Urad:'ಉದ್ದು'},
   ml: {Rice:'നെല്ല്/അരി',Wheat:'ഗോതമ്പ്',Maize:'ചോളം',Cotton:'പഞ്ഞി',Tomato:'തക്കാളി',Sugarcane:'കരിമ്പ്',Soybean:'സോയാബീൻ',Mustard:'കടുക്',Onion:'ഉള്ളി',Potato:'ഉരുളക്കിഴങ്ങ്',Chilli:'മുളക്',Groundnut:'നിലക്കടല',Arhar:'തുവര',Moong:'ചെറുപയർ',Urad:'ഉഴുന്ന്'},
+  or: {Rice:'ଧାନ/ଚାଉଳ',Wheat:'ଗହମ',Maize:'ମକା',Cotton:'କପା',Tomato:'ଟମାଟୋ',Sugarcane:'ଆଖୁ',Soybean:'ସୋୟାବିନ',Mustard:'ସରିଷା',Onion:'ପିଆଜ',Potato:'ଆଳୁ',Chilli:'ଲଙ୍କା',Groundnut:'ଚିନାବାଦାମ',Arhar:'ହରଡ',Moong:'ମୁଗ',Urad:'ବିରି'},
+  as: {Rice:'ধান/চাউল',Wheat:'ঘেঁহু',Maize:'মকৈ',Cotton:'কপাহ',Tomato:'টমেটো',Sugarcane:'কুঁহিয়াৰ',Soybean:'চয়াবিন',Mustard:'সৰিয়হ',Onion:'পিঁয়াজ',Potato:'আলু',Chilli:'জলকীয়া',Groundnut:'বাদাম',Arhar:'অৰহৰ',Moong:'মগু',Urad:'বৰামাহ'},
 };
 
 // ── Crop descriptions ──
@@ -167,6 +171,34 @@ const CROP_DESC = {
     Chilli:'ഉയർന്ന വിപണി മൂല്യമുള്ള ചൂടുള്ള കാലാവസ്ഥ മസാല',
     Groundnut:'ഊഷ്മള ഋതുവിലെ എണ്ണ വിത്ത് വിള',
   },
+  or: {
+    Rice:'ଅଧିକ ଆର୍ଦ୍ରତା ଓ ଉଷ୍ଣ ପାଣିପାଗ ପାଇଁ ସର୍ବୋତ୍ତମ',
+    Wheat:'ଥଣ୍ଡା ଶୁଷ୍କ ଶୀତ ଋତୁରେ ସବୁଠୁ ଲୋକପ୍ରିୟ ରବି ଫସଲ',
+    Maize:'ଉଷ୍ଣ ଆର୍ଦ୍ର ପାଣିପାଗ ପାଇଁ ଉପଯୁକ୍ତ ଫସଲ',
+    Cotton:'ଉଷ୍ଣ ଶୁଷ୍କ ପାଣିପାଗରେ ମଧ୍ୟମ ବୃଷ୍ଟିପାତ ସହ',
+    Tomato:'ମଧ୍ୟମ ଜଳବାୟୁ ପାଇଁ ଉଚ୍ଚ ମୂଲ୍ୟ ଫସଲ',
+    Sugarcane:'ଉଷ୍ଣ ଜଳବାୟୁ ଓ ଭାରୀ ବର୍ଷା ଆବଶ୍ୟକ',
+    Soybean:'ଉଷ୍ଣ ବର୍ଷା ଋତୁ ପାଇଁ ନାଇଟ୍ରୋଜେନ ସ୍ଥିରୀକରଣ ଫସଲ',
+    Mustard:'ଥଣ୍ଡା ପାଣିପାଗର ତୈଳ ବୀଜ ଫସଲ',
+    Onion:'ଭଲ ଆୟ ସହ ଅଧିକ ଚାହିଦାର ସବ୍ଜି',
+    Potato:'ଥଣ୍ଡା ପାଣିପାଗର ମୁଖ୍ୟ ଫସଲ, ଅଧିକ ଅମଳ',
+    Chilli:'ଉଚ୍ଚ ବଜାର ମୂଲ୍ୟ ସହ ଉଷ୍ଣ ପାଣିପାଗ ମସଲା',
+    Groundnut:'ଉଷ୍ଣ ଋତୁର ତୈଳ ବୀଜ ଫସଲ',
+  },
+  as: {
+    Rice:'অধিক আর্দ্রতা আৰু উষ্ণ বতৰৰ বাবে সৰ্বোত্তম',
+    Wheat:'ঠাণ্ডা শুষ্ক শীতকালত সবচেয়ে জনপ্ৰিয় ৰবি শস্য',
+    Maize:'উষ্ণ আর্দ্র বতৰৰ বাবে উপযুক্ত শস্য',
+    Cotton:'গৰম শুষ্ক বতৰত মধ্যমীয়া বৰষুণৰ সৈতে',
+    Tomato:'মধ্যমীয়া জলবায়ুৰ বাবে উচ্চ মূল্যৰ শস্য',
+    Sugarcane:'গৰম জলবায়ু আৰু ভাৰী বৰষুণ প্ৰয়োজন',
+    Soybean:'উষ্ণ বৰষুণৰ বাবে নাইট্ৰজেন স্থিৰীকৰণ শস্য',
+    Mustard:'ঠাণ্ডা বতৰৰ তেল বীজ শস্য',
+    Onion:'ভাল আয়ৰ সৈতে অধিক চাহিদাৰ পাচলি',
+    Potato:'ঠাণ্ডা বতৰৰ মুখ্য শস্য, অধিক উৎপাদন',
+    Chilli:'উচ্চ বজাৰ মূল্যৰ উষ্ণ জলবায়ু মছলা',
+    Groundnut:'উষ্ণ ঋতুৰ তেল বীজ শস্য',
+  },
 };
 
 // ── Season translations ──
@@ -181,6 +213,8 @@ const SEASON_T = {
   gu: {"Kharif (Monsoon)":"ખરીફ (ચોમાસુ)","Rabi (Winter)":"રવિ (શિયાળો)","Zaid (Summer)":"ઝાઇદ (ઉનાળો)"},
   kn: {"Kharif (Monsoon)":"ಖಾರಿಫ್ (ಮಳೆಗಾಲ)","Rabi (Winter)":"ರಬಿ (ಚಳಿಗಾಲ)","Zaid (Summer)":"ಜಾಯಿದ್ (ಬೇಸಿಗೆ)"},
   ml: {"Kharif (Monsoon)":"ഖരീഫ് (മൺസൂൺ)","Rabi (Winter)":"റബി (ശൈത്യകാലം)","Zaid (Summer)":"സൈദ് (വേനൽ)"},
+  or: {"Kharif (Monsoon)":"ଖରିଫ (ବର୍ଷା)","Rabi (Winter)":"ରବି (ଶୀତ)","Zaid (Summer)":"ଯାଇଦ (ଗ୍ରୀଷ୍ମ)"},
+  as: {"Kharif (Monsoon)":"খাৰিফ (বৰষুণ)","Rabi (Winter)":"ৰবি (শীত)","Zaid (Summer)":"জায়েদ (গ্ৰীষ্ম)"},
 };
 
 // ── Weather labels ──
@@ -195,6 +229,8 @@ const WEATHER_T = {
   gu: {humidity:'ભેજ',wind:'પવન ગતિ',visibility:'દ્રષ્ટિ',pressure:'હવાનું દબાણ',feels:'અનુભવ થાય',today:'આજ',tomorrow:'કાલ',rain_yes:'હા — વરસાદ અपेक्षित',rain_no:'ના — સ્વચ્છ આકાશ',forecast:'6 દિવસની આગાહી'},
   kn: {humidity:'ಆರ್ದ್ರತೆ',wind:'ಗಾಳಿ ವೇಗ',visibility:'ದೃಶ್ಯಮಾನತೆ',pressure:'ವಾಯು ಒತ್ತಡ',feels:'ಅನಿಸುತ್ತದೆ',today:'ಇಂದು',tomorrow:'ನಾಳೆ',rain_yes:'ಹೌದು — ಮಳೆ ನಿರೀಕ್ಷಿತ',rain_no:'ಇಲ್ಲ — ನಿರ್ಮಲ ಆಕಾಶ',forecast:'6 ದಿನಗಳ ಮುನ್ಸೂಚನೆ'},
   ml: {humidity:'ആർദ്രത',wind:'കാറ്റ് വേഗത',visibility:'ദൃശ്യദൂരം',pressure:'വായുമർദ്ദം',feels:'അനുഭവപ്പെടുന്നത്',today:'ഇന്ന്',tomorrow:'നാളെ',rain_yes:'അതെ — മഴ പ്രതീക്ഷിക്കുന്നു',rain_no:'ഇല്ല — തെളിഞ്ഞ ആകാശം',forecast:'6 ദിവസത്തെ പ്രവചനം'},
+  or: {humidity:'ଆର୍ଦ୍ରତା',wind:'ବାୟୁ ବେଗ',visibility:'ଦୃଶ୍ୟମାନତା',pressure:'ବାୟୁଚାପ',feels:'ଅନୁଭବ ହୁଏ',today:'ଆଜି',tomorrow:'କାଲି',rain_yes:'ହଁ — ବର୍ଷା ସଂଭାବ୍ୟ',rain_no:'ନାହିଁ — ସ୍ୱଚ୍ଛ ଆକାଶ',forecast:'୬ ଦିନର ପୂର୍ବାନୁମାନ'},
+  as: {humidity:'আর্দ্রতা',wind:'বায়ু গতি',visibility:'দৃশ্যমানতা',pressure:'বায়ুচাপ',feels:'অনুভৱ হয়',today:'আজি',tomorrow:'কালি',rain_yes:'হয় — বৰষুণ সম্ভাৱনা',rain_no:'নহয় — পৰিষ্কাৰ আকাশ',forecast:'৬ দিনৰ পূৰ্বানুমান'},
 };
 
 // ── Alert translations ──
@@ -279,6 +315,22 @@ const ALERT_T = {
     "Aphid and Whitefly Risk":"അഫിഡ്, വൈറ്റ്ഫ്ലൈ അപകടം",
     "Spider Mite Alert":"ചിലന്തി കീടം മുന്നറിയിപ്പ്","Crops at Risk":"അപകടത്തിലുള്ള വിളകൾ",
   },
+  or: {
+    danger:'ବିপଦ',warning:'ସତର୍କତା',info:'ପରାମର୍ଶ',
+    "Extreme Heat":"ଅତ୍ୟଧିକ ଗରମ","Frost Warning":"ତୁଷାର ସତର୍କତା",
+    "Fungal Disease Risk":"ଫଙ୍ଗଲ ରୋଗ ବିପଦ","Strong Winds":"ଶକ୍ତିଶାଳୀ ପବନ",
+    "Heavy Rainfall":"ଭାରୀ ବର୍ଷା","Thunderstorm":"ବଜ୍ରଝଡ",
+    "Aphid and Whitefly Risk":"ଜାବ ପୋକ ଓ ଧଳା ମାଛି ବିପଦ",
+    "Spider Mite Alert":"ମାକଡ ମାଇଟ ସତର୍କତା","Crops at Risk":"ବିପଦରେ ଫସଲ",
+  },
+  as: {
+    danger:'বিপদ',warning:'সতৰ্কতা',info:'পৰামৰ্শ',
+    "Extreme Heat":"অতিমাত্ৰা গৰম","Frost Warning":"তুষাৰ সতৰ্কতা",
+    "Fungal Disease Risk":"ফাংগাল ৰোগ বিপদ","Strong Winds":"শক্তিশালী বতাহ",
+    "Heavy Rainfall":"ভাৰী বৰষুণ","Thunderstorm":"বজ্ৰপাত ধুমুহা",
+    "Aphid and Whitefly Risk":"জাব পোক আৰু বগা মাখিৰ বিপদ",
+    "Spider Mite Alert":"মকৰা মাইট সতৰ্কতা","Crops at Risk":"বিপদত শস্য",
+  },
 };
 
 // ── Soil tip translations ──
@@ -329,6 +381,8 @@ const SOIL_T = {
   gu: {"Drainage Important":"નિકાલ જરૂરી","Green Manure":"લીલો ખાતર","Soil Testing":"માટી પરીક્ષણ","Deep Ploughing":"ઊંડી ખેડ","Phosphorus Application":"ફોસ્ફરસ ઉપયોગ","Residue Management":"અવશેષ વ્યવસ્થાપન","Mulching Essential":"મલ્ચિંગ જરૂરી","Early Morning Irrigation":"સવારે સિંચાઈ","Micronutrients":"સૂક્ષ્મ પોષક","Fungal Disease Alert":"ફૂગ રોગ ચેતવણી","Heat Stress Warning":"ગરમી તણાવ ચેતવણી"},
   kn: {"Drainage Important":"ನೀರು ಬಸಿಯುವಿಕೆ ಮುಖ್ಯ","Green Manure":"ಹಸಿರೆಲೆ ಗೊಬ್ಬರ","Soil Testing":"ಮಣ್ಣು ಪರೀಕ್ಷೆ","Deep Ploughing":"ಆಳ ಉಳುಮೆ","Phosphorus Application":"ರಂಜಕ ಬಳಕೆ","Residue Management":"ಉಳಿಕೆ ನಿರ್ವಹಣೆ","Mulching Essential":"ಮಲ್ಚಿಂಗ್ ಅಗತ್ಯ","Early Morning Irrigation":"ಬೆಳಗ್ಗೆ ನೀರಾವರಿ","Micronutrients":"ಸೂಕ್ಷ್ಮ ಪೋಷಕಾಂಶಗಳು","Fungal Disease Alert":"ಶಿಲೀಂಧ್ರ ರೋಗ ಎಚ್ಚರಿಕೆ","Heat Stress Warning":"ಶಾಖ ಒತ್ತಡ ಎಚ್ಚರಿಕೆ"},
   ml: {"Drainage Important":"ഡ്രെയ്‌നേജ് പ്രധാനം","Green Manure":"ഹരിത വളം","Soil Testing":"മണ്ണ് പരിശോധന","Deep Ploughing":"ആഴത്തിൽ ഉഴുതിടൽ","Phosphorus Application":"ഫോസ്ഫറസ് ഉപയോഗം","Residue Management":"അവശിഷ്ട മാനേജ്‌മെന്റ്","Mulching Essential":"മൾച്ചിംഗ് അത്യാവശ്യം","Early Morning Irrigation":"രാവിലെ ജലസേചനം","Micronutrients":"സൂക്ഷ്മ പോഷകങ്ങൾ","Fungal Disease Alert":"കുമിൾ രോഗ മുന്നറിയിപ്പ്","Heat Stress Warning":"ചൂട് സമ്മർദ്ദ മുന്നറിയിപ്പ്"},
+  or: {"Drainage Important":"ଜଳ ନିଷ୍କାସନ ଜରୁରୀ","Green Manure":"ସବୁଜ ସାର","Soil Testing":"ମାଟି ପରୀକ୍ଷା","Deep Ploughing":"ଗଭୀର ଚାଷ","Phosphorus Application":"ଫସଫରସ ବ୍ୟବହାର","Residue Management":"ଅବଶିଷ୍ଟ ପ୍ରବନ୍ଧ","Mulching Essential":"ମଲଚିଂ ଜରୁରୀ","Early Morning Irrigation":"ସକାଳ ଜଳସେଚନ","Micronutrients":"ସୂକ୍ଷ୍ମ ପୋଷକ","Fungal Disease Alert":"ଫଙ୍ଗଲ ରୋଗ ସତର୍କତା","Heat Stress Warning":"ଉଷ୍ଣ ଚାପ ସତର୍କତା"},
+  as: {"Drainage Important":"পানী নিষ্কাশন জৰুৰী","Green Manure":"সেউজীয়া সাৰ","Soil Testing":"মাটি পৰীক্ষা","Deep Ploughing":"গভীৰ হাল","Phosphorus Application":"ফছফৰাছ ব্যৱহাৰ","Residue Management":"অৱশিষ্ট ব্যৱস্থাপনা","Mulching Essential":"মালচিং জৰুৰী","Early Morning Irrigation":"পুৱা জলসিঞ্চন","Micronutrients":"সূক্ষ্ম পোষক","Fungal Disease Alert":"ফাংগাল ৰোগ সতৰ্কতা","Heat Stress Warning":"তাপ চাপ সতৰ্কতা"},
 };
 
 // ── Pest name translations ──
@@ -343,6 +397,8 @@ const PEST_T = {
   gu: {"Brown Plant Hopper":"ભૂરો પ્લાન્ટ હૉપર","Leaf folder":"પાંદડા મોડનાર","Aphids":"માઈટ","Yellow rust":"પીળો ગેરૂ","Fall Armyworm":"ફૉલ આર્મીવર્મ","Bollworm":"ભૂળ","Whitefly":"સફેદ માખી","Early Blight":"વહેલો ખારો","Thrips":"ચૂસિયા"},
   kn: {"Brown Plant Hopper":"ಕಂದು ಸಸ್ಯ ಹಾಪರ್","Leaf folder":"ಎಲೆ ಸುರುಳಿ","Aphids":"ರಸ ಹೀರುವ ಕೀಟ","Yellow rust":"ಹಳದಿ ತುಕ್ಕು","Fall Armyworm":"ಫಾಲ್ ಆರ್ಮಿವರ್ಮ್","Bollworm":"ಕಾಯಿ ಹುಳ","Whitefly":"ಬಿಳಿ ನೊಣ","Early Blight":"ಮೊದಲ ರೋಗ","Thrips":"ಥ್ರಿಪ್ಸ್"},
   ml: {"Brown Plant Hopper":"തവിട്ട് ചാടി","Leaf folder":"ഇല മടക്കി","Aphids":"മൂട് പേൻ","Yellow rust":"മഞ്ഞ ക്ഷയം","Fall Armyworm":"ഫാൾ ആർമിവോം","Bollworm":"ബോൾവോം","Whitefly":"വെള്ള ഈച്ച","Early Blight":"നേരത്തെ കരിച്ചിൽ","Thrips":"ത്രിപ്സ്"},
+  or: {"Brown Plant Hopper":"ଭୂରା ଗଛ ହପର","Leaf folder":"ପତ୍ର ଗୋଟ","Aphids":"ଜାବ ପୋକ","Yellow rust":"ହଳଦିଆ ଦଡ","Fall Armyworm":"ଫଲ ଆର୍ମିୱର୍ମ","Bollworm":"ବଲ୍ ପୋକ","Whitefly":"ଧଳା ମାଛି","Early Blight":"ଆଗ ଝଳସ","Thrips":"ଥ୍ରିପ୍ସ"},
+  as: {"Brown Plant Hopper":"বাদামী গছ হপাৰ","Leaf folder":"পাত মুড়া","Aphids":"জাব পোক","Yellow rust":"হালধীয়া মৰিছা","Fall Armyworm":"ফল আৰ্মিৱৰ্ম","Bollworm":"বলৱৰ্ম","Whitefly":"বগা মাখি","Early Blight":"আগতীয়া পচন","Thrips":"থ্ৰিপছ"},
 };
 
 // ── Market labels ──
@@ -357,6 +413,8 @@ const MARKET_T = {
   gu: {above_msp:'MSP ઉપર',below_msp:'MSP નીચે',per_quintal:'પ્રતિ ક્વિન્ટલ',msp:'લઘુત્તમ ટેકાના ભાવ',demand:'માંગ',price_up:'ભાવ વધ્યો',price_down:'ભાવ ઘટ્યો',live:'લાઈવ',indicative:'અંદાજિત'},
   kn: {above_msp:'MSP ಮೇಲೆ',below_msp:'MSP ಕೆಳಗೆ',per_quintal:'ಕ್ವಿಂಟಾಲ್‌ಗೆ',msp:'ಕನಿಷ್ಠ ಬೆಂಬಲ ಬೆಲೆ',demand:'ಬೇಡಿಕೆ',price_up:'ಬೆಲೆ ಏರಿತು',price_down:'ಬೆಲೆ ಇಳಿಯಿತು',live:'ನೇರ',indicative:'ಸೂಚಕ'},
   ml: {above_msp:'MSP ൽ കൂടുതൽ',below_msp:'MSP ൽ കുറവ്',per_quintal:'ക്വിന്റലിന്',msp:'കുറഞ്ഞ താങ്ങുവില',demand:'ഡിമാൻഡ്',price_up:'വില ഉയർന്നു',price_down:'വില കുറഞ്ഞു',live:'തത്സമയം',indicative:'ഏകദേശം'},
+  or: {above_msp:'MSP ଉପରେ',below_msp:'MSP ତଳେ',per_quintal:'ପ୍ରତି କୁଇଣ୍ଟାଲ',msp:'ନ୍ୟୂନତମ ସମର୍ଥନ ମୂଲ୍ୟ',demand:'ଚାହିଦା',price_up:'ମୂଲ୍ୟ ବଢ଼ିଲା',price_down:'ମୂଲ୍ୟ କମିଲା',live:'ସିଧା',indicative:'ଆନୁମାନିକ'},
+  as: {above_msp:'MSP ৰ উপৰত',below_msp:'MSP ৰ তলত',per_quintal:'প্ৰতি কুইন্টাল',msp:'নিম্নতম সমৰ্থন মূল্য',demand:'চাহিদা',price_up:'দাম বাঢ়িল',price_down:'দাম কমিল',live:'লাইভ',indicative:'আনুমানিক'},
 };
 
 // ── Helper functions ──
