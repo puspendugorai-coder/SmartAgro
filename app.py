@@ -159,26 +159,26 @@ def get_soil_tips(season, temp, humidity):
     tips = []
     if season == "Kharif (Monsoon)":
         tips = [
-            {"icon":"💧","title":"Drainage Important","tip":"Ensure field drainage channels are open to prevent waterlogging during heavy rains."},
-            {"icon":"🌱","title":"Green Manure","tip":"Grow Dhaincha or Sunhemp as green manure before main crop to improve soil nitrogen."},
-            {"icon":"🧪","title":"Soil Testing","tip":"Test soil pH before sowing. Most crops need pH 6.0-7.5. Apply lime if acidic."},
+            {"icon":"fa-droplets","title":"Drainage Important","tip":"Ensure field drainage channels are open to prevent waterlogging during heavy rains."},
+            {"icon":"fa-seedling","title":"Green Manure","tip":"Grow Dhaincha or Sunhemp as green manure before main crop to improve soil nitrogen."},
+            {"icon":"fa-flask","title":"Soil Testing","tip":"Test soil pH before sowing. Most crops need pH 6.0-7.5. Apply lime if acidic."},
         ]
     elif season == "Rabi (Winter)":
         tips = [
-            {"icon":"🌡️","title":"Deep Ploughing","tip":"Do deep ploughing 20-25 cm to expose soil to winter cold, killing pests and weeds."},
-            {"icon":"💊","title":"Phosphorus Application","tip":"Apply DAP at sowing time for strong root development in cool weather."},
-            {"icon":"🌾","title":"Residue Management","tip":"Incorporate crop residues from kharif into soil to improve organic matter."},
+            {"icon":"fa-temperature-half","title":"Deep Ploughing","tip":"Do deep ploughing 20-25 cm to expose soil to winter cold, killing pests and weeds."},
+            {"icon":"fa-capsules","title":"Phosphorus Application","tip":"Apply DAP at sowing time for strong root development in cool weather."},
+            {"icon":"fa-wheat-awn","title":"Residue Management","tip":"Incorporate crop residues from kharif into soil to improve organic matter."},
         ]
     else:
         tips = [
-            {"icon":"💦","title":"Mulching Essential","tip":"Apply mulch around plants to retain soil moisture in summer heat."},
-            {"icon":"🌅","title":"Early Morning Irrigation","tip":"Irrigate in early morning or evening to reduce evaporation losses."},
-            {"icon":"🧬","title":"Micronutrients","tip":"Apply zinc sulphate 25 kg/ha for summer crops — deficiency common in hot weather."},
+            {"icon":"fa-layer-group","title":"Mulching Essential","tip":"Apply mulch around plants to retain soil moisture in summer heat."},
+            {"icon":"fa-sun","title":"Early Morning Irrigation","tip":"Irrigate in early morning or evening to reduce evaporation losses."},
+            {"icon":"fa-dna","title":"Micronutrients","tip":"Apply zinc sulphate 25 kg/ha for summer crops — deficiency common in hot weather."},
         ]
     if humidity > 80:
-        tips.append({"icon":"🍄","title":"Fungal Disease Alert","tip":"High humidity — apply preventive fungicide spray on susceptible crops."})
+        tips.append({"icon":"fa-bacterium","title":"Fungal Disease Alert","tip":"High humidity — apply preventive fungicide spray on susceptible crops."})
     if temp > 38:
-        tips.append({"icon":"🌡️","title":"Heat Stress Warning","tip":"Temperature above 38 degrees — increase irrigation frequency and apply shade nets."})
+        tips.append({"icon":"fa-temperature-high","title":"Heat Stress Warning","tip":"Temperature above 38 degrees — increase irrigation frequency and apply shade nets."})
     return tips
 
 # ── Kindwise Diagnosis ───────────────────────────────────
@@ -279,27 +279,27 @@ def get_alerts():
     description = data.get("description", "").lower()
     alerts_list = []
     if temp > 40:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"🌡️","title":"Extreme Heat","message":"Temperature above 40C. Crops may wilt and soil loses moisture fast.","action":"Irrigate every 4-5 hours. Provide shade netting."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"fa-temperature-high","title":"Extreme Heat","message":"Temperature above 40C. Crops may wilt and soil loses moisture fast.","action":"Irrigate every 4-5 hours. Provide shade netting."})
     if temp < 5:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"Cold","title":"Frost Warning","message":"Very cold temperature. Frost can destroy crops overnight.","action":"Cover crops with cloth. Use sprinkler irrigation at night."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"fa-snowflake","title":"Frost Warning","message":"Very cold temperature. Frost can destroy crops overnight.","action":"Cover crops with cloth. Use sprinkler irrigation at night."})
     if humidity > 85:
-        alerts_list.append({"type":"warning","category":"Disease","icon":"Fungal","title":"Fungal Disease Risk","message":"Humidity above 85 percent — blight and rust risk very high.","action":"Spray Mancozeb 75 WP at 2.5 g/L immediately."})
+        alerts_list.append({"type":"warning","category":"Disease","icon":"fa-bacterium","title":"Fungal Disease Risk","message":"Humidity above 85 percent — blight and rust risk very high.","action":"Spray Mancozeb 75 WP at 2.5 g/L immediately."})
     if wind_speed > 50:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"Wind","title":"Strong Winds","message":"Strong winds can lodge tall crops like maize and wheat.","action":"Avoid spraying. Support tall crops with stakes."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"fa-wind","title":"Strong Winds","message":"Strong winds can lodge tall crops like maize and wheat.","action":"Avoid spraying. Support tall crops with stakes."})
     if rain > 50:
-        alerts_list.append({"type":"warning","category":"Weather","icon":"Rain","title":"Heavy Rainfall","message":"Excess rain may cause waterlogging and root rot.","action":"Open drainage channels. Stop irrigation."})
+        alerts_list.append({"type":"warning","category":"Weather","icon":"fa-cloud-rain","title":"Heavy Rainfall","message":"Excess rain may cause waterlogging and root rot.","action":"Open drainage channels. Stop irrigation."})
     if "storm" in description or "thunder" in description:
-        alerts_list.append({"type":"danger","category":"Weather","icon":"Storm","title":"Thunderstorm","message":"Risk of lightning and hail damage to crops.","action":"Stay indoors. Secure farm equipment."})
+        alerts_list.append({"type":"danger","category":"Weather","icon":"fa-bolt","title":"Thunderstorm","message":"Risk of lightning and hail damage to crops.","action":"Stay indoors. Secure farm equipment."})
     if 25 <= temp <= 35 and humidity > 70:
-        alerts_list.append({"type":"warning","category":"Pest","icon":"Bug","title":"Aphid and Whitefly Risk","message":"Warm humid conditions — aphids multiplying fast.","action":"Spray Neem oil 5 ml/L at dusk."})
+        alerts_list.append({"type":"warning","category":"Pest","icon":"fa-bug","title":"Aphid and Whitefly Risk","message":"Warm humid conditions — aphids multiplying fast.","action":"Spray Neem oil 5 ml/L at dusk."})
     if temp > 30 and humidity < 50:
-        alerts_list.append({"type":"warning","category":"Pest","icon":"Mite","title":"Spider Mite Alert","message":"Hot dry conditions — mites spreading rapidly.","action":"Apply Abamectin 1.8 EC at 0.5 ml/L."})
+        alerts_list.append({"type":"warning","category":"Pest","icon":"fa-spider","title":"Spider Mite Alert","message":"Hot dry conditions — mites spreading rapidly.","action":"Apply Abamectin 1.8 EC at 0.5 ml/L."})
     harmful = []
     if temp > 38: harmful.append("Wheat")
     if humidity > 85 and rain > 20: harmful.append("Cotton")
     if temp < 10: harmful.append("Rice")
     if harmful:
-        alerts_list.append({"type":"info","category":"Crop Advisory","icon":"Crop","title":"Crops at Risk","message":f"Avoid growing: {', '.join(harmful)} in current weather.","action":"Consider alternate crops better suited to current conditions."})
+        alerts_list.append({"type":"info","category":"Crop Advisory","icon":"fa-seedling","title":"Crops at Risk","message":f"Avoid growing: {', '.join(harmful)} in current weather.","action":"Consider alternate crops better suited to current conditions."})
     return jsonify({"alerts": alerts_list, "total": len(alerts_list)})
 
 # ── Market Prices — with data.gov.in real data ───────────
@@ -325,11 +325,9 @@ CITY_FACTORS = {
     "Coimbatore":1.05,"Visakhapatnam":1.03,"Bhubaneswar":0.98,"Guwahati":1.01,"Amritsar":1.00,
 }
 
-# Cache for real data
 _market_cache = {"data": None, "date": None}
 
 def fetch_real_mandi_data():
-    """Fetch real data from data.gov.in Agmarknet API"""
     if not DATAGOV_API_KEY:
         return None
     try:
@@ -346,8 +344,6 @@ def fetch_real_mandi_data():
         records = resp.json().get("records", [])
         if not records:
             return None
-
-        # Build market data from real records
         markets = {}
         for r in records:
             city = r.get("Market", "").strip()
@@ -355,11 +351,8 @@ def fetch_real_mandi_data():
             modal_price = r.get("Modal_Price", 0)
             min_price   = r.get("Min_Price", 0)
             max_price   = r.get("Max_Price", 0)
-
             if not city or not commodity or not modal_price:
                 continue
-
-            # Normalize commodity name to match our crops
             crop_map = {
                 "Paddy": "Rice", "Rice": "Rice",
                 "Wheat": "Wheat", "Maize": "Maize",
@@ -371,10 +364,8 @@ def fetch_real_mandi_data():
                 "Moong": "Moong", "Urad": "Urad",
             }
             crop_name = crop_map.get(commodity, commodity)
-
             if city not in markets:
                 markets[city] = []
-
             msp = MSP_PRICES.get(crop_name, int(modal_price))
             markets[city].append({
                 "crop":       crop_name,
@@ -395,7 +386,6 @@ def fetch_real_mandi_data():
         return None
 
 def get_hardcoded_markets():
-    """Fallback hardcoded MSP-based prices"""
     seed = int(datetime.now().strftime("%Y%m%d"))
     rng  = random.Random(seed)
     markets = {}
@@ -423,13 +413,10 @@ def get_hardcoded_markets():
 def get_market_data():
     global _market_cache
     today = datetime.now().strftime("%Y-%m-%d")
-
-    # Use cache if same day
     if _market_cache["date"] == today and _market_cache["data"]:
         markets = _market_cache["data"]
         data_source = "live"
     else:
-        # Try real data first
         real = fetch_real_mandi_data()
         if real and len(real) >= 3:
             markets = real
@@ -440,11 +427,9 @@ def get_market_data():
             markets = get_hardcoded_markets()
             data_source = "indicative"
             print(f"[Market] Using HARDCODED fallback data")
-
     location = request.args.get("location", "").strip().lower()
     if location:
         markets = {c: v for c, v in markets.items() if location in c.lower()}
-
     return jsonify({
         "markets":     markets,
         "locations":   list(markets.keys()),
