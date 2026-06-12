@@ -1,5 +1,10 @@
 function requestLocation() {
   const btn = document.getElementById('locationBtn');
+  const CROP_EMOJI = {
+  Rice:'🌾', Wheat:'🌿', Maize:'🌽', Cotton:'☁️', Tomato:'🍅',
+  Sugarcane:'🎋', Soybean:'🫘', Mustard:'🌻', Onion:'🧅', Potato:'🥔',
+  Chilli:'🌶️', Groundnut:'🥜', Arhar:'🫛', Moong:'🫛', Urad:'🫛',
+};
   if (btn) {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span>Getting location...</span>';
     btn.disabled  = true;
@@ -208,7 +213,21 @@ async function loadCrops(current) {
     if (label) label.textContent = `${getSeason(data.season)} — ${current.city}`;
   } catch { showToast('Could not load crop data.', 'error'); }
 }
+function translateLevel(val) {
+  const map = {
+    'Very High': translate('level_very_high'),
+    'High':      translate('level_high'),
+    'Medium':    translate('level_medium'),
+    'Low':       translate('level_low'),
+  };
+  return map[val] || val;
+}
 
+function translateDuration(val) {
+  // e.g. "90-150 days" → "90-150 <translated days>"
+  const daysWord = translate('unit_days');
+  return val.replace(/days/gi, daysWord);
+}
 function renderCrops(data) {
   const section = document.getElementById('cropSection');
   const grid    = document.getElementById('cropsGrid');
@@ -224,22 +243,21 @@ function renderCrops(data) {
   grid.innerHTML = (data.crops || []).map((crop, i) => `
     <div class="crop-card" style="animation-delay:${i*0.07}s">
       <div class="crop-card-top">
-        <div class="crop-emoji">🌱</div>
+        <div class="crop-emoji">${CROP_EMOJI[crop.name] || '🌱'}</div>
         <div class="crop-match-badge"><i class="fas fa-check-circle"></i> ${crop.match}</div>
       </div>
       <div class="crop-name">${getCropName(crop.name)}</div>
       <div class="crop-desc">${getCropDesc(crop.name)}</div>
       <div class="crop-meta">
-        <div class="cm-item"><span class="cm-label">Season</span><span class="cm-val">${getSeason(crop.season)}</span></div>
-        <div class="cm-item"><span class="cm-label">Water</span><span class="cm-val">${crop.water}</span></div>
-        <div class="cm-item"><span class="cm-label">Yield</span><span class="cm-val">${crop.yield}</span></div>
-        <div class="cm-item"><span class="cm-label">Duration</span><span class="cm-val">${crop.duration}</span></div>
+        <div class="cm-item"><span class="cm-label">${translate('cm_season')}</span><span class="cm-val">${getSeason(crop.season)}</span></div>
+        <div class="cm-item"><span class="cm-label">${translate('cm_water')}</span><span class="cm-val">${translateLevel(crop.water)}</span></div>
+        <div class="cm-item"><span class="cm-label">${translate('cm_yield')}</span><span class="cm-val">${crop.yield}</span></div>
+        <div class="cm-item"><span class="cm-label">${translate('cm_duration')}</span><span class="cm-val">${translateDuration(crop.duration)}</span></div>
       </div>
       <div class="crop-profit"><i class="fas fa-indian-rupee-sign"></i> ${crop.profit}</div>
     </div>`).join('');
   setTimeout(() => observeAnimations(), 100);
 }
-
 function renderSoilTips(tips) {
   const section = document.getElementById('soilSection');
   const grid    = document.getElementById('soilGrid');
