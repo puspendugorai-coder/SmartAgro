@@ -1029,4 +1029,20 @@ document.addEventListener('DOMContentLoaded', () => {
   buildLangList();
   applyTranslations();
   updateLangUI();
+// ── Completion of Helper functions ──
+function getAlertT(key) {
+  return (ALERT_T[currentLang] || ALERT_T.en)[key] || (ALERT_T.en)[key] || key;
+}
+
+function getSoilT(key) {
+  return (SOIL_T[currentLang] || SOIL_T.en)[key] || (SOIL_T.en)[key] || key;
+}
+
+function getPestT(key) {
+  return (PEST_T[currentLang] || PEST_T.en)[key] || (PEST_T.en)[key] || key;
+}
+
+function getMarketT(key) {
+  return (MARKET_T[currentLang] || MARKET_T.en)[key] || (MARKET_T.en)[key] || key;
+}
 });
