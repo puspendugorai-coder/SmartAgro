@@ -487,7 +487,9 @@ const T = {
     stat_temp:'Temperature',stat_humidity:'Humidity',stat_wind:'Wind',
     stat_visibility:'Visibility',stat_pressure:'Pressure',install_app:'Install App',cm_season:'Season', cm_water:'Water', cm_yield:'Yield', cm_duration:'Duration',
     level_very_high:'Very High', level_high:'High', level_medium:'Medium', level_low:'Low',
-    unit_days:'days',
+    unit_days:'days',diag_cause:'Cause', diag_recovery:'Recovery', diag_eco:'Eco-Friendly Treatment',diag_recommended:'RECOMMENDED', diag_chemical:'Chemical Treatment',
+    diag_prevention:'Prevention', diag_confidence:'Confidence', diag_severity:'Severity',diag_disclaimer:'AI diagnosis for guidance only. Consult a local agronomist for critical decisions.',
+
   },
   hi: {
     nav_home:'होम',nav_diagnose:'फसल जांच',nav_market:'मंडी भाव',nav_alerts:'अलर्ट',
@@ -531,7 +533,11 @@ const T = {
     stat_temp:'तापमान',stat_humidity:'आर्द्रता',stat_wind:'हवा',
     stat_visibility:'दृश्यता',stat_pressure:'दबाव',install_app:'App इंस्टॉल करें',  cm_season:'मौसम', cm_water:'पानी', cm_yield:'उपज', cm_duration:'अवधि',
     level_very_high:'बहुत अधिक', level_high:'अधिक', level_medium:'मध्यम', level_low:'कम',
-    unit_days:'दिन',
+    unit_days:'दिन',diag_cause:'कारण', diag_recovery:'ठीक होने का समय', diag_eco:'पर्यावरण-अनुकूल उपचार',
+diag_recommended:'अनुशंसित', diag_chemical:'रासायनिक उपचार',
+diag_prevention:'रोकथाम', diag_confidence:'विश्वसनीयता', diag_severity:'गंभीरता',
+diag_disclaimer:'AI निदान केवल मार्गदर्शन के लिए है। महत्वपूर्ण निर्णयों के लिए स्थानीय कृषि विशेषज्ञ से सलाह लें।',
+
   },
   bn: {
     nav_home:'হোম',nav_diagnose:'ফসল নির্ণয়',nav_market:'বাজার মূল্য',nav_alerts:'সতর্কতা',
@@ -563,7 +569,15 @@ const T = {
     chat_placeholder:'টাইপ করুন বা বলুন...',helpline:'কিসান হেল্পলাইন',
     stat_temp:'তাপমাত্রা',stat_humidity:'আর্দ্রতা',stat_wind:'বায়ু',stat_visibility:'দৃশ্যমানতা',stat_pressure:'চাপ',  cm_season:'মৌসুম', cm_water:'জল', cm_yield:'ফলন', cm_duration:'সময়কাল',
     level_very_high:'অত্যধিক', level_high:'বেশি', level_medium:'মাঝারি', level_low:'কম',
-    unit_days:'দিন',
+    unit_days:'দিন',diag_cause:'কারণ',diag_cause: 'কারণ',
+  diag_recovery: 'সেরে উঠতে সময়',
+  diag_eco: 'পরিবেশ-বান্ধব চিকিৎসা',
+  diag_recommended: 'প্রস্তাবিত',
+  diag_chemical: 'রাসায়নিক চিকিৎসা',
+  diag_prevention: 'প্রতিরোধ',
+  diag_confidence: 'নিশ্চয়তা',
+  diag_severity: 'তীব্রতা',
+  diag_disclaimer: 'AI রোগ নির্ণয় শুধু গাইডেন্সের জন্য। গুরুত্বপূর্ণ সিদ্ধান্তে স্থানীয় কৃষি বিশেষজ্ঞের পরামর্শ নিন।'
   },
   ta: {
     nav_home:'முகப்பு',nav_diagnose:'பயிர் நோய்',nav_market:'சந்தை விலை',nav_alerts:'எச்சரிக்கை',
@@ -596,7 +610,16 @@ const T = {
     stat_temp:'வெப்பநிலை',stat_humidity:'ஈரப்பதம்',stat_wind:'காற்று',stat_visibility:'தெரிவுத்திறன்',stat_pressure:'அழுத்தம்',
     cm_season:'பருவம்', cm_water:'நீர்', cm_yield:'விளைச்சல்', cm_duration:'காலம்',
     level_very_high:'மிக அதிகம்', level_high:'அதிகம்', level_medium:'நடுத்தரம்', level_low:'குறைவு',
-    unit_days:'நாட்கள்',
+    unit_days:'நாட்கள்',ta: {
+    diag_cause: 'காரணம்',
+    diag_recovery: 'குணமடைதல்',
+    diag_eco: 'சூழல் நட்பு சிகிச்சை',
+    diag_recommended: 'பரிந்துரைக்கப்படுவது',
+    diag_chemical: 'வேதியியல் சிகிச்சை',
+    diag_prevention: 'தடுப்பு முறை',
+    diag_confidence: 'நம்பிக்கை',
+    diag_severity: 'தீவிரம்',
+    diag_disclaimer: 'AI கண்டறிதல் வழிகாட்டுதலுக்காக மட்டுமே. முக்கியமான முடிவுகளுக்கு உள்ளூர் விவசாய நிபுணரை அணுகவும்.'
   },
   te: {
     nav_home:'హోమ్',nav_diagnose:'పంట నిర్ధారణ',nav_market:'మార్కెట్ ధరలు',nav_alerts:'హెచ్చరికలు',
@@ -628,7 +651,15 @@ const T = {
     chat_placeholder:'టైప్ చేయండి లేదా మాట్లాడండి...',helpline:'కిసాన్ హెల్ప్‌లైన్',
     stat_temp:'ఉష్ణోగ్రత',stat_humidity:'తేమ',stat_wind:'గాలి',stat_visibility:'దృశ్యమానత',stat_pressure:'పీడనం',  cm_season:'సీజన్', cm_water:'నీరు', cm_yield:'దిగుబడి', cm_duration:'వ్యవధి',
     level_very_high:'చాలా అధికం', level_high:'అధికం', level_medium:'మధ్యమం', level_low:'తక్కువ',
-    unit_days:'రోజులు',
+    unit_days:'రోజులు',diag_cause: 'కారణం',
+    diag_recovery: 'కోలుకోవడం',
+    diag_eco: 'పర్యావరణ అనుకూల చికిత్స',
+    diag_recommended: 'సిఫార్సు చేయబడింది',
+    diag_chemical: 'రసాయన చికిత్స',
+    diag_prevention: 'నివారణ',
+    diag_confidence: 'విశ్వాసం',
+    diag_severity: 'తీవ్రత',
+    diag_disclaimer: 'AI నిర్ధారణ కేవలం మార్గదర్శకత్వం కోసం మాత్రమే. కీలక నిర్ణయాల కోసం స్థానిక వ్యవసాయ నిపుణులను సంప్రదించండి.'
   },
   mr: {
     nav_home:'होम',nav_diagnose:'पीक निदान',nav_market:'बाजारभाव',nav_alerts:'सतर्कता',
@@ -660,7 +691,15 @@ const T = {
     chat_placeholder:'लिहा किंवा बोला...',helpline:'किसान हेल्पलाइन',
     stat_temp:'तापमान',stat_humidity:'आर्द्रता',stat_wind:'वारा',stat_visibility:'दृश्यमानता',stat_pressure:'दाब', cm_season:'हंगाम', cm_water:'पाणी', cm_yield:'उत्पादन', cm_duration:'कालावधी',
     level_very_high:'खूप जास्त', level_high:'जास्त', level_medium:'मध्यम', level_low:'कमी',
-    unit_days:'दिवस',
+    unit_days:'दिवस',diag_cause: 'कारण',
+    diag_recovery: 'बरे होणे',
+    diag_eco: 'पर्यावरणपूरक उपचार',
+    diag_recommended: 'शिफारस केलेले',
+    diag_chemical: 'रासायनिक उपचार',
+    diag_prevention: 'प्रतिबंध',
+    diag_confidence: 'विश्वास',
+    diag_severity: 'तीव्रता',
+    diag_disclaimer: 'एआय निदान केवळ मार्गदर्शनासाठी आहे. महत्त्वाच्या निर्णयांसाठी स्थानिक कृषी तज्ञांचा सल्ला घ्या.'
   },
   pa: {
     nav_home:'ਹੋਮ',nav_diagnose:'ਫਸਲ ਜਾਂਚ',nav_market:'ਮੰਡੀ ਭਾਅ',nav_alerts:'ਚੇਤਾਵਨੀ',
@@ -692,7 +731,15 @@ const T = {
     chat_placeholder:'ਲਿਖੋ ਜਾਂ ਬੋਲੋ...',helpline:'ਕਿਸਾਨ ਹੈਲਪਲਾਈਨ',
     stat_temp:'ਤਾਪਮਾਨ',stat_humidity:'ਨਮੀ',stat_wind:'ਹਵਾ',stat_visibility:'ਦਿੱਖ',stat_pressure:'ਦਬਾਅ',cm_season:'ਮੌਸਮ', cm_water:'ਪਾਣੀ', cm_yield:'ਝਾੜ', cm_duration:'ਸਮਾਂ',
     level_very_high:'ਬਹੁਤ ਜ਼ਿਆਦਾ', level_high:'ਜ਼ਿਆਦਾ', level_medium:'ਦਰਮਿਆਨਾ', level_low:'ਘੱਟ',
-    unit_days:'ਦਿਨ',
+    unit_days:'ਦਿਨ',diag_cause: 'ਕਾਰਨ',
+    diag_recovery: 'ਠੀਕ ਹੋਣਾ',
+    diag_eco: 'ਵਾਤਾਵਰਣ-ਅਨੁਕੂਲ ਇਲਾਜ',
+    diag_recommended: 'ਸਿਫਾਰਸ਼ ਕੀਤੀ ਗਈ',
+    diag_chemical: 'ਰਸਾਇਣਕ ਇਲਾਜ',
+    diag_prevention: 'ਰੋਕਥਾਮ',
+    diag_confidence: 'ਵਿਸ਼ਵਾਸ',
+    diag_severity: 'ਗੰਭੀਰਤਾ',
+    diag_disclaimer: 'AI ਨਿਦਾਨ ਸਿਰਫ ਮਾਰਗਦਰਸ਼ਨ ਲਈ ਹੈ। ਮਹੱਤਵਪੂਰਨ ਫੈਸਲਿਆਂ ਲਈ ਸਥਾਨਕ ਖੇਤੀਬਾੜੀ ਮਾਹਰ ਨਾਲ ਸਲਾਹ ਕਰੋ।'
   },
   gu: {
     nav_home:'હોમ',nav_diagnose:'પાક નિદાન',nav_market:'બજાર ભાવ',nav_alerts:'ચેતવણી',
@@ -724,7 +771,16 @@ const T = {
     chat_placeholder:'લખો અથવા બોલો...',helpline:'કિસાન હેલ્પલાઈન',
     stat_temp:'તાપમાન',stat_humidity:'ભેજ',stat_wind:'પવન',stat_visibility:'દ્રષ્ટિ',stat_pressure:'દબાણ',cm_season:'ઋતુ', cm_water:'પાણી', cm_yield:'ઉત્પાદન', cm_duration:'સમયગાળો',
     level_very_high:'ખૂબ વધારે', level_high:'વધારે', level_medium:'મધ્યમ', level_low:'ઓછું',
-    unit_days:'દિવસ',
+    unit_days:'દિવસ',diag_cause: 'કારણ',
+    diag_recovery: 'સાજા થવું',
+    diag_eco: 'પર્યાવરણ-અનુકૂળ સારવાર',
+    diag_recommended: 'ભલામણ કરેલ',
+    diag_chemical: 'રાસાયણિક સારવાર',
+    diag_prevention: 'નિવારણ',
+    diag_confidence: 'આત્મવિશ્વાસ',
+    diag_severity: 'તીવ્રતા',
+    diag_disclaimer: 'AI નિદાન ફક્ત માર્ગદર્શન માટે છે. મહત્વપૂર્ણ નિર્ણયો માટે સ્થાનિક કૃષિ નિષ્ણાતની સલાહ લો.'
+  },
   },
   kn: {
     nav_home:'ಹೋಮ್',nav_diagnose:'ಬೆಳೆ ರೋಗ',nav_market:'ಬೆಲೆಗಳು',nav_alerts:'ಎಚ್ಚರಿಕೆ',
@@ -756,7 +812,15 @@ const T = {
     chat_placeholder:'ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಮಾತನಾಡಿ...',helpline:'ಕಿಸಾನ್ ಸಹಾಯವಾಣಿ',
     stat_temp:'ತಾಪಮಾನ',stat_humidity:'ಆರ್ದ್ರತೆ',stat_wind:'ಗಾಳಿ',stat_visibility:'ದೃಶ್ಯಮಾನತೆ',stat_pressure:'ಒತ್ತಡ',  cm_season:'ಋತು', cm_water:'ನೀರು', cm_yield:'ಇಳುವರಿ', cm_duration:'ಅವಧಿ',
     level_very_high:'ಬಹಳ ಹೆಚ್ಚು', level_high:'ಹೆಚ್ಚು', level_medium:'ಮಧ್ಯಮ', level_low:'ಕಡಿಮೆ',
-    unit_days:'ದಿನಗಳು',
+    unit_days:'ದಿನಗಳು',diag_cause: 'ಕಾರಣ',
+    diag_recovery: 'ಚೇತರಿಕೆ',
+    diag_eco: 'ಪರಿಸರ ಸ್ನೇಹಿ ಚಿಕಿತ್ಸೆ',
+    diag_recommended: 'ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ',
+    diag_chemical: 'ರಾಸಾಯನಿಕ ಚಿಕಿತ್ಸೆ',
+    diag_prevention: 'ತಡೆಗಟ್ಟುವಿಕೆ',
+    diag_confidence: 'ವಿಶ್ವಾಸ',
+    diag_severity: 'ತೀವ್ರತೆ',
+    diag_disclaimer: 'AI ರೋಗನಿರ್ಣಯವು ಕೇವಲ ಮಾರ್ಗದರ್ಶನಕ್ಕಾಗಿ ಮಾತ್ರ. ನಿರ್ಣಾಯಕ ನಿರ್ಧಾರಗಳಿಗಾಗಿ ಸ್ಥಳೀಯ ಕೃಷಿ ತಜ್ಞರನ್ನು ಸಂಪರ್ಕಿಸಿ.'
   },
   ml: {
     nav_home:'ഹോം',nav_diagnose:'വിള രോഗം',nav_market:'വിപണി വില',nav_alerts:'മുന്നറിയിപ്പ്',
@@ -789,7 +853,15 @@ const T = {
     stat_temp:'താപനില',stat_humidity:'ആർദ്രത',stat_wind:'കാറ്റ്',stat_visibility:'ദൃശ്യദൂരം',stat_pressure:'മർദ്ദം',
     cm_season:'സീസൺ', cm_water:'ജലം', cm_yield:'വിളവ്', cm_duration:'കാലാവധി',
     level_very_high:'വളരെ ഉയർന്ന', level_high:'ഉയർന്ന', level_medium:'മധ്യമം', level_low:'കുറഞ്ഞ',
-    unit_days:'ദിവസം',
+    unit_days:'ദിവസം',diag_cause: 'കാരണം',
+    diag_recovery: 'സുഖം പ്രാപിക്കൽ',
+    diag_eco: 'പരിസ്ഥിതി സൗഹൃദ ചികിത്സ',
+    diag_recommended: 'നിർദ്ദേശിക്കുന്നത്',
+    diag_chemical: 'രാസ ചികിത്സ',
+    diag_prevention: 'പ്രതിരോധം',
+    diag_confidence: 'ആത്മവിശ്വാസം',
+    diag_severity: 'തീവ്രത',
+    diag_disclaimer: 'AI രോഗനിർണ്ണയം മാർഗ്ഗനിർദ്ദേശത്തിന് മാത്രമുള്ളതാണ്. നിർണ്ണായക തീരുമാനങ്ങൾക്കായി ഒരു പ്രാദേശിക കാർഷിക വിദഗ്ദ്ധനെ സമീപിക്കുക.'
   },
   or: {
     nav_home:'ହୋମ',nav_diagnose:'ଫସଲ ରୋଗ',nav_market:'ବଜାର ଦର',nav_alerts:'ସତର୍କତା',
@@ -822,7 +894,15 @@ const T = {
     stat_temp:'ତାପମାତ୍ରା',stat_humidity:'ଆର୍ଦ୍ରତା',stat_wind:'ପବନ',stat_visibility:'ଦୃଶ୍ୟମାନତା',stat_pressure:'ଚାପ',
     cm_season:'ଋତୁ', cm_water:'ଜଳ', cm_yield:'ଅମଳ', cm_duration:'ଅବଧି',
     level_very_high:'ଅତ୍ୟଧିକ', level_high:'ଅଧିକ', level_medium:'ମଧ୍ୟମ', level_low:'କମ',
-    unit_days:'ଦିନ',
+    unit_days:'ଦିନ',diag_cause: 'କାରଣ',
+    diag_recovery: 'ସୁସ୍ଥ ହେବା',
+    diag_eco: 'ପରିବେଶ ଅନୁକୂଳ ଚିକିତ୍ସା',
+    diag_recommended: 'ସୁପାରିଶ କରାଯାଇଛି',
+    diag_chemical: 'ରାସାୟନିକ ଚିକିତ୍ସା',
+    diag_prevention: 'ପ୍ରତିରୋଧ',
+    diag_confidence: 'ଆତ୍ମବିଶ୍ୱାସ',
+    diag_severity: 'ଗମ୍ଭୀରତା',
+    diag_disclaimer: 'AI ନିଦାନ କେବଳ ମାର୍ଗଦର୍ଶନ ପାଇଁ। ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ ନିଷ୍ପତ୍ତି ପାଇଁ ସ୍ଥानीय କୃଷି ବିଶେଷଜ୍ଞଙ୍କ ସହିତ ପରାମର୍ଶ କରନ୍ତୁ।'
   },
   as: {
     nav_home:'হোম',nav_diagnose:'শস্য ৰোগ',nav_market:'বজাৰ মূল্য',nav_alerts:'সতৰ্কতা',
@@ -855,7 +935,15 @@ const T = {
     stat_temp:'তাপমাত্ৰা',stat_humidity:'আর্দ্রতা',stat_wind:'বতাহ',stat_visibility:'দৃশ্যমানতা',stat_pressure:'চাপ',
     cm_season:'ঋতু', cm_water:'পানী', cm_yield:'উৎপাদন', cm_duration:'সময়কাল',
     level_very_high:'অতি বেছি', level_high:'বেছি', level_medium:'মধ্যমীয়া', level_low:'কম',
-    unit_days:'দিন',
+    unit_days:'দিন',diag_cause: 'কাৰণ',
+    diag_recovery: 'সুস্থ হোৱা',
+    diag_eco: 'পৰিৱেশ-অনুকূল চিকিৎসা',
+    diag_recommended: 'পৰামৰ্শ দিয়া হৈছে',
+    diag_chemical: 'ৰাসায়নিক চিকিৎসা',
+    diag_prevention: 'প্ৰতিৰোধ',
+    diag_confidence: 'বিশ্বাস',
+    diag_severity: 'তীব্ৰতা',
+    diag_disclaimer: 'AI নিদান কেৱল মাৰ্গদৰ্শনৰ বাবেহে। গুৰুত্বপূৰ্ণ সিদ্ধান্তৰ বাবে স্থানীয় কৃষি বিশেষজ্ঞৰ পৰামৰ্শ লওক।'
   },};
 
 let currentLang = localStorage.getItem('agrosmart_lang') || 'en';
