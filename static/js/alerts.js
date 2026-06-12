@@ -44,26 +44,52 @@ function updateCounts(alerts) {
   set('totalCount',alerts.length);
 }
 
-function renderAlerts(alerts) {
-  const list=document.getElementById('alertsList');
-  const none=document.getElementById('noAlerts');
+function renderAlertsList(alerts) {
+  window._lastAlertsData = alerts; // cache for re-render
+  const list  = document.getElementById('alertsList');
+  const none  = document.getElementById('noAlerts');
+  const badge = document.getElementById('alertBadge');
+
   if (!list) return;
-  if (!alerts.length) { list.innerHTML=''; if(none) none.style.display='block'; return; }
-  if (none) none.style.display='none';
-  list.innerHTML=alerts.map((a,i)=>`
-    <div class="alert-card ${a.type}" data-type="${a.type}" data-category="${a.category}" style="animation-delay:${i*0.07}s">
-      <div class="alert-card-icon">${a.icon}</div>
+  if (!alerts || alerts.length === 0) {
+    list.style.display  = 'none';
+    if (none) none.style.display = '';
+    updateAlertBadge(0);
+    return;
+  }
+
+  if (none) none.style.display = 'none';
+  list.style.display  = '';
+
+  // Update summary counts
+  const danger  = alerts.filter(a => a.type === 'danger').length;
+  const warning = alerts.filter(a => a.type === 'warning').length;
+  const info    = alerts.filter(a => a.type === 'info').length;
+  const setEl   = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  setEl('dangerCount',  danger);
+  setEl('warningCount', warning);
+  setEl('infoCount',    info);
+  setEl('totalCount',   alerts.length);
+  updateAlertBadge(danger + warning);
+  sessionStorage.setItem('alert_count', danger + warning);
+
+  list.innerHTML = alerts.map((a, i) => `
+    <div class="alert-card ${a.type}" style="animation-delay:${i*0.06}s">
+      <div class="alert-card-icon">
+        <i class="fas ${a.icon}"></i>
+      </div>
       <div class="alert-card-body">
         <div class="alert-card-top">
-          <span class="alert-card-title">${a.title}</span>
+          <span class="alert-card-title">${getAlertT(a.title)}</span>
           <span class="alert-category cat-${a.category.toLowerCase().replace(' ','-')}">${a.category}</span>
         </div>
         <div class="alert-card-msg">${a.message}</div>
-        <div class="alert-card-action"><i class="fas fa-circle-right"></i> <strong>Action:</strong> ${a.action}</div>
+        <div class="alert-card-action">
+          <i class="fas fa-lightbulb"></i> ${a.action}
+        </div>
       </div>
     </div>`).join('');
 }
-
 function filterAlerts(filter) {
   document.querySelectorAll('.alert-tab').forEach(t=>t.classList.remove('active'));
   event.target.classList.add('active');
