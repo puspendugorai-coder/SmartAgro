@@ -991,6 +991,15 @@ function rerenderDynamic() {
   if (typeof renderGrid === 'function' && window.allMarketData) {
     renderGrid(window.allMarketData);
   }
+  if (typeof buildDiagnosisHTML === 'function' && window._lastDiagnosisData) {
+    buildDiagnosisHTML(window._lastDiagnosisData);
+  }
+  if (typeof renderPestCalendar === 'function' && window._lastPestWeather) {
+    renderPestCalendar(window._lastPestWeather);
+  }
+  if (typeof renderHarmfulSafe === 'function' && window._lastHarmfulWeather) {
+    renderHarmfulSafe(window._lastHarmfulWeather);
+  }
 }
 
 function setLanguage(code) {
