@@ -485,5 +485,60 @@ Keep answers SHORT and PRACTICAL. Use simple words. Be encouraging."""
     except Exception as e:
         return jsonify({"reply": f"Error: {str(e)}"}), 500
 
+# ── Language names for translation prompts ──────────────
+LANG_NAMES = {
+    'hi':'Hindi','bn':'Bengali','ta':'Tamil','te':'Telugu','mr':'Marathi',
+    'pa':'Punjabi','gu':'Gujarati','kn':'Kannada','ml':'Malayalam',
+    'or':'Odia','as':'Assamese'
+}
+
+# ── Generic text translation via Groq ────────────────────
+@app.route("/api/translate", methods=["POST"])
+def translate_texts():
+    data  = request.json or {}
+    texts = data.get("texts", [])
+    lang  = data.get("lang", "en")
+
+    if not texts or lang == "en" or lang not in LANG_NAMES:
+        return jsonify({"translations": texts})
+
+    if not GROQ_API_KEY:
+        return jsonify({"translations": texts})
+
+    lang_name = LANG_NAMES[lang]
+    prompt = (
+        f"Translate each string in this JSON array into {lang_name}. "
+        f"Return ONLY a valid JSON array of {len(texts)} translated strings, "
+        f"same order, no markdown, no extra text. "
+        f"Keep numbers, units (%, °C, ml/ha, kg, ₹, etc.) and chemical/product names mostly as-is.\n\n"
+        f"{json.dumps(texts, ensure_ascii=False)}"
+    )
+    try:
+        resp = requests.post(
+            "https://api.groq.com/openai/v1/chat/completions",
+            headers={"Authorization": f"Bearer {GROQ_API_KEY}", "Content-Type": "application/json"},
+            json={
+                "model": "llama-3.3-70b-versatile",
+                "messages": [
+                    {"role": "system", "content": "You are a professional translator. Return ONLY a valid JSON array, nothing else."},
+                    {"role": "user", "content": prompt}
+                ],
+                "temperature": 0.2,
+                "max_tokens": 2000
+            }, timeout=30)
+        if resp.status_code != 200:
+            return jsonify({"translations": texts})
+        raw   = resp.json()["choices"][0]["message"]["content"].strip()
+        clean = re.sub(r"```(?:json)?", "", raw).replace("```", "").strip()
+        match = re.search(r"\[.*\]", clean, re.DOTALL)
+        if match:
+            translated = json.loads(match.group())
+            if isinstance(translated, list) and len(translated) == len(texts):
+                return jsonify({"translations": translated})
+        return jsonify({"translations": texts})
+    except Exception as e:
+        print(f"[translate error] {e}")
+        return jsonify({"translations": texts})
+
 if __name__ == "__main__":
     app.run(debug=True, port=5000)
