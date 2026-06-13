@@ -569,7 +569,7 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     chat_placeholder:'টাইপ করুন বা বলুন...',helpline:'কিসান হেল্পলাইন',
     stat_temp:'তাপমাত্রা',stat_humidity:'আর্দ্রতা',stat_wind:'বায়ু',stat_visibility:'দৃশ্যমানতা',stat_pressure:'চাপ',  cm_season:'মৌসুম', cm_water:'জল', cm_yield:'ফলন', cm_duration:'সময়কাল',
     level_very_high:'অত্যধিক', level_high:'বেশি', level_medium:'মাঝারি', level_low:'কম',
-    unit_days:'দিন',diag_cause:'কারণ',diag_cause: 'কারণ',
+    unit_days:'দিন',diag_cause:'কারণ',
   diag_recovery: 'সেরে উঠতে সময়',
   diag_eco: 'পরিবেশ-বান্ধব চিকিৎসা',
   diag_recommended: 'প্রস্তাবিত',
@@ -610,7 +610,7 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     stat_temp:'வெப்பநிலை',stat_humidity:'ஈரப்பதம்',stat_wind:'காற்று',stat_visibility:'தெரிவுத்திறன்',stat_pressure:'அழுத்தம்',
     cm_season:'பருவம்', cm_water:'நீர்', cm_yield:'விளைச்சல்', cm_duration:'காலம்',
     level_very_high:'மிக அதிகம்', level_high:'அதிகம்', level_medium:'நடுத்தரம்', level_low:'குறைவு',
-    unit_days:'நாட்கள்',ta: {
+    unit_days:'நாட்கள்',
     diag_cause: 'காரணம்',
     diag_recovery: 'குணமடைதல்',
     diag_eco: 'சூழல் நட்பு சிகிச்சை',
@@ -780,7 +780,6 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     diag_confidence: 'આત્મવિશ્વાસ',
     diag_severity: 'તીવ્રતા',
     diag_disclaimer: 'AI નિદાન ફક્ત માર્ગદર્શન માટે છે. મહત્વપૂર્ણ નિર્ણયો માટે સ્થાનિક કૃષિ નિષ્ણાતની સલાહ લો.'
-  },
   },
   kn: {
     nav_home:'ಹೋಮ್',nav_diagnose:'ಬೆಳೆ ರೋಗ',nav_market:'ಬೆಲೆಗಳು',nav_alerts:'ಎಚ್ಚರಿಕೆ',
@@ -1029,20 +1028,4 @@ document.addEventListener('DOMContentLoaded', () => {
   buildLangList();
   applyTranslations();
   updateLangUI();
-// ── Completion of Helper functions ──
-function getAlertT(key) {
-  return (ALERT_T[currentLang] || ALERT_T.en)[key] || (ALERT_T.en)[key] || key;
-}
-
-function getSoilT(key) {
-  return (SOIL_T[currentLang] || SOIL_T.en)[key] || (SOIL_T.en)[key] || key;
-}
-
-function getPestT(key) {
-  return (PEST_T[currentLang] || PEST_T.en)[key] || (PEST_T.en)[key] || key;
-}
-
-function getMarketT(key) {
-  return (MARKET_T[currentLang] || MARKET_T.en)[key] || (MARKET_T.en)[key] || key;
-}
 });
