@@ -48,7 +48,6 @@ function renderAlertsList(alerts) {
   window._lastAlertsData = alerts; // cache for re-render
   const list  = document.getElementById('alertsList');
   const none  = document.getElementById('noAlerts');
-  const badge = document.getElementById('alertBadge');
 
   if (!list) return;
   if (!alerts || alerts.length === 0) {
@@ -61,7 +60,6 @@ function renderAlertsList(alerts) {
   if (none) none.style.display = 'none';
   list.style.display  = '';
 
-  // Update summary counts
   const danger  = alerts.filter(a => a.type === 'danger').length;
   const warning = alerts.filter(a => a.type === 'warning').length;
   const info    = alerts.filter(a => a.type === 'info').length;
@@ -73,8 +71,27 @@ function renderAlertsList(alerts) {
   updateAlertBadge(danger + warning);
   sessionStorage.setItem('alert_count', danger + warning);
 
+  renderAlertsHTML(alerts);
+}
+
+async function renderAlertsHTML(alerts) {
+  const list = document.getElementById('alertsList');
+  if (!list) return;
+
+  let messages = alerts.map(a => a.message);
+  let actions  = alerts.map(a => a.action);
+
+  if (typeof currentLang !== 'undefined' && currentLang !== 'en') {
+    try {
+      const translatedMsgs = await translateDynamicTexts(messages, currentLang);
+      const translatedActs = await translateDynamicTexts(actions, currentLang);
+      messages = translatedMsgs;
+      actions  = translatedActs;
+    } catch (e) { console.error(e); }
+  }
+
   list.innerHTML = alerts.map((a, i) => `
-    <div class="alert-card ${a.type}" style="animation-delay:${i*0.06}s">
+    <div class="alert-card ${a.type}" data-type="${a.type}" data-category="${a.category}" style="animation-delay:${i*0.06}s">
       <div class="alert-card-icon">
         <i class="fas ${a.icon}"></i>
       </div>
@@ -83,13 +100,14 @@ function renderAlertsList(alerts) {
           <span class="alert-card-title">${getAlertT(a.title)}</span>
           <span class="alert-category cat-${a.category.toLowerCase().replace(' ','-')}">${a.category}</span>
         </div>
-        <div class="alert-card-msg">${a.message}</div>
+        <div class="alert-card-msg">${messages[i]}</div>
         <div class="alert-card-action">
-          <i class="fas fa-lightbulb"></i> ${a.action}
+          <i class="fas fa-lightbulb"></i> ${actions[i]}
         </div>
       </div>
     </div>`).join('');
 }
+
 function filterAlerts(filter) {
   document.querySelectorAll('.alert-tab').forEach(t=>t.classList.remove('active'));
   event.target.classList.add('active');
@@ -112,22 +130,34 @@ const PESTS=[
   {name:'Stem Borer',icon:'🐞',season:'Kharif (Jun–Sep)',risk:'High',crops:'Rice, Maize',description:'Bores into stems causing dead heart in vegetative stage.',prevention:'Pheromone traps. Remove crop residues.'},
 ];
 
-function renderPestCalendar(weather) {
+async function renderPestCalendar(weather) {
+  window._lastPestWeather = weather; // cache for re-render
   const grid=document.getElementById('pestCalendarGrid');
   if (!grid) return;
   const highRisk=weather.humidity>70||weather.temp>30;
+
+  let descs = PESTS.map(p=>p.description);
+  let prevs = PESTS.map(p=>p.prevention);
+
+  if (typeof currentLang !== 'undefined' && currentLang !== 'en') {
+    try {
+      descs = await translateDynamicTexts(descs, currentLang);
+      prevs = await translateDynamicTexts(prevs, currentLang);
+    } catch (e) { console.error(e); }
+  }
+
   grid.innerHTML=PESTS.map((p,i)=>{
     const active=highRisk&&p.risk==='High';
     return `<div class="pest-cal-card ${active?'current-risk':''}" style="animation-delay:${i*0.05}s">
       <div class="pcal-header">
         <div class="pcal-icon">${p.icon}</div>
-        <div><div class="pcal-name">${p.name}</div><div class="pcal-season">${p.season}</div></div>
+        <div><div class="pcal-name">${getPestT(p.name)}</div><div class="pcal-season">${p.season}</div></div>
         ${active?'<span style="font-size:0.65rem;padding:2px 8px;background:rgba(248,113,113,0.1);color:var(--red);border-radius:50px;border:1px solid rgba(248,113,113,0.2)">⚠ Active</span>':''}
       </div>
       <div class="pcal-body">
         <div style="font-size:0.78rem;color:var(--text-3);margin-bottom:4px">🌱 ${p.crops}</div>
-        <div style="font-size:0.8rem;color:var(--text-2);margin-bottom:6px">${p.description}</div>
-        <div style="font-size:0.75rem;color:var(--teal)">🛡️ ${p.prevention}</div>
+        <div style="font-size:0.8rem;color:var(--text-2);margin-bottom:6px">${descs[i]}</div>
+        <div style="font-size:0.75rem;color:var(--teal)">🛡️ ${prevs[i]}</div>
         <span class="pcal-risk risk-${p.risk.toLowerCase()}">${p.risk} Risk</span>
       </div>
     </div>`;
@@ -147,7 +177,8 @@ const ALL_CROPS=[
   {name:'Mustard',icon:'🌻',minTemp:10,maxTemp:25,minHumidity:40},
 ];
 
-function renderHarmfulSafe(weather) {
+async function renderHarmfulSafe(weather) {
+  window._lastHarmfulWeather = weather; // cache for re-render
   const section=document.getElementById('harmfulSection');
   const harmGrid=document.getElementById('harmfulGrid');
   const safeGrid=document.getElementById('safeGrid');
@@ -166,6 +197,29 @@ function renderHarmfulSafe(weather) {
       harmful.push({...crop,reasons});
     } else { safe.push(crop); }
   });
-  harmGrid.innerHTML=harmful.length?harmful.map(c=>`<div class="harmful-card"><div class="hsc-name"><span style="font-size:1.5rem">${c.icon}</span>${c.name}<span style="margin-left:auto;font-size:0.7rem;padding:2px 8px;background:rgba(248,113,113,0.1);color:var(--red);border-radius:50px">⚠ Risky</span></div><div class="hsc-reason">${c.reasons.map(r=>`<div><i class="fas fa-xmark" style="color:var(--red);margin-right:4px"></i>${r}</div>`).join('')}</div></div>`).join(''):'<p style="color:var(--text-3)">No risky crops found.</p>';
-  safeGrid.innerHTML=safe.length?safe.map(c=>`<div class="safe-card"><div class="hsc-name"><span style="font-size:1.5rem">${c.icon}</span>${c.name}<span style="margin-left:auto;font-size:0.7rem;padding:2px 8px;background:rgba(74,222,128,0.1);color:var(--green);border-radius:50px">✓ Safe</span></div><div style="font-size:0.78rem;color:var(--text-2);margin-top:4px">Good for ${temp}°C, ${humidity}% humidity</div></div>`).join(''):'<p style="color:var(--text-3)">No fully safe crops found.</p>';
+
+  // collect all reason strings for translation
+  let allReasons = [];
+  harmful.forEach(c => allReasons.push(...c.reasons));
+  let translatedReasons = allReasons;
+  let goodForText = `Good for ${temp}°C, ${humidity}% humidity`;
+
+  if (typeof currentLang !== 'undefined' && currentLang !== 'en') {
+    try {
+      const toTranslate = [...allReasons, goodForText];
+      const result = await translateDynamicTexts(toTranslate, currentLang);
+      translatedReasons = result.slice(0, allReasons.length);
+      goodForText = result[allReasons.length] || goodForText;
+    } catch (e) { console.error(e); }
+  }
+
+  // map translated reasons back per crop
+  let ri = 0;
+  const harmfulTranslated = harmful.map(c => {
+    const reasons = c.reasons.map(() => translatedReasons[ri++]);
+    return {...c, reasons};
+  });
+
+  harmGrid.innerHTML=harmfulTranslated.length?harmfulTranslated.map(c=>`<div class="harmful-card"><div class="hsc-name"><span style="font-size:1.5rem">${c.icon}</span>${getCropName(c.name)}<span style="margin-left:auto;font-size:0.7rem;padding:2px 8px;background:rgba(248,113,113,0.1);color:var(--red);border-radius:50px">⚠ Risky</span></div><div class="hsc-reason">${c.reasons.map(r=>`<div><i class="fas fa-xmark" style="color:var(--red);margin-right:4px"></i>${r}</div>`).join('')}</div></div>`).join(''):'<p style="color:var(--text-3)">No risky crops found.</p>';
+  safeGrid.innerHTML=safe.length?safe.map(c=>`<div class="safe-card"><div class="hsc-name"><span style="font-size:1.5rem">${c.icon}</span>${getCropName(c.name)}<span style="margin-left:auto;font-size:0.7rem;padding:2px 8px;background:rgba(74,222,128,0.1);color:var(--green);border-radius:50px">✓ Safe</span></div><div style="font-size:0.78rem;color:var(--text-2);margin-top:4px">${goodForText}</div></div>`).join(''):'<p style="color:var(--text-3)">No fully safe crops found.</p>';
 }
