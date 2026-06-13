@@ -282,7 +282,7 @@ function renderPesticides(pesticides) {
   section.style.display = '';
   cards.innerHTML = pesticides.map(p => `
     <div class="pest-crop-card">
-      <div class="pcc-header"><i class="fas fa-bug" style="margin-right:6px;color:var(--amber)"></i>${getCropName(p.crop)} — Pest Control</div>
+      <div class="pcc-header"><i class="fas fa-bug" style="margin-right:6px;color:var(--amber)"></i>${getCropName(p.crop)} — ${translate('pest_title')}</div>
       <div class="pcc-items">
         ${p.guides.map(g => `
           <div class="pcc-item">
@@ -291,7 +291,7 @@ function renderPesticides(pesticides) {
               <span><i class="fas fa-flask"></i> ${g.pesticide}</span>
               <span><i class="fas fa-scale-balanced"></i> ${g.dose}</span>
             </div>
-            <div class="pcc-eco eco-${g.eco}">${g.eco ? 'Eco-Friendly' : 'Chemical'}</div>
+            <div class="pcc-eco eco-${g.eco}">${g.eco ? translate('diag_eco').split(' ')[0]+'-'+translate('diag_eco').split(' ')[1] : translate('diag_chemical').split(' ')[0]}</div>
           </div>`).join('')}
       </div>
     </div>`).join('');
