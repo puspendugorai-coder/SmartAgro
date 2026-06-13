@@ -39,6 +39,7 @@ function resetResults() {
   if (!panel) return;
   panel.innerHTML=`<div class="results-placeholder"><div class="placeholder-icon"><i class="fas fa-leaf"></i></div><h3>Upload a photo to start</h3><p>AI will find the disease and tell you how to treat it</p><div class="placeholder-steps"><div class="ps-item"><span class="ps-num">1</span> Upload or take photo</div><div class="ps-item"><span class="ps-num">2</span> Click Analyze</div><div class="ps-item"><span class="ps-num">3</span> Get diagnosis</div></div></div>`;
   if (remedyChartInst) { remedyChartInst.destroy(); remedyChartInst=null; }
+  window._lastDiagnosisData = null;
 }
 
 async function openCamera() {
@@ -88,27 +89,59 @@ async function analyzeImage() {
 }
 
 function renderDiagnosis(data) {
+  window._lastDiagnosisData = data; // cache for re-render on language change
+  buildDiagnosisHTML(data);
+}
+
+async function buildDiagnosisHTML(data) {
   const panel   = document.getElementById('resultsPanel');
   if (!panel) return;
   const isHealthy = (data.disease||'').toLowerCase().includes('healthy');
   const sevClass  = `badge-severity-${(data.severity||'mild').toLowerCase()}`;
-  const ecoList   = Array.isArray(data.eco_remedies)      ? data.eco_remedies      : [];
-  const chemList  = Array.isArray(data.chemical_remedies) ? data.chemical_remedies : [];
-  const prevList  = Array.isArray(data.prevention)        ? data.prevention        : [];
+  let ecoList   = Array.isArray(data.eco_remedies)      ? data.eco_remedies.map(r=>({...r}))      : [];
+  let chemList  = Array.isArray(data.chemical_remedies) ? data.chemical_remedies.map(c=>({...c})) : [];
+  let prevList  = Array.isArray(data.prevention)        ? [...data.prevention]                    : [];
+  let disease   = data.disease || 'Unknown';
+  let cause     = data.cause || '';
+  let recovery  = data.recovery_timeline || '';
+  let severity  = data.severity || '';
+  let affected  = data.affected_part || '';
+
+  // ── Translate dynamic content if not English ──
+  if (typeof currentLang !== 'undefined' && currentLang !== 'en') {
+    const texts = [];
+    texts.push(disease, cause, recovery, severity, affected);
+    ecoList.forEach(r => texts.push(r.remedy||'', r.method||'', r.frequency||''));
+    chemList.forEach(c => texts.push(c.name||'', c.dose||'', c.interval||''));
+    prevList.forEach(p => texts.push(p));
+
+    try {
+      const translated = await translateDynamicTexts(texts, currentLang);
+      let i = 0;
+      disease  = translated[i++] || disease;
+      cause    = translated[i++] || cause;
+      recovery = translated[i++] || recovery;
+      severity = translated[i++] || severity;
+      affected = translated[i++] || affected;
+      ecoList.forEach(r => { r.remedy=translated[i++]||r.remedy; r.method=translated[i++]||r.method; r.frequency=translated[i++]||r.frequency; });
+      chemList.forEach(c => { c.name=translated[i++]||c.name; c.dose=translated[i++]||c.dose; c.interval=translated[i++]||c.interval; });
+      prevList = prevList.map(() => translated[i++]);
+    } catch (e) { console.error(e); }
+  }
 
   panel.innerHTML=`
     <div class="results-content">
       <div class="result-header">
-        <div class="result-disease-name">${isHealthy?'✅':'🔬'} ${data.disease||'Unknown'}</div>
+        <div class="result-disease-name">${isHealthy?'✅':'🔬'} ${disease}</div>
         <div class="result-meta">
           <span class="result-badge badge-confidence"><i class="fas fa-circle-check"></i> ${data.confidence||0}% ${translate('diag_confidence')}</span>
-          ${data.severity?`<span class="result-badge ${sevClass}">${data.severity}${translate('diag_severity')}</span> `:''}
-          ${data.affected_part?`<span class="result-badge" style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);color:var(--amber)"><i class="fas fa-leaf"></i> ${data.affected_part}</span>`:''}
+          ${severity?`<span class="result-badge ${sevClass}">${severity} ${translate('diag_severity')}</span> `:''}
+          ${affected?`<span class="result-badge" style="background:rgba(251,191,36,0.08);border:1px solid rgba(251,191,36,0.2);color:var(--amber)"><i class="fas fa-leaf"></i> ${affected}</span>`:''}
         </div>
       </div>
       <div class="result-body">
-        ${data.cause?`<div class="result-section"><h4><i class="fas fa-circle-info"></i> ${translate('diag_cause')}</h4><div class="result-cause">${data.cause}</div></div>`:''}
-        ${data.recovery_timeline?`<div class="result-section"><h4><i class="fas fa-clock-rotate-left"></i> ${translate('diag_recovery')}</h4><div class="result-timeline"><i class="fas fa-calendar-check"></i> ${data.recovery_timeline}</div></div>`:''}
+        ${cause?`<div class="result-section"><h4><i class="fas fa-circle-info"></i> ${translate('diag_cause')}</h4><div class="result-cause">${cause}</div></div>`:''}
+        ${recovery?`<div class="result-section"><h4><i class="fas fa-clock-rotate-left"></i> ${translate('diag_recovery')}</h4><div class="result-timeline"><i class="fas fa-calendar-check"></i> ${recovery}</div></div>`:''}
         ${ecoList.length?`<div class="result-section"><h4><i class="fas fa-leaf"></i> ${translate('diag_eco')} <span style="font-size:0.68rem;padding:2px 8px;background:rgba(74,222,128,0.1);color:var(--green);border-radius:50px;border:1px solid rgba(74,222,128,0.2);margin-left:4px">${translate('diag_recommended')}</span></h4><div class="eco-remedies">${ecoList.map(r=>`<div class="eco-remedy-card"><div class="eco-remedy-name">🌿 ${r.remedy}</div><div class="eco-remedy-method"><i class="fas fa-hand-dots" style="color:var(--teal);margin-right:4px"></i>${r.method}</div><div class="eco-remedy-freq"><i class="fas fa-rotate" style="color:var(--text-3);margin-right:4px"></i>${r.frequency}</div><div class="eco-effectiveness"><div class="eco-effectiveness-bar" style="width:0%" data-target="${r.effectiveness||75}%"></div></div><div style="font-size:0.68rem;color:var(--text-3)">${r.effectiveness||75}% effectiveness</div></div>`).join('')}</div></div>`:''}
         ${chemList.length?`<div class="result-section"><h4><i class="fas fa-flask"></i> ${translate('diag_chemical')}</h4><div class="chemical-remedies">${chemList.map(c=>`<div class="chem-item"><span class="chem-name">⚗️ ${c.name}</span><span class="chem-dose">${c.dose}</span><span style="font-size:0.72rem;color:var(--text-3)">${c.interval}</span></div>`).join('')}</div></div>`:''}
         ${prevList.length?`<div class="result-section"><h4><i class="fas fa-shield-halved"></i> ${translate('diag_prevention')}</h4><ul class="prevention-list">${prevList.map(t=>`<li>${t}</li>`).join('')}</ul></div>`:''}
