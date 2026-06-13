@@ -242,7 +242,8 @@ const ALERT_T = {
     "Heavy Rainfall":"Heavy Rainfall","Thunderstorm":"Thunderstorm",
     "Aphid and Whitefly Risk":"Aphid and Whitefly Risk",
     "Spider Mite Alert":"Spider Mite Alert","Crops at Risk":"Crops at Risk",
-  },
+  "Pest":"Pest","Weather":"Weather","Crop Advisory":"Crop Advisory","Disease":"Disease",
+},
   hi: {
     danger:'खतरा',warning:'चेतावनी',info:'सलाह',
     "Extreme Heat":"अत्यधिक गर्मी","Frost Warning":"पाले की चेतावनी",
@@ -250,6 +251,7 @@ const ALERT_T = {
     "Heavy Rainfall":"भारी वर्षा","Thunderstorm":"आंधी-तूफान",
     "Aphid and Whitefly Risk":"माहू और सफेद मक्खी का खतरा",
     "Spider Mite Alert":"मकड़ी के कण का अलर्ट","Crops at Risk":"जोखिम में फसलें",
+ "Pest":"कीड़े","Weather":"मौसम","Crop Advisory":"फसल सलाह","Disease":"रोग",
   },
   bn: {
     danger:'বিপদ',warning:'সতর্কতা',info:'পরামর্শ',
@@ -257,7 +259,7 @@ const ALERT_T = {
     "Fungal Disease Risk":"ছত্রাক রোগের ঝুঁকি","Strong Winds":"শক্তিশালী বায়ু",
     "Heavy Rainfall":"ভারী বৃষ্টিপাত","Thunderstorm":"বজ্রঝড়",
     "Aphid and Whitefly Risk":"জাব পোকা ও সাদামাছির ঝুঁকি",
-    "Spider Mite Alert":"মাকড়সা মাইট সতর্কতা","Crops at Risk":"ঝুঁকিতে ফসল",
+    "Spider Mite Alert":"মাকড়সা মাইট সতর্কতা","Crops at Risk":"ঝুঁকিতে ফসল","Pest":"কীটপতঙ্গ","Weather":"আবহাওয়া","Crop Advisory":"ফসল পরামর্শ","Disease":"রোগ",
   },
   ta: {
     danger:'அபாயம்',warning:'எச்சரிக்கை',info:'ஆலோசனை',
@@ -266,7 +268,7 @@ const ALERT_T = {
     "Heavy Rainfall":"கனமழை","Thunderstorm":"இடிமழை",
     "Aphid and Whitefly Risk":"அசுவினி மற்றும் வெள்ளை ஈ அபாயம்",
     "Spider Mite Alert":"சிலந்தி பூச்சி எச்சரிக்கை","Crops at Risk":"அபாயத்தில் பயிர்கள்",
-  },
+  "Pest":"பூச்சி","Weather":"வானிலை","Crop Advisory":"பயிர் ஆலோசனை","Disease":"நோய்",},
   te: {
     danger:'ప్రమాదం',warning:'హెచ్చరిక',info:'సలహా',
     "Extreme Heat":"అధిక వేడి","Frost Warning":"మంచు హెచ్చరిక",
@@ -274,14 +276,16 @@ const ALERT_T = {
     "Heavy Rainfall":"భారీ వర్షపాతం","Thunderstorm":"పెనుగాలి తుఫాను",
     "Aphid and Whitefly Risk":"పేను మరియు తెల్ల ఈగ ప్రమాదం",
     "Spider Mite Alert":"సాలీడు పురుగు హెచ్చరిక","Crops at Risk":"ప్రమాదంలో పంటలు",
-  },
+  "Pest":"పురుగులు","Weather":"వాతావరణం","Crop Advisory":"పంట సలహా","Disease":"వ్యాధి",
+
+// Add to ALERT_T.ta:},
   mr: {
     danger:'धोका',warning:'सावधानता',info:'सल्ला',
     "Extreme Heat":"अत्यंत उष्णता","Frost Warning":"दंव इशारा",
     "Fungal Disease Risk":"बुरशी रोगाचा धोका","Strong Winds":"जोरदार वारे",
     "Heavy Rainfall":"जड पाऊस","Thunderstorm":"वादळ",
     "Aphid and Whitefly Risk":"मावा आणि पांढरी माशी धोका",
-    "Spider Mite Alert":"कोळी माइट अलर्ट","Crops at Risk":"धोक्यात पिके",
+    "Spider Mite Alert":"कोळी माइट अलर्ट","Crops at Risk":"धोक्यात पिके","Pest":"कीड","Weather":"हवामान","Crop Advisory":"पीक सल्ला","Disease":"रोग",
   },
   pa: {
     danger:'ਖ਼ਤਰਾ',warning:'ਚੇਤਾਵਨੀ',info:'ਸਲਾਹ',
@@ -289,7 +293,7 @@ const ALERT_T = {
     "Fungal Disease Risk":"ਫੰਗਲ ਬਿਮਾਰੀ ਦਾ ਖ਼ਤਰਾ","Strong Winds":"ਤੇਜ਼ ਹਵਾਵਾਂ",
     "Heavy Rainfall":"ਭਾਰੀ ਬਾਰਿਸ਼","Thunderstorm":"ਤੂਫ਼ਾਨ",
     "Aphid and Whitefly Risk":"ਮਾਹੂ ਅਤੇ ਚਿੱਟੀ ਮੱਖੀ ਦਾ ਖ਼ਤਰਾ",
-    "Spider Mite Alert":"ਮੱਕੜੀ ਦੇ ਕੀੜੇ ਦੀ ਚੇਤਾਵਨੀ","Crops at Risk":"ਖ਼ਤਰੇ ਵਿੱਚ ਫ਼ਸਲਾਂ",
+    "Spider Mite Alert":"ਮੱਕੜੀ ਦੇ ਕੀੜੇ ਦੀ ਚੇਤਾਵਨੀ","Crops at Risk":"ਖ਼ਤਰੇ ਵਿੱਚ ਫ਼ਸਲਾਂ","Pest":"ਕੀੜੇ","Weather":"ਮੌਸਮ","Crop Advisory":"ਫਸਲ ਸਲਾਹ","Disease":"ਰੋਗ",
   },
   gu: {
     danger:'ખતરો',warning:'ચેતવણી',info:'સલાહ',
@@ -297,7 +301,7 @@ const ALERT_T = {
     "Fungal Disease Risk":"ફૂગ રોગ ખતરો","Strong Winds":"ઝડપી પવન",
     "Heavy Rainfall":"ભારે વરસાદ","Thunderstorm":"વાવાઝોડું",
     "Aphid and Whitefly Risk":"માઇટ અને સફેદ માખી ખતરો",
-    "Spider Mite Alert":"સ્પાઇડર માઇટ ચેતવણી","Crops at Risk":"ખતરામાં પાક",
+    "Spider Mite Alert":"સ્પાઇડર માઇટ ચેતવણી","Crops at Risk":"ખતરામાં પાક","Pest":"જીવાત","Weather":"હવામાન","Crop Advisory":"પાક સલાહ","Disease":"રોગ",
   },
   kn: {
     danger:'ಅಪಾಯ',warning:'ಎಚ್ಚರಿಕೆ',info:'ಸಲಹೆ',
@@ -306,7 +310,8 @@ const ALERT_T = {
     "Heavy Rainfall":"ಭಾರೀ ಮಳೆ","Thunderstorm":"ಗುಡುಗು ಚಂಡಮಾರುತ",
     "Aphid and Whitefly Risk":"ರಸ ಹೀರುವ ಕೀಟ ಅಪಾಯ",
     "Spider Mite Alert":"ಜೇಡ ಮಿಟೆ ಎಚ್ಚರಿಕೆ","Crops at Risk":"ಅಪಾಯದಲ್ಲಿ ಬೆಳೆಗಳು",
-  },
+ "Pest":"ಕೀಟ","Weather":"ಹವಾಮಾನ","Crop Advisory":"ಬೆಳೆ ಸಲಹೆ","Disease":"ರೋಗ",
+ },
   ml: {
     danger:'അപകടം',warning:'മുന്നറിയിപ്പ്',info:'ഉപദേശം',
     "Extreme Heat":"അതിശക്തമായ ചൂട്","Frost Warning":"മഞ്ഞ് മുന്നറിയിപ്പ്",
@@ -314,6 +319,7 @@ const ALERT_T = {
     "Heavy Rainfall":"കനത്ത മഴ","Thunderstorm":"ഇടിമിന്നൽ കൊടുങ്കാറ്റ്",
     "Aphid and Whitefly Risk":"അഫിഡ്, വൈറ്റ്ഫ്ലൈ അപകടം",
     "Spider Mite Alert":"ചിലന്തി കീടം മുന്നറിയിപ്പ്","Crops at Risk":"അപകടത്തിലുള്ള വിളകൾ",
+  "Pest":"കീടം","Weather":"കാലാവസ്ഥ","Crop Advisory":"വിള ഉപദേശം","Disease":"രോഗം",
   },
   or: {
     danger:'ବିপଦ',warning:'ସତର୍କତା',info:'ପରାମର୍ଶ',
@@ -321,7 +327,7 @@ const ALERT_T = {
     "Fungal Disease Risk":"ଫଙ୍ଗଲ ରୋଗ ବିପଦ","Strong Winds":"ଶକ୍ତିଶାଳୀ ପବନ",
     "Heavy Rainfall":"ଭାରୀ ବର୍ଷା","Thunderstorm":"ବଜ୍ରଝଡ",
     "Aphid and Whitefly Risk":"ଜାବ ପୋକ ଓ ଧଳା ମାଛି ବିପଦ",
-    "Spider Mite Alert":"ମାକଡ ମାଇଟ ସତର୍କତା","Crops at Risk":"ବିପଦରେ ଫସଲ",
+    "Spider Mite Alert":"ମାକଡ ମାଇଟ ସତର୍କତା","Crops at Risk":"ବିପଦରେ ଫସଲ","Pest":"କୀଟ","Weather":"ପାଣିପାଗ","Crop Advisory":"ଫସଲ ପରାମର୍ଶ","Disease":"ରୋଗ",
   },
   as: {
     danger:'বিপদ',warning:'সতৰ্কতা',info:'পৰামৰ্শ',
@@ -329,7 +335,7 @@ const ALERT_T = {
     "Fungal Disease Risk":"ফাংগাল ৰোগ বিপদ","Strong Winds":"শক্তিশালী বতাহ",
     "Heavy Rainfall":"ভাৰী বৰষুণ","Thunderstorm":"বজ্ৰপাত ধুমুহা",
     "Aphid and Whitefly Risk":"জাব পোক আৰু বগা মাখিৰ বিপদ",
-    "Spider Mite Alert":"মকৰা মাইট সতৰ্কতা","Crops at Risk":"বিপদত শস্য",
+    "Spider Mite Alert":"মকৰা মাইট সতৰ্কতা","Crops at Risk":"বিপদত শস্য","Pest":"কীট","Weather":"বতৰ","Crop Advisory":"শস্য পৰামৰ্শ","Disease":"ৰোগ",
   },
 };
 
