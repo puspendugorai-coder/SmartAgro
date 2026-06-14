@@ -13,7 +13,6 @@ const LANGUAGES = [
   {code:'as', name:'অসমীয়া (Assamese)', flag:'🇮🇳', label:'AS'},
 ];
 
-// ── Crop name translations ──
 const CROP_NAMES = {
   en: {Rice:'Rice',Wheat:'Wheat',Maize:'Maize',Cotton:'Cotton',Tomato:'Tomato',Sugarcane:'Sugarcane',Soybean:'Soybean',Mustard:'Mustard',Onion:'Onion',Potato:'Potato',Chilli:'Chilli',Groundnut:'Groundnut',Arhar:'Arhar',Moong:'Moong',Urad:'Urad'},
   hi: {Rice:'धान/चावल',Wheat:'गेहूं',Maize:'मक्का',Cotton:'कपास',Tomato:'टमाटर',Sugarcane:'गन्ना',Soybean:'सोयाबीन',Mustard:'सरसों',Onion:'प्याज',Potato:'आलू',Chilli:'मिर्च',Groundnut:'मूंगफली',Arhar:'अरहर',Moong:'मूंग',Urad:'उड़द'},
@@ -29,179 +28,21 @@ const CROP_NAMES = {
   as: {Rice:'ধান/চাউল',Wheat:'ঘেঁহু',Maize:'মকৈ',Cotton:'কপাহ',Tomato:'টমেটো',Sugarcane:'কুঁহিয়াৰ',Soybean:'চয়াবিন',Mustard:'সৰিয়হ',Onion:'পিঁয়াজ',Potato:'আলু',Chilli:'জলকীয়া',Groundnut:'বাদাম',Arhar:'অৰহৰ',Moong:'মগু',Urad:'বৰামাহ'},
 };
 
-// ── Crop descriptions ──
 const CROP_DESC = {
-  en: {
-    Rice:'Best for high humidity and warm weather',
-    Wheat:'Cool dry winters, most popular rabi crop',
-    Maize:'Versatile crop for warm humid weather',
-    Cotton:'Hot dry spells with moderate rain',
-    Tomato:'High value crop for moderate climates',
-    Sugarcane:'Hot climate and heavy rainfall needed',
-    Soybean:'Nitrogen-fixing legume for warm monsoon',
-    Mustard:'Cool weather oil seed crop',
-    Onion:'High demand vegetable with good income',
-    Potato:'Cool weather staple with high yield',
-    Chilli:'Warm climate spice with high market value',
-    Groundnut:'Warm season oilseed crop',
-  },
-  hi: {
-    Rice:'अधिक नमी और गर्म मौसम के लिए सबसे अच्छा',
-    Wheat:'ठंडी सर्दियों में उगाई जाने वाली सबसे लोकप्रिय फसल',
-    Maize:'गर्म और नम मौसम के लिए उपयुक्त फसल',
-    Cotton:'गर्म और शुष्क मौसम में मध्यम बारिश के साथ',
-    Tomato:'मध्यम जलवायु के लिए उच्च मूल्य वाली फसल',
-    Sugarcane:'गर्म जलवायु और भारी वर्षा आवश्यक',
-    Soybean:'गर्म मानसून के लिए नाइट्रोजन-स्थिरक फलीदार',
-    Mustard:'ठंडे मौसम की तिलहन फसल',
-    Onion:'अच्छी आय वाली उच्च मांग की सब्जी',
-    Potato:'ठंडे मौसम की मुख्य फसल, उच्च उपज',
-    Chilli:'उच्च बाजार मूल्य वाला गर्म जलवायु मसाला',
-    Groundnut:'गर्म मौसम की तिलहन फसल',
-  },
-  bn: {
-    Rice:'উচ্চ আর্দ্রতা এবং গরম আবহাওয়ার জন্য সেরা',
-    Wheat:'ঠান্ডা শুষ্ক শীতকালে সবচেয়ে জনপ্রিয় রবি ফসল',
-    Maize:'গরম আর্দ্র আবহাওয়ার জন্য বহুমুখী ফসল',
-    Cotton:'গরম শুষ্ক আবহাওয়ায় মাঝারি বৃষ্টিতে ভালো',
-    Tomato:'মাঝারি জলবায়ুতে উচ্চ মূল্যের ফসল',
-    Sugarcane:'গরম জলবায়ু এবং ভারী বৃষ্টিপাত প্রয়োজন',
-    Soybean:'উষ্ণ বর্ষায় নাইট্রোজেন-স্থিরকারী শিম',
-    Mustard:'ঠান্ডা আবহাওয়ার তেলবীজ ফসল',
-    Onion:'ভালো আয়ের উচ্চ চাহিদার সবজি',
-    Potato:'ঠান্ডা আবহাওয়ার প্রধান ফসল, উচ্চ ফলন',
-    Chilli:'উচ্চ বাজার মূল্যের উষ্ণ জলবায়ু মসলা',
-    Groundnut:'উষ্ণ মৌসুমের তেলবীজ ফসল',
-  },
-  ta: {
-    Rice:'அதிக ஈரப்பதம் மற்றும் வெப்பமான வானிலைக்கு சிறந்தது',
-    Wheat:'குளிர் வறண்ட குளிர்காலத்தில் பிரபலமான பயிர்',
-    Maize:'வெப்பமான ஈரமான வானிலைக்கு ஏற்ற பயிர்',
-    Cotton:'வெப்பமான வறண்ட காலத்தில் மிதமான மழையுடன்',
-    Tomato:'மிதமான காலநிலைக்கு உயர் மதிப்பு பயிர்',
-    Sugarcane:'வெப்பமான காலநிலை மற்றும் கனமழை தேவை',
-    Soybean:'வெப்பமான பருவமழைக்கு நைட்ரஜன் நிலைப்படுத்தும் பயிர்',
-    Mustard:'குளிர் வானிலை எண்ணெய் வித்து பயிர்',
-    Onion:'நல்ல வருமானமுள்ள அதிக தேவையுள்ள காய்கறி',
-    Potato:'குளிர் வானிலை முக்கிய பயிர், அதிக மகசூல்',
-    Chilli:'உயர் சந்தை மதிப்புள்ள வெப்பமண்டல மசாலா',
-    Groundnut:'வெப்ப காலத்தில் எண்ணெய் வித்து பயிர்',
-  },
-  te: {
-    Rice:'అధిక తేమ మరియు వెచ్చని వాతావరణానికి అనుకూలం',
-    Wheat:'చల్లని పొడి శీతాకాలంలో అత్యంత ప్రాచుర్యం పొందిన పంట',
-    Maize:'వెచ్చని తేమతో కూడిన వాతావరణానికి అనువైన పంట',
-    Cotton:'వేడి పొడి వాతావరణంలో మితమైన వర్షంతో',
-    Tomato:'మితమైన వాతావరణానికి అధిక విలువైన పంట',
-    Sugarcane:'వేడి వాతావరణం మరియు భారీ వర్షపాతం అవసరం',
-    Soybean:'వెచ్చని వర్షాకాలంలో నత్రజని స్థిరీకరించే పంట',
-    Mustard:'చల్లని వాతావరణపు నూనె గింజల పంట',
-    Onion:'మంచి ఆదాయంతో అధిక డిమాండ్ ఉన్న కూరగాయ',
-    Potato:'చల్లని వాతావరణపు ప్రధాన పంట, అధిక దిగుబడి',
-    Chilli:'అధిక మార్కెట్ విలువతో వేడి వాతావరణ మసాలా',
-    Groundnut:'వేడి కాలపు నూనె గింజల పంట',
-  },
-  mr: {
-    Rice:'जास्त आर्द्रता आणि उष्ण हवामानासाठी सर्वोत्तम',
-    Wheat:'थंड कोरड्या हिवाळ्यातील सर्वात लोकप्रिय रब्बी पीक',
-    Maize:'उष्ण दमट हवामानासाठी योग्य पीक',
-    Cotton:'उष्ण कोरड्या हवामानात मध्यम पावसासह',
-    Tomato:'मध्यम हवामानासाठी उच्च मूल्याचे पीक',
-    Sugarcane:'उष्ण हवामान आणि जास्त पाऊस आवश्यक',
-    Soybean:'उष्ण मान्सूनसाठी नायट्रोजन-स्थिरीकरण करणारी शेंग',
-    Mustard:'थंड हवामानातील तेलबिया पीक',
-    Onion:'चांगल्या उत्पन्नासह जास्त मागणी असलेली भाजी',
-    Potato:'थंड हवामानातील मुख्य पीक, जास्त उत्पादन',
-    Chilli:'उच्च बाजारभावाचे उष्ण हवामानातील मसाला पीक',
-    Groundnut:'उष्ण हंगामातील तेलबिया पीक',
-  },
-  pa: {
-    Rice:'ਵੱਧ ਨਮੀ ਅਤੇ ਗਰਮ ਮੌਸਮ ਲਈ ਸਭ ਤੋਂ ਵਧੀਆ',
-    Wheat:'ਠੰਡੇ ਸੁੱਕੇ ਸਰਦੀਆਂ ਵਿੱਚ ਸਭ ਤੋਂ ਪ੍ਰਸਿੱਧ ਰਬੀ ਫਸਲ',
-    Maize:'ਗਰਮ ਨਮੀ ਵਾਲੇ ਮੌਸਮ ਲਈ ਢੁਕਵੀਂ ਫਸਲ',
-    Cotton:'ਗਰਮ ਸੁੱਕੇ ਮੌਸਮ ਵਿੱਚ ਦਰਮਿਆਨੀ ਬਾਰਿਸ਼ ਨਾਲ',
-    Tomato:'ਦਰਮਿਆਨੇ ਮੌਸਮ ਲਈ ਉੱਚ ਮੁੱਲ ਵਾਲੀ ਫਸਲ',
-    Sugarcane:'ਗਰਮ ਮੌਸਮ ਅਤੇ ਭਾਰੀ ਬਾਰਿਸ਼ ਜ਼ਰੂਰੀ',
-    Soybean:'ਗਰਮ ਮਾਨਸੂਨ ਲਈ ਨਾਈਟ੍ਰੋਜਨ ਬਣਾਉਣ ਵਾਲੀ ਫਲੀ',
-    Mustard:'ਠੰਡੇ ਮੌਸਮ ਦੀ ਤੇਲ ਬੀਜ ਫਸਲ',
-    Onion:'ਚੰਗੀ ਆਮਦਨ ਵਾਲੀ ਵੱਧ ਮੰਗ ਵਾਲੀ ਸਬਜ਼ੀ',
-    Potato:'ਠੰਡੇ ਮੌਸਮ ਦੀ ਮੁੱਖ ਫਸਲ, ਵੱਧ ਝਾੜ',
-    Chilli:'ਉੱਚ ਬਾਜ਼ਾਰ ਮੁੱਲ ਵਾਲਾ ਗਰਮ ਮੌਸਮ ਮਸਾਲਾ',
-    Groundnut:'ਗਰਮ ਮੌਸਮ ਦੀ ਤੇਲ ਬੀਜ ਫਸਲ',
-  },
-  gu: {
-    Rice:'વધુ ભેજ અને ગરમ હવામાન માટે શ્રેષ્ઠ',
-    Wheat:'ઠંડા સૂકા શિયાળામાં સૌથી લોકપ્રિય રવિ પાક',
-    Maize:'ગરમ ભેજવાળા હવામાન માટે યોગ્ય પાક',
-    Cotton:'ગરમ સૂકા હવામાનમાં મધ્યમ વરસાદ સાથે',
-    Tomato:'સમશીતોષ્ણ હવામાન માટે ઉચ્ચ મૂલ્યનો પાક',
-    Sugarcane:'ગરમ હવામાન અને ભારે વરસાદ જરૂરી',
-    Soybean:'ગરમ ચોમાસા માટે નાઇટ્રોજન સ્થિર કરતી કઠોળ',
-    Mustard:'ઠંડા હવામાનનો તેલીબિયાં પાક',
-    Onion:'સારી આવક સાથે વધુ માંગ ધરાવતી શાક',
-    Potato:'ઠંડા હવામાનનો મુખ્ય પાક, વધુ ઉત્પાદન',
-    Chilli:'ઉચ્ચ બજાર ભાવ ધરાવતો ગરમ હવામાન મસાલો',
-    Groundnut:'ગરમ ઋતુનો તેલીબિયાં પાક',
-  },
-  kn: {
-    Rice:'ಹೆಚ್ಚು ತೇವಾಂಶ ಮತ್ತು ಬಿಸಿ ವಾತಾವರಣಕ್ಕೆ ಸೂಕ್ತ',
-    Wheat:'ತಂಪಾದ ಶುಷ್ಕ ಚಳಿಗಾಲದಲ್ಲಿ ಅತ್ಯಂತ ಜನಪ್ರಿಯ ರಬಿ ಬೆಳೆ',
-    Maize:'ಬಿಸಿ ತೇವಾಂಶದ ವಾತಾವರಣಕ್ಕೆ ಸೂಕ್ತ ಬೆಳೆ',
-    Cotton:'ಬಿಸಿ ಶುಷ್ಕ ವಾತಾವರಣದಲ್ಲಿ ಮಧ್ಯಮ ಮಳೆಯೊಂದಿಗೆ',
-    Tomato:'ಸಮಶೀತೋಷ್ಣ ವಾತಾವರಣಕ್ಕೆ ಹೆಚ್ಚಿನ ಮೌಲ್ಯದ ಬೆಳೆ',
-    Sugarcane:'ಬಿಸಿ ವಾತಾವರಣ ಮತ್ತು ಭಾರಿ ಮಳೆ ಅವಶ್ಯಕ',
-    Soybean:'ಬಿಸಿ ಮಾನ್ಸೂನ್‌ಗೆ ನೈಟ್ರೋಜನ್ ಸ್ಥಿರೀಕರಿಸುವ ದ್ವಿದಳ',
-    Mustard:'ತಂಪಾದ ವಾತಾವರಣದ ಎಣ್ಣೆ ಬೀಜ ಬೆಳೆ',
-    Onion:'ಉತ್ತಮ ಆದಾಯದೊಂದಿಗೆ ಹೆಚ್ಚು ಬೇಡಿಕೆಯ ತರಕಾರಿ',
-    Potato:'ತಂಪಾದ ವಾತಾವರಣದ ಮುಖ್ಯ ಬೆಳೆ, ಹೆಚ್ಚು ಇಳುವರಿ',
-    Chilli:'ಹೆಚ್ಚು ಮಾರುಕಟ್ಟೆ ಮೌಲ್ಯದ ಬಿಸಿ ವಾತಾವರಣ ಮಸಾಲೆ',
-    Groundnut:'ಬಿಸಿ ಋತುವಿನ ಎಣ್ಣೆ ಬೀಜ ಬೆಳೆ',
-  },
-  ml: {
-    Rice:'ഉയർന്ന ആർദ്രതയും ചൂടുള്ള കാലാവസ്ഥയ്ക്കും അനുയോജ്യം',
-    Wheat:'തണുത്ത വരണ്ട ശൈത്യകാലത്ത് ഏറ്റവും ജനപ്രിയ രബി വിള',
-    Maize:'ചൂടും ഈർപ്പവുമുള്ള കാലാവസ്ഥയ്ക്ക് അനുയോജ്യം',
-    Cotton:'ചൂടുള്ള വരണ്ട കാലത്ത് മിതമായ മഴയോടെ',
-    Tomato:'മിതശീതോഷ്ണ കാലാവസ്ഥയ്ക്ക് ഉയർന്ന മൂല്യമുള്ള വിള',
-    Sugarcane:'ചൂടുള്ള കാലാവസ്ഥയും കനത്ത മഴയും ആവശ്യം',
-    Soybean:'ഊഷ്മള മൺസൂണിൽ നൈട്രജൻ സ്ഥിരീകരിക്കുന്ന പയർ',
-    Mustard:'തണുത്ത കാലാവസ്ഥയുടെ എണ്ണ വിത്ത് വിള',
-    Onion:'നല്ല വരുമാനമുള്ള ഉയർന്ന ഡിമാൻഡ് പച്ചക്കറി',
-    Potato:'തണുത്ത കാലാവസ്ഥയുടെ പ്രധാന വിള, ഉയർന്ന വിളവ്',
-    Chilli:'ഉയർന്ന വിപണി മൂല്യമുള്ള ചൂടുള്ള കാലാവസ്ഥ മസാല',
-    Groundnut:'ഊഷ്മള ഋതുവിലെ എണ്ണ വിത്ത് വിള',
-  },
-  or: {
-    Rice:'ଅଧିକ ଆର୍ଦ୍ରତା ଓ ଉଷ୍ଣ ପାଣିପାଗ ପାଇଁ ସର୍ବୋତ୍ତମ',
-    Wheat:'ଥଣ୍ଡା ଶୁଷ୍କ ଶୀତ ଋତୁରେ ସବୁଠୁ ଲୋକପ୍ରିୟ ରବି ଫସଲ',
-    Maize:'ଉଷ୍ଣ ଆର୍ଦ୍ର ପାଣିପାଗ ପାଇଁ ଉପଯୁକ୍ତ ଫସଲ',
-    Cotton:'ଉଷ୍ଣ ଶୁଷ୍କ ପାଣିପାଗରେ ମଧ୍ୟମ ବୃଷ୍ଟିପାତ ସହ',
-    Tomato:'ମଧ୍ୟମ ଜଳବାୟୁ ପାଇଁ ଉଚ୍ଚ ମୂଲ୍ୟ ଫସଲ',
-    Sugarcane:'ଉଷ୍ଣ ଜଳବାୟୁ ଓ ଭାରୀ ବର୍ଷା ଆବଶ୍ୟକ',
-    Soybean:'ଉଷ୍ଣ ବର୍ଷା ଋତୁ ପାଇଁ ନାଇଟ୍ରୋଜେନ ସ୍ଥିରୀକରଣ ଫସଲ',
-    Mustard:'ଥଣ୍ଡା ପାଣିପାଗର ତୈଳ ବୀଜ ଫସଲ',
-    Onion:'ଭଲ ଆୟ ସହ ଅଧିକ ଚାହିଦାର ସବ୍ଜି',
-    Potato:'ଥଣ୍ଡା ପାଣିପାଗର ମୁଖ୍ୟ ଫସଲ, ଅଧିକ ଅମଳ',
-    Chilli:'ଉଚ୍ଚ ବଜାର ମୂଲ୍ୟ ସହ ଉଷ୍ଣ ପାଣିପାଗ ମସଲା',
-    Groundnut:'ଉଷ୍ଣ ଋତୁର ତୈଳ ବୀଜ ଫସଲ',
-  },
-  as: {
-    Rice:'অধিক আর্দ্রতা আৰু উষ্ণ বতৰৰ বাবে সৰ্বোত্তম',
-    Wheat:'ঠাণ্ডা শুষ্ক শীতকালত সবচেয়ে জনপ্ৰিয় ৰবি শস্য',
-    Maize:'উষ্ণ আর্দ্র বতৰৰ বাবে উপযুক্ত শস্য',
-    Cotton:'গৰম শুষ্ক বতৰত মধ্যমীয়া বৰষুণৰ সৈতে',
-    Tomato:'মধ্যমীয়া জলবায়ুৰ বাবে উচ্চ মূল্যৰ শস্য',
-    Sugarcane:'গৰম জলবায়ু আৰু ভাৰী বৰষুণ প্ৰয়োজন',
-    Soybean:'উষ্ণ বৰষুণৰ বাবে নাইট্ৰজেন স্থিৰীকৰণ শস্য',
-    Mustard:'ঠাণ্ডা বতৰৰ তেল বীজ শস্য',
-    Onion:'ভাল আয়ৰ সৈতে অধিক চাহিদাৰ পাচলি',
-    Potato:'ঠাণ্ডা বতৰৰ মুখ্য শস্য, অধিক উৎপাদন',
-    Chilli:'উচ্চ বজাৰ মূল্যৰ উষ্ণ জলবায়ু মছলা',
-    Groundnut:'উষ্ণ ঋতুৰ তেল বীজ শস্য',
-  },
+  en: {Rice:'Best for high humidity and warm weather',Wheat:'Cool dry winters, most popular rabi crop',Maize:'Versatile crop for warm humid weather',Cotton:'Hot dry spells with moderate rain',Tomato:'High value crop for moderate climates',Sugarcane:'Hot climate and heavy rainfall needed',Soybean:'Nitrogen-fixing legume for warm monsoon',Mustard:'Cool weather oil seed crop',Onion:'High demand vegetable with good income',Potato:'Cool weather staple with high yield',Chilli:'Warm climate spice with high market value',Groundnut:'Warm season oilseed crop'},
+  hi: {Rice:'अधिक नमी और गर्म मौसम के लिए सबसे अच्छा',Wheat:'ठंडी सर्दियों में उगाई जाने वाली सबसे लोकप्रिय फसल',Maize:'गर्म और नम मौसम के लिए उपयुक्त फसल',Cotton:'गर्म और शुष्क मौसम में मध्यम बारिश के साथ',Tomato:'मध्यम जलवायु के लिए उच्च मूल्य वाली फसल',Sugarcane:'गर्म जलवायु और भारी वर्षा आवश्यक',Soybean:'गर्म मानसून के लिए नाइट्रोजन-स्थिरक फलीदार',Mustard:'ठंडे मौसम की तिलहन फसल',Onion:'अच्छी आय वाली उच्च मांग की सब्जी',Potato:'ठंडे मौसम की मुख्य फसल, उच्च उपज',Chilli:'उच्च बाजार मूल्य वाला गर्म जलवायु मसाला',Groundnut:'गर्म मौसम की तिलहन फसल'},
+  bn: {Rice:'উচ্চ আর্দ্রতা এবং গরম আবহাওয়ার জন্য সেরা',Wheat:'ঠান্ডা শুষ্ক শীতকালে সবচেয়ে জনপ্রিয় রবি ফসল',Maize:'গরম আর্দ্র আবহাওয়ার জন্য বহুমুখী ফসল',Cotton:'গরম শুষ্ক আবহাওয়ায় মাঝারি বৃষ্টিতে ভালো',Tomato:'মাঝারি জলবায়ুতে উচ্চ মূল্যের ফসল',Sugarcane:'গরম জলবায়ু এবং ভারী বৃষ্টিপাত প্রয়োজন',Soybean:'উষ্ণ বর্ষায় নাইট্রোজেন-স্থিরকারী শিম',Mustard:'ঠান্ডা আবহাওয়ার তেলবীজ ফসল',Onion:'ভালো আয়ের উচ্চ চাহিদার সবজি',Potato:'ঠান্ডা আবহাওয়ার প্রধান ফসল, উচ্চ ফলন',Chilli:'উচ্চ বাজার মূল্যের উষ্ণ জলবায়ু মসলা',Groundnut:'উষ্ণ মৌসুমের তেলবীজ ফসল'},
+  ta: {Rice:'அதிக ஈரப்பதம் மற்றும் வெப்பமான வானிலைக்கு சிறந்தது',Wheat:'குளிர் வறண்ட குளிர்காலத்தில் பிரபலமான பயிர்',Maize:'வெப்பமான ஈரமான வானிலைக்கு ஏற்ற பயிர்',Cotton:'வெப்பமான வறண்ட காலத்தில் மிதமான மழையுடன்',Tomato:'மிதமான காலநிலைக்கு உயர் மதிப்பு பயிர்',Sugarcane:'வெப்பமான காலநிலை மற்றும் கனமழை தேவை',Soybean:'வெப்பமான பருவமழைக்கு நைட்ரஜன் நிலைப்படுத்தும் பயிர்',Mustard:'குளிர் வானிலை எண்ணெய் வித்து பயிர்',Onion:'நல்ல வருமானமுள்ள அதிக தேவையுள்ள காய்கறி',Potato:'குளிர் வானிலை முக்கிய பயிர், அதிக மகசூல்',Chilli:'உயர் சந்தை மதிப்புள்ள வெப்பமண்டல மசாலா',Groundnut:'வெப்ப காலத்தில் எண்ணெய் வித்து பயிர்'},
+  te: {Rice:'అధిక తేమ మరియు వెచ్చని వాతావరణానికి అనుకూలం',Wheat:'చల్లని పొడి శీతాకాలంలో అత్యంత ప్రాచుర్యం పొందిన పంట',Maize:'వెచ్చని తేమతో కూడిన వాతావరణానికి అనువైన పంట',Cotton:'వేడి పొడి వాతావరణంలో మితమైన వర్షంతో',Tomato:'మితమైన వాతావరణానికి అధిక విలువైన పంట',Sugarcane:'వేడి వాతావరణం మరియు భారీ వర్షపాతం అవసరం',Soybean:'వెచ్చని వర్షాకాలంలో నత్రజని స్థిరీకరించే పంట',Mustard:'చల్లని వాతావరణపు నూనె గింజల పంట',Onion:'మంచి ఆదాయంతో అధిక డిమాండ్ ఉన్న కూరగాయ',Potato:'చల్లని వాతావరణపు ప్రధాన పంట, అధిక దిగుబడి',Chilli:'అధిక మార్కెట్ విలువతో వేడి వాతావరణ మసాలా',Groundnut:'వేడి కాలపు నూనె గింజల పంట'},
+  mr: {Rice:'जास्त आर्द्रता आणि उष्ण हवामानासाठी सर्वोत्तम',Wheat:'थंड कोरड्या हिवाळ्यातील सर्वात लोकप्रिय रब्बी पीक',Maize:'उष्ण दमट हवामानासाठी योग्य पीक',Cotton:'उष्ण कोरड्या हवामानात मध्यम पावसासह',Tomato:'मध्यम हवामानासाठी उच्च मूल्याचे पीक',Sugarcane:'उष्ण हवामान आणि जास्त पाऊस आवश्यक',Soybean:'उष्ण मान्सूनसाठी नायट्रोजन-स्थिरीकरण करणारी शेंग',Mustard:'थंड हवामानातील तेलबिया पीक',Onion:'चांगल्या उत्पन्नासह जास्त मागणी असलेली भाजी',Potato:'थंड हवामानातील मुख्य पीक, जास्त उत्पादन',Chilli:'उच्च बाजारभावाचे उष्ण हवामानातील मसाला पीक',Groundnut:'उष्ण हंगामातील तेलबिया पीक'},
+  pa: {Rice:'ਵੱਧ ਨਮੀ ਅਤੇ ਗਰਮ ਮੌਸਮ ਲਈ ਸਭ ਤੋਂ ਵਧੀਆ',Wheat:'ਠੰਡੇ ਸੁੱਕੇ ਸਰਦੀਆਂ ਵਿੱਚ ਸਭ ਤੋਂ ਪ੍ਰਸਿੱਧ ਰਬੀ ਫਸਲ',Maize:'ਗਰਮ ਨਮੀ ਵਾਲੇ ਮੌਸਮ ਲਈ ਢੁਕਵੀਂ ਫਸਲ',Cotton:'ਗਰਮ ਸੁੱਕੇ ਮੌਸਮ ਵਿੱਚ ਦਰਮਿਆਨੀ ਬਾਰਿਸ਼ ਨਾਲ',Tomato:'ਦਰਮਿਆਨੇ ਮੌਸਮ ਲਈ ਉੱਚ ਮੁੱਲ ਵਾਲੀ ਫਸਲ',Sugarcane:'ਗਰਮ ਮੌਸਮ ਅਤੇ ਭਾਰੀ ਬਾਰਿਸ਼ ਜ਼ਰੂਰੀ',Soybean:'ਗਰਮ ਮਾਨਸੂਨ ਲਈ ਨਾਈਟ੍ਰੋਜਨ ਬਣਾਉਣ ਵਾਲੀ ਫਲੀ',Mustard:'ਠੰਡੇ ਮੌਸਮ ਦੀ ਤੇਲ ਬੀਜ ਫਸਲ',Onion:'ਚੰਗੀ ਆਮਦਨ ਵਾਲੀ ਵੱਧ ਮੰਗ ਵਾਲੀ ਸਬਜ਼ੀ',Potato:'ਠੰਡੇ ਮੌਸਮ ਦੀ ਮੁੱਖ ਫਸਲ, ਵੱਧ ਝਾੜ',Chilli:'ਉੱਚ ਬਾਜ਼ਾਰ ਮੁੱਲ ਵਾਲਾ ਗਰਮ ਮੌਸਮ ਮਸਾਲਾ',Groundnut:'ਗਰਮ ਮੌਸਮ ਦੀ ਤੇਲ ਬੀਜ ਫਸਲ'},
+  gu: {Rice:'વધુ ભેજ અને ગરમ હવામાન માટે શ્રેષ્ઠ',Wheat:'ઠંડા સૂકા શિયાળામાં સૌથી લોકપ્રિય રવિ પાક',Maize:'ગરમ ભેજવાળા હવામાન માટે યોગ્ય પાક',Cotton:'ગરમ સૂકા હવામાનમાં મધ્યમ વરસાદ સાથે',Tomato:'સમશીતોષ્ણ હવામાન માટે ઉચ્ચ મૂલ્યનો પાક',Sugarcane:'ગરમ હવામાન અને ભારે વરસાદ જરૂરી',Soybean:'ગરમ ચોમાસા માટે નાઇટ્રોજન સ્થિર કરતી કઠોળ',Mustard:'ઠંડા હવામાનનો તેલીબિયાં પાક',Onion:'સારી આવક સાથે વધુ માંગ ધરાવતી શાક',Potato:'ઠંડા હવામાનનો મુખ્ય પાક, વધુ ઉત્પાદન',Chilli:'ઉચ્ચ બજાર ભાવ ધરાવતો ગરમ હવામાન મસાલો',Groundnut:'ગરમ ઋતુનો તેલીબિયાં પાક'},
+  kn: {Rice:'ಹೆಚ್ಚು ತೇವಾಂಶ ಮತ್ತು ಬಿಸಿ ವಾತಾವರಣಕ್ಕೆ ಸೂಕ್ತ',Wheat:'ತಂಪಾದ ಶುಷ್ಕ ಚಳಿಗಾಲದಲ್ಲಿ ಅತ್ಯಂತ ಜನಪ್ರಿಯ ರಬಿ ಬೆಳೆ',Maize:'ಬಿಸಿ ತೇವಾಂಶದ ವಾತಾವರಣಕ್ಕೆ ಸೂಕ್ತ ಬೆಳೆ',Cotton:'ಬಿಸಿ ಶುಷ್ಕ ವಾತಾವರಣದಲ್ಲಿ ಮಧ್ಯಮ ಮಳೆಯೊಂದಿಗೆ',Tomato:'ಸಮಶೀತೋಷ್ಣ ವಾತಾವರಣಕ್ಕೆ ಹೆಚ್ಚಿನ ಮೌಲ್ಯದ ಬೆಳೆ',Sugarcane:'ಬಿಸಿ ವಾತಾವರಣ ಮತ್ತು ಭಾರಿ ಮಳೆ ಅವಶ್ಯಕ',Soybean:'ಬಿಸಿ ಮಾನ್ಸೂನ್‌ಗೆ ನೈಟ್ರೋಜನ್ ಸ್ಥಿರೀಕರಿಸುವ ದ್ವಿದಳ',Mustard:'ತಂಪಾದ ವಾತಾವರಣದ ಎಣ್ಣೆ ಬೀಜ ಬೆಳೆ',Onion:'ಉತ್ತಮ ಆದಾಯದೊಂದಿಗೆ ಹೆಚ್ಚು ಬೇಡಿಕೆಯ ತರಕಾರಿ',Potato:'ತಂಪಾದ ವಾತಾವರಣದ ಮುಖ್ಯ ಬೆಳೆ, ಹೆಚ್ಚು ಇಳುವರಿ',Chilli:'ಹೆಚ್ಚು ಮಾರುಕಟ್ಟೆ ಮೌಲ್ಯದ ಬಿಸಿ ವಾತಾವರಣ ಮಸಾಲೆ',Groundnut:'ಬಿಸಿ ಋತುವಿನ ಎಣ್ಣೆ ಬೀಜ ಬೆಳೆ'},
+  ml: {Rice:'ഉയർന്ന ആർദ്രതയും ചൂടുള്ള കാലാവസ്ഥയ്ക്കും അനുയോജ്യം',Wheat:'തണുത്ത വരണ്ട ശൈത്യകാലത്ത് ഏറ്റവും ജനപ്രിയ രബി വിള',Maize:'ചൂടും ഈർപ്പവുമുള്ള കാലാവസ്ഥയ്ക്ക് അനുയോജ്യം',Cotton:'ചൂടുള്ള വരണ്ട കാലത്ത് മിതമായ മഴയോടെ',Tomato:'മിതശീതോഷ്ണ കാലാവസ്ഥയ്ക്ക് ഉയർന്ന മൂല്യമുള്ള വിള',Sugarcane:'ചൂടുള്ള കാലാവസ്ഥയും കനത്ത മഴയും ആവശ്യം',Soybean:'ഊഷ്മള മൺസൂണിൽ നൈട്രജൻ സ്ഥിരീകരിക്കുന്ന പയർ',Mustard:'തണുത്ത കാലാവസ്ഥയുടെ എണ്ണ വിത്ത് വിള',Onion:'നല്ല വരുമാനമുള്ള ഉയർന്ന ഡിമാൻഡ് പച്ചക്കറി',Potato:'തണുത്ത കാലാവസ്ഥയുടെ പ്രധാന വിള, ഉയർന്ന വിളവ്',Chilli:'ഉയർന്ന വിപണി മൂല്യമുള്ള ചൂടുള്ള കാലാവസ്ഥ മസാല',Groundnut:'ഊഷ്മള ഋതുവിലെ എണ്ണ വിത്ത് വിള'},
+  or: {Rice:'ଅଧିକ ଆର୍ଦ୍ରତା ଓ ଉଷ୍ଣ ପାଣିପାଗ ପାଇଁ ସର୍ବୋତ୍ତମ',Wheat:'ଥଣ୍ଡା ଶୁଷ୍କ ଶୀତ ଋତୁରେ ସବୁଠୁ ଲୋକପ୍ରିୟ ରବି ଫସଲ',Maize:'ଉଷ୍ଣ ଆର୍ଦ୍ର ପାଣିପାଗ ପାଇଁ ଉପଯୁକ୍ତ ଫସଲ',Cotton:'ଉଷ୍ଣ ଶୁଷ୍କ ପାଣିପାଗରେ ମଧ୍ୟମ ବୃଷ୍ଟିପାତ ସହ',Tomato:'ମଧ୍ୟମ ଜଳବାୟୁ ପାଇଁ ଉଚ୍ଚ ମୂଲ୍ୟ ଫସଲ',Sugarcane:'ଉଷ୍ଣ ଜଳବାୟୁ ଓ ଭାରୀ ବର୍ଷା ଆବଶ୍ୟକ',Soybean:'ଉଷ୍ଣ ବର୍ଷା ଋତୁ ପାଇଁ ନାଇଟ୍ରୋଜେନ ସ୍ଥିରୀକରଣ ଫସଲ',Mustard:'ଥଣ୍ଡା ପାଣିପାଗର ତୈଳ ବୀଜ ଫସଲ',Onion:'ଭଲ ଆୟ ସହ ଅଧିକ ଚାହିଦାର ସବ୍ଜି',Potato:'ଥଣ୍ଡା ପାଣିପାଗର ମୁଖ୍ୟ ଫସଲ, ଅଧିକ ଅମଳ',Chilli:'ଉଚ୍ଚ ବଜାର ମୂଲ୍ୟ ସହ ଉଷ୍ଣ ପାଣିପାଗ ମସଲା',Groundnut:'ଉଷ୍ଣ ଋତୁର ତୈଳ ବୀଜ ଫସଲ'},
+  as: {Rice:'অধিক আর্দ্রতা আৰু উষ্ণ বতৰৰ বাবে সৰ্বোত্তম',Wheat:'ঠাণ্ডা শুষ্ক শীতকালত সবচেয়ে জনপ্ৰিয় ৰবি শস্য',Maize:'উষ্ণ আর্দ্র বতৰৰ বাবে উপযুক্ত শস্য',Cotton:'গৰম শুষ্ক বতৰত মধ্যমীয়া বৰষুণৰ সৈতে',Tomato:'মধ্যমীয়া জলবায়ুৰ বাবে উচ্চ মূল্যৰ শস্য',Sugarcane:'গৰম জলবায়ু আৰু ভাৰী বৰষুণ প্ৰয়োজন',Soybean:'উষ্ণ বৰষুণৰ বাবে নাইট্ৰজেন স্থিৰীকৰণ শস্য',Mustard:'ঠাণ্ডা বতৰৰ তেল বীজ শস্য',Onion:'ভাল আয়ৰ সৈতে অধিক চাহিদাৰ পাচলি',Potato:'ঠাণ্ডা বতৰৰ মুখ্য শস্য, অধিক উৎপাদন',Chilli:'উচ্চ বজাৰ মূল্যৰ উষ্ণ জলবায়ু মছলা',Groundnut:'উষ্ণ ঋতুৰ তেল বীজ শস্য'},
 };
 
-// ── Season translations ──
 const SEASON_T = {
   en: {"Kharif (Monsoon)":"Kharif (Monsoon)","Rabi (Winter)":"Rabi (Winter)","Zaid (Summer)":"Zaid (Summer)"},
   hi: {"Kharif (Monsoon)":"खरीफ (मानसून)","Rabi (Winter)":"रबी (सर्दी)","Zaid (Summer)":"जायद (गर्मी)"},
@@ -217,7 +58,6 @@ const SEASON_T = {
   as: {"Kharif (Monsoon)":"খাৰিফ (বৰষুণ)","Rabi (Winter)":"ৰবি (শীত)","Zaid (Summer)":"জায়েদ (গ্ৰীষ্ম)"},
 };
 
-// ── Weather labels ──
 const WEATHER_T = {
   en: {humidity:'Humidity',wind:'Wind Speed',visibility:'Visibility',pressure:'Pressure',feels:'Feels like',today:'Today',tomorrow:'Tomorrow',rain_yes:'YES — Rain Expected',rain_no:'NO — Clear Sky',forecast:'6-Day Forecast'},
   hi: {humidity:'आर्द्रता',wind:'हवा की गति',visibility:'दृश्यता',pressure:'वायुदाब',feels:'महसूस होता है',today:'आज',tomorrow:'कल',rain_yes:'हाँ — बारिश की संभावना',rain_no:'नहीं — साफ आकाश',forecast:'6 दिन का पूर्वानुमान'},
@@ -233,147 +73,25 @@ const WEATHER_T = {
   as: {humidity:'আর্দ্রতা',wind:'বায়ু গতি',visibility:'দৃশ্যমানতা',pressure:'বায়ুচাপ',feels:'অনুভৱ হয়',today:'আজি',tomorrow:'কালি',rain_yes:'হয় — বৰষুণ সম্ভাৱনা',rain_no:'নহয় — পৰিষ্কাৰ আকাশ',forecast:'৬ দিনৰ পূৰ্বানুমান'},
 };
 
-// ── Alert translations ──
 const ALERT_T = {
-  en: {
-    danger:'Critical',warning:'Warning',info:'Advisory',
-    "Extreme Heat":"Extreme Heat","Frost Warning":"Frost Warning",
-    "Fungal Disease Risk":"Fungal Disease Risk","Strong Winds":"Strong Winds",
-    "Heavy Rainfall":"Heavy Rainfall","Thunderstorm":"Thunderstorm",
-    "Aphid and Whitefly Risk":"Aphid and Whitefly Risk",
-    "Spider Mite Alert":"Spider Mite Alert","Crops at Risk":"Crops at Risk",
-  },
-  hi: {
-    danger:'खतरा',warning:'चेतावनी',info:'सलाह',
-    "Extreme Heat":"अत्यधिक गर्मी","Frost Warning":"पाले की चेतावनी",
-    "Fungal Disease Risk":"फफूंद रोग का खतरा","Strong Winds":"तेज हवाएं",
-    "Heavy Rainfall":"भारी वर्षा","Thunderstorm":"आंधी-तूफान",
-    "Aphid and Whitefly Risk":"माहू और सफेद मक्खी का खतरा",
-    "Spider Mite Alert":"मकड़ी के कण का अलर्ट","Crops at Risk":"जोखिम में फसलें",
-  },
-  bn: {
-    danger:'বিপদ',warning:'সতর্কতা',info:'পরামর্শ',
-    "Extreme Heat":"চরম গরম","Frost Warning":"তুষারপাতের সতর্কতা",
-    "Fungal Disease Risk":"ছত্রাক রোগের ঝুঁকি","Strong Winds":"শক্তিশালী বায়ু",
-    "Heavy Rainfall":"ভারী বৃষ্টিপাত","Thunderstorm":"বজ্রঝড়",
-    "Aphid and Whitefly Risk":"জাব পোকা ও সাদামাছির ঝুঁকি",
-    "Spider Mite Alert":"মাকড়সা মাইট সতর্কতা","Crops at Risk":"ঝুঁকিতে ফসল",
-  },
-  ta: {
-    danger:'அபாயம்',warning:'எச்சரிக்கை',info:'ஆலோசனை',
-    "Extreme Heat":"அதிக வெப்பம்","Frost Warning":"உறைபனி எச்சரிக்கை",
-    "Fungal Disease Risk":"பூஞ்சை நோய் அபாயம்","Strong Winds":"வலிமையான காற்று",
-    "Heavy Rainfall":"கனமழை","Thunderstorm":"இடிமழை",
-    "Aphid and Whitefly Risk":"அசுவினி மற்றும் வெள்ளை ஈ அபாயம்",
-    "Spider Mite Alert":"சிலந்தி பூச்சி எச்சரிக்கை","Crops at Risk":"அபாயத்தில் பயிர்கள்",
-  },
-  te: {
-    danger:'ప్రమాదం',warning:'హెచ్చరిక',info:'సలహా',
-    "Extreme Heat":"అధిక వేడి","Frost Warning":"మంచు హెచ్చరిక",
-    "Fungal Disease Risk":"శిలీంధ్ర వ్యాధి ప్రమాదం","Strong Winds":"తీవ్రమైన గాలులు",
-    "Heavy Rainfall":"భారీ వర్షపాతం","Thunderstorm":"పెనుగాలి తుఫాను",
-    "Aphid and Whitefly Risk":"పేను మరియు తెల్ల ఈగ ప్రమాదం",
-    "Spider Mite Alert":"సాలీడు పురుగు హెచ్చరిక","Crops at Risk":"ప్రమాదంలో పంటలు",
-  },
-  mr: {
-    danger:'धोका',warning:'सावधानता',info:'सल्ला',
-    "Extreme Heat":"अत्यंत उष्णता","Frost Warning":"दंव इशारा",
-    "Fungal Disease Risk":"बुरशी रोगाचा धोका","Strong Winds":"जोरदार वारे",
-    "Heavy Rainfall":"जड पाऊस","Thunderstorm":"वादळ",
-    "Aphid and Whitefly Risk":"मावा आणि पांढरी माशी धोका",
-    "Spider Mite Alert":"कोळी माइट अलर्ट","Crops at Risk":"धोक्यात पिके",
-  },
-  pa: {
-    danger:'ਖ਼ਤਰਾ',warning:'ਚੇਤਾਵਨੀ',info:'ਸਲਾਹ',
-    "Extreme Heat":"ਬਹੁਤ ਜ਼ਿਆਦਾ ਗਰਮੀ","Frost Warning":"ਪਾਲੇ ਦੀ ਚੇਤਾਵਨੀ",
-    "Fungal Disease Risk":"ਫੰਗਲ ਬਿਮਾਰੀ ਦਾ ਖ਼ਤਰਾ","Strong Winds":"ਤੇਜ਼ ਹਵਾਵਾਂ",
-    "Heavy Rainfall":"ਭਾਰੀ ਬਾਰਿਸ਼","Thunderstorm":"ਤੂਫ਼ਾਨ",
-    "Aphid and Whitefly Risk":"ਮਾਹੂ ਅਤੇ ਚਿੱਟੀ ਮੱਖੀ ਦਾ ਖ਼ਤਰਾ",
-    "Spider Mite Alert":"ਮੱਕੜੀ ਦੇ ਕੀੜੇ ਦੀ ਚੇਤਾਵਨੀ","Crops at Risk":"ਖ਼ਤਰੇ ਵਿੱਚ ਫ਼ਸਲਾਂ",
-  },
-  gu: {
-    danger:'ખતરો',warning:'ચેતવણી',info:'સલાહ',
-    "Extreme Heat":"અત્યંત ગરમી","Frost Warning":"હિમ ચેતવણી",
-    "Fungal Disease Risk":"ફૂગ રોગ ખતરો","Strong Winds":"ઝડપી પવન",
-    "Heavy Rainfall":"ભારે વરસાદ","Thunderstorm":"વાવાઝોડું",
-    "Aphid and Whitefly Risk":"માઇટ અને સફેદ માખી ખતરો",
-    "Spider Mite Alert":"સ્પાઇડર માઇટ ચેતવણી","Crops at Risk":"ખતરામાં પાક",
-  },
-  kn: {
-    danger:'ಅಪಾಯ',warning:'ಎಚ್ಚರಿಕೆ',info:'ಸಲಹೆ',
-    "Extreme Heat":"ಅತಿಯಾದ ಶಾಖ","Frost Warning":"ಹಿಮ ಎಚ್ಚರಿಕೆ",
-    "Fungal Disease Risk":"ಶಿಲೀಂಧ್ರ ರೋಗ ಅಪಾಯ","Strong Winds":"ಬಲವಾದ ಗಾಳಿ",
-    "Heavy Rainfall":"ಭಾರೀ ಮಳೆ","Thunderstorm":"ಗುಡುಗು ಚಂಡಮಾರುತ",
-    "Aphid and Whitefly Risk":"ರಸ ಹೀರುವ ಕೀಟ ಅಪಾಯ",
-    "Spider Mite Alert":"ಜೇಡ ಮಿಟೆ ಎಚ್ಚರಿಕೆ","Crops at Risk":"ಅಪಾಯದಲ್ಲಿ ಬೆಳೆಗಳು",
-  },
-  ml: {
-    danger:'അപകടം',warning:'മുന്നറിയിപ്പ്',info:'ഉപദേശം',
-    "Extreme Heat":"അതിശക്തമായ ചൂട്","Frost Warning":"മഞ്ഞ് മുന്നറിയിപ്പ്",
-    "Fungal Disease Risk":"കുമിൾ രോഗ അപകടം","Strong Winds":"ശക്തമായ കാറ്റ്",
-    "Heavy Rainfall":"കനത്ത മഴ","Thunderstorm":"ഇടിമിന്നൽ കൊടുങ്കാറ്റ്",
-    "Aphid and Whitefly Risk":"അഫിഡ്, വൈറ്റ്ഫ്ലൈ അപകടം",
-    "Spider Mite Alert":"ചിലന്തി കീടം മുന്നറിയിപ്പ്","Crops at Risk":"അപകടത്തിലുള്ള വിളകൾ",
-  },
-  or: {
-    danger:'ବିপଦ',warning:'ସତର୍କତା',info:'ପରାମର୍ଶ',
-    "Extreme Heat":"ଅତ୍ୟଧିକ ଗରମ","Frost Warning":"ତୁଷାର ସତର୍କତା",
-    "Fungal Disease Risk":"ଫଙ୍ଗଲ ରୋଗ ବିପଦ","Strong Winds":"ଶକ୍ତିଶାଳୀ ପବନ",
-    "Heavy Rainfall":"ଭାରୀ ବର୍ଷା","Thunderstorm":"ବଜ୍ରଝଡ",
-    "Aphid and Whitefly Risk":"ଜାବ ପୋକ ଓ ଧଳା ମାଛି ବିପଦ",
-    "Spider Mite Alert":"ମାକଡ ମାଇଟ ସତର୍କତା","Crops at Risk":"ବିପଦରେ ଫସଲ",
-  },
-  as: {
-    danger:'বিপদ',warning:'সতৰ্কতা',info:'পৰামৰ্শ',
-    "Extreme Heat":"অতিমাত্ৰা গৰম","Frost Warning":"তুষাৰ সতৰ্কতা",
-    "Fungal Disease Risk":"ফাংগাল ৰোগ বিপদ","Strong Winds":"শক্তিশালী বতাহ",
-    "Heavy Rainfall":"ভাৰী বৰষুণ","Thunderstorm":"বজ্ৰপাত ধুমুহা",
-    "Aphid and Whitefly Risk":"জাব পোক আৰু বগা মাখিৰ বিপদ",
-    "Spider Mite Alert":"মকৰা মাইট সতৰ্কতা","Crops at Risk":"বিপদত শস্য",
-  },
+  en: {danger:'Critical',warning:'Warning',info:'Advisory',"Extreme Heat":"Extreme Heat","Frost Warning":"Frost Warning","Fungal Disease Risk":"Fungal Disease Risk","Strong Winds":"Strong Winds","Heavy Rainfall":"Heavy Rainfall","Thunderstorm":"Thunderstorm","Aphid and Whitefly Risk":"Aphid and Whitefly Risk","Spider Mite Alert":"Spider Mite Alert","Crops at Risk":"Crops at Risk"},
+  hi: {danger:'खतरा',warning:'चेतावनी',info:'सलाह',"Extreme Heat":"अत्यधिक गर्मी","Frost Warning":"पाले की चेतावनी","Fungal Disease Risk":"फफूंद रोग का खतरा","Strong Winds":"तेज हवाएं","Heavy Rainfall":"भारी वर्षा","Thunderstorm":"आंधी-तूफान","Aphid and Whitefly Risk":"माहू और सफेद मक्खी का खतरा","Spider Mite Alert":"मकड़ी के कण का अलर्ट","Crops at Risk":"जोखिम में फसलें"},
+  bn: {danger:'বিপদ',warning:'সতর্কতা',info:'পরামর্শ',"Extreme Heat":"চরম গরম","Frost Warning":"তুষারপাতের সতর্কতা","Fungal Disease Risk":"ছত্রাক রোগের ঝুঁকি","Strong Winds":"শক্তিশালী বায়ু","Heavy Rainfall":"ভারী বৃষ্টিপাত","Thunderstorm":"বজ্রঝড়","Aphid and Whitefly Risk":"জাব পোকা ও সাদামাছির ঝুঁকি","Spider Mite Alert":"মাকড়সা মাইট সতর্কতা","Crops at Risk":"ঝুঁকিতে ফসল"},
+  ta: {danger:'அபாயம்',warning:'எச்சரிக்கை',info:'ஆலோசனை',"Extreme Heat":"அதிக வெப்பம்","Frost Warning":"உறைபனி எச்சரிக்கை","Fungal Disease Risk":"பூஞ்சை நோய் அபாயம்","Strong Winds":"வலிமையான காற்று","Heavy Rainfall":"கனமழை","Thunderstorm":"இடிமழை","Aphid and Whitefly Risk":"அசுவினி மற்றும் வெள்ளை ஈ அபாயம்","Spider Mite Alert":"சிலந்தி பூச்சி எச்சரிக்கை","Crops at Risk":"அபாயத்தில் பயிர்கள்"},
+  te: {danger:'ప్రమాదం',warning:'హెచ్చరిక',info:'సలహా',"Extreme Heat":"అధిక వేడి","Frost Warning":"మంచు హెచ్చరిక","Fungal Disease Risk":"శిలీంధ్ర వ్యాధి ప్రమాదం","Strong Winds":"తీవ్రమైన గాలులు","Heavy Rainfall":"భారీ వర్షపాతం","Thunderstorm":"పెనుగాలి తుఫాను","Aphid and Whitefly Risk":"పేను మరియు తెల్ల ఈగ ప్రమాదం","Spider Mite Alert":"సాలీడు పురుగు హెచ్చరిక","Crops at Risk":"ప్రమాదంలో పంటలు"},
+  mr: {danger:'धोका',warning:'सावधानता',info:'सल्ला',"Extreme Heat":"अत्यंत उष्णता","Frost Warning":"दंव इशारा","Fungal Disease Risk":"बुरशी रोगाचा धोका","Strong Winds":"जोरदार वारे","Heavy Rainfall":"जड पाऊस","Thunderstorm":"वादळ","Aphid and Whitefly Risk":"मावा आणि पांढरी माशी धोका","Spider Mite Alert":"कोळी माइट अलर्ट","Crops at Risk":"धोक्यात पिके"},
+  pa: {danger:'ਖ਼ਤਰਾ',warning:'ਚੇਤਾਵਨੀ',info:'ਸਲਾਹ',"Extreme Heat":"ਬਹੁਤ ਜ਼ਿਆਦਾ ਗਰਮੀ","Frost Warning":"ਪਾਲੇ ਦੀ ਚੇਤਾਵਨੀ","Fungal Disease Risk":"ਫੰਗਲ ਬਿਮਾਰੀ ਦਾ ਖ਼ਤਰਾ","Strong Winds":"ਤੇਜ਼ ਹਵਾਵਾਂ","Heavy Rainfall":"ਭਾਰੀ ਬਾਰਿਸ਼","Thunderstorm":"ਤੂਫ਼ਾਨ","Aphid and Whitefly Risk":"ਮਾਹੂ ਅਤੇ ਚਿੱਟੀ ਮੱਖੀ ਦਾ ਖ਼ਤਰਾ","Spider Mite Alert":"ਮੱਕੜੀ ਦੇ ਕੀੜੇ ਦੀ ਚੇਤਾਵਨੀ","Crops at Risk":"ਖ਼ਤਰੇ ਵਿੱਚ ਫ਼ਸਲਾਂ"},
+  gu: {danger:'ખતરો',warning:'ચેતવણી',info:'સલાહ',"Extreme Heat":"અત્યંત ગરમી","Frost Warning":"હિમ ચેતવણી","Fungal Disease Risk":"ફૂગ રોગ ખતરો","Strong Winds":"ઝડપી પવન","Heavy Rainfall":"ભારે વરસાદ","Thunderstorm":"વાવાઝોડું","Aphid and Whitefly Risk":"માઇટ અને સફેદ માખી ખતરો","Spider Mite Alert":"સ્પાઇડર માઇટ ચેતવણી","Crops at Risk":"ખતરામાં પાક"},
+  kn: {danger:'ಅಪಾಯ',warning:'ಎಚ್ಚರಿಕೆ',info:'ಸಲಹೆ',"Extreme Heat":"ಅತಿಯಾದ ಶಾಖ","Frost Warning":"ಹಿಮ ಎಚ್ಚರಿಕೆ","Fungal Disease Risk":"ಶಿಲೀಂಧ್ರ ರೋಗ ಅಪಾಯ","Strong Winds":"ಬಲವಾದ ಗಾಳಿ","Heavy Rainfall":"ಭಾರೀ ಮಳೆ","Thunderstorm":"ಗುಡುಗು ಚಂಡಮಾರುತ","Aphid and Whitefly Risk":"ರಸ ಹೀರುವ ಕೀಟ ಅಪಾಯ","Spider Mite Alert":"ಜೇಡ ಮಿಟೆ ಎಚ್ಚರಿಕೆ","Crops at Risk":"ಅಪಾಯದಲ್ಲಿ ಬೆಳೆಗಳು"},
+  ml: {danger:'അപകടം',warning:'മുന്നറിയിപ്പ്',info:'ഉപദേശം',"Extreme Heat":"അതിശക്തമായ ചൂട്","Frost Warning":"മഞ്ഞ് മുന്നറിയിപ്പ്","Fungal Disease Risk":"കുമിൾ രോഗ അപകടം","Strong Winds":"ശക്തമായ കാറ്റ്","Heavy Rainfall":"കനത്ത മഴ","Thunderstorm":"ഇടിമിന്നൽ കൊടുങ്കാറ്റ്","Aphid and Whitefly Risk":"അഫിഡ്, വൈറ്റ്ഫ്ലൈ അപകടം","Spider Mite Alert":"ചിലന്തി കീടം മുന്നറിയിപ്പ്","Crops at Risk":"അപകടത്തിലുള്ള വിളകൾ"},
+  or: {danger:'ବିପଦ',warning:'ସତର୍କତା',info:'ପରାମର୍ଶ',"Extreme Heat":"ଅତ୍ୟଧିକ ଗରମ","Frost Warning":"ତୁଷାର ସତର୍କତା","Fungal Disease Risk":"ଫଙ୍ଗଲ ରୋଗ ବିପଦ","Strong Winds":"ଶକ୍ତିଶାଳୀ ପବନ","Heavy Rainfall":"ଭାରୀ ବର୍ଷା","Thunderstorm":"ବଜ୍ରଝଡ","Aphid and Whitefly Risk":"ଜାବ ପୋକ ଓ ଧଳା ମାଛି ବିପଦ","Spider Mite Alert":"ମାକଡ ମାଇଟ ସତର୍କତା","Crops at Risk":"ବିପଦରେ ଫସଲ"},
+  as: {danger:'বিপদ',warning:'সতৰ্কতা',info:'পৰামৰ্শ',"Extreme Heat":"অতিমাত্ৰা গৰম","Frost Warning":"তুষাৰ সতৰ্কতা","Fungal Disease Risk":"ফাংগাল ৰোগ বিপদ","Strong Winds":"শক্তিশালী বতাহ","Heavy Rainfall":"ভাৰী বৰষুণ","Thunderstorm":"বজ্ৰপাত ধুমুহা","Aphid and Whitefly Risk":"জাব পোক আৰু বগা মাখিৰ বিপদ","Spider Mite Alert":"মকৰা মাইট সতৰ্কতা","Crops at Risk":"বিপদত শস্য"},
 };
 
-// ── Soil tip translations ──
 const SOIL_T = {
-  en: {
-    "Drainage Important":"Drainage Important",
-    "Green Manure":"Green Manure",
-    "Soil Testing":"Soil Testing",
-    "Deep Ploughing":"Deep Ploughing",
-    "Phosphorus Application":"Phosphorus Application",
-    "Residue Management":"Residue Management",
-    "Mulching Essential":"Mulching Essential",
-    "Early Morning Irrigation":"Early Morning Irrigation",
-    "Micronutrients":"Micronutrients",
-    "Fungal Disease Alert":"Fungal Disease Alert",
-    "Heat Stress Warning":"Heat Stress Warning",
-  },
-  hi: {
-    "Drainage Important":"जल निकासी जरूरी",
-    "Green Manure":"हरी खाद",
-    "Soil Testing":"मिट्टी परीक्षण",
-    "Deep Ploughing":"गहरी जुताई",
-    "Phosphorus Application":"फास्फोरस का उपयोग",
-    "Residue Management":"फसल अवशेष प्रबंधन",
-    "Mulching Essential":"मल्चिंग जरूरी",
-    "Early Morning Irrigation":"सुबह सिंचाई",
-    "Micronutrients":"सूक्ष्म पोषक तत्व",
-    "Fungal Disease Alert":"फफूंद रोग अलर्ट",
-    "Heat Stress Warning":"गर्मी तनाव चेतावनी",
-  },
-  bn: {
-    "Drainage Important":"নিষ্কাশন গুরুত্বপূর্ণ",
-    "Green Manure":"সবুজ সার",
-    "Soil Testing":"মাটি পরীক্ষা",
-    "Deep Ploughing":"গভীর চাষ",
-    "Phosphorus Application":"ফসফরাস প্রয়োগ",
-    "Residue Management":"অবশিষ্ট ব্যবস্থাপনা",
-    "Mulching Essential":"মালচিং জরুরি",
-    "Early Morning Irrigation":"সকালে সেচ",
-    "Micronutrients":"অণু পুষ্টি",
-    "Fungal Disease Alert":"ছত্রাক রোগ সতর্কতা",
-    "Heat Stress Warning":"তাপ চাপ সতর্কতা",
-  },
+  en: {"Drainage Important":"Drainage Important","Green Manure":"Green Manure","Soil Testing":"Soil Testing","Deep Ploughing":"Deep Ploughing","Phosphorus Application":"Phosphorus Application","Residue Management":"Residue Management","Mulching Essential":"Mulching Essential","Early Morning Irrigation":"Early Morning Irrigation","Micronutrients":"Micronutrients","Fungal Disease Alert":"Fungal Disease Alert","Heat Stress Warning":"Heat Stress Warning"},
+  hi: {"Drainage Important":"जल निकासी जरूरी","Green Manure":"हरी खाद","Soil Testing":"मिट्टी परीक्षण","Deep Ploughing":"गहरी जुताई","Phosphorus Application":"फास्फोरस का उपयोग","Residue Management":"फसल अवशेष प्रबंधन","Mulching Essential":"मल्चिंग जरूरी","Early Morning Irrigation":"सुबह सिंचाई","Micronutrients":"सूक्ष्म पोषक तत्व","Fungal Disease Alert":"फफूंद रोग अलर्ट","Heat Stress Warning":"गर्मी तनाव चेतावनी"},
+  bn: {"Drainage Important":"নিষ্কাশন গুরুত্বপূর্ণ","Green Manure":"সবুজ সার","Soil Testing":"মাটি পরীক্ষা","Deep Ploughing":"গভীর চাষ","Phosphorus Application":"ফসফরাস প্রয়োগ","Residue Management":"অবশিষ্ট ব্যবস্থাপনা","Mulching Essential":"মালচিং জরুরি","Early Morning Irrigation":"সকালে সেচ","Micronutrients":"অণু পুষ্টি","Fungal Disease Alert":"ছত্রাক রোগ সতর্কতা","Heat Stress Warning":"তাপ চাপ সতর্কতা"},
   ta: {"Drainage Important":"வடிகால் முக்கியம்","Green Manure":"பசுந்தாள் உரம்","Soil Testing":"மண் பரிசோதனை","Deep Ploughing":"ஆழ உழவு","Phosphorus Application":"பாஸ்பரஸ் பயன்பாடு","Residue Management":"எச்சம் மேலாண்மை","Mulching Essential":"மல்சிங் அவசியம்","Early Morning Irrigation":"காலை நீர்ப்பாசனம்","Micronutrients":"நுண்ணூட்டச்சத்துகள்","Fungal Disease Alert":"பூஞ்சை நோய் எச்சரிக்கை","Heat Stress Warning":"வெப்ப அழுத்த எச்சரிக்கை"},
   te: {"Drainage Important":"డ్రైనేజ్ ముఖ్యం","Green Manure":"పచ్చిరొట్ట ఎరువు","Soil Testing":"నేల పరీక్ష","Deep Ploughing":"లోతు దున్నడం","Phosphorus Application":"ఫాస్ఫరస్ వినియోగం","Residue Management":"అవశేష నిర్వహణ","Mulching Essential":"మల్చింగ్ అవసరం","Early Morning Irrigation":"ఉదయం నీటి పారుదల","Micronutrients":"సూక్ష్మ పోషకాలు","Fungal Disease Alert":"శిలీంధ్ర వ్యాధి హెచ్చరిక","Heat Stress Warning":"వేడి ఒత్తిడి హెచ్చరిక"},
   mr: {"Drainage Important":"निचरा महत्त्वाचा","Green Manure":"हिरवळीचे खत","Soil Testing":"माती परीक्षण","Deep Ploughing":"खोल नांगरणी","Phosphorus Application":"फॉस्फरस वापर","Residue Management":"अवशेष व्यवस्थापन","Mulching Essential":"आच्छादन आवश्यक","Early Morning Irrigation":"सकाळी सिंचन","Micronutrients":"सूक्ष्म पोषक","Fungal Disease Alert":"बुरशी रोग सूचना","Heat Stress Warning":"उष्णता ताण इशारा"},
@@ -385,7 +103,6 @@ const SOIL_T = {
   as: {"Drainage Important":"পানী নিষ্কাশন জৰুৰী","Green Manure":"সেউজীয়া সাৰ","Soil Testing":"মাটি পৰীক্ষা","Deep Ploughing":"গভীৰ হাল","Phosphorus Application":"ফছফৰাছ ব্যৱহাৰ","Residue Management":"অৱশিষ্ট ব্যৱস্থাপনা","Mulching Essential":"মালচিং জৰুৰী","Early Morning Irrigation":"পুৱা জলসিঞ্চন","Micronutrients":"সূক্ষ্ম পোষক","Fungal Disease Alert":"ফাংগাল ৰোগ সতৰ্কতা","Heat Stress Warning":"তাপ চাপ সতৰ্কতা"},
 };
 
-// ── Pest name translations ──
 const PEST_T = {
   en: {"Brown Plant Hopper":"Brown Plant Hopper","Leaf folder":"Leaf Folder","Aphids":"Aphids","Yellow rust":"Yellow Rust","Fall Armyworm":"Fall Armyworm","Bollworm":"Bollworm","Whitefly":"Whitefly","Early Blight":"Early Blight","Thrips":"Thrips"},
   hi: {"Brown Plant Hopper":"भूरा पौधा हॉपर","Leaf folder":"पत्ती मोड़क","Aphids":"माहू/चेपा","Yellow rust":"पीला रस्ट","Fall Armyworm":"फॉल आर्मीवर्म","Bollworm":"बॉलवर्म","Whitefly":"सफेद मक्खी","Early Blight":"अगेती झुलसा","Thrips":"थ्रिप्स"},
@@ -401,7 +118,6 @@ const PEST_T = {
   as: {"Brown Plant Hopper":"বাদামী গছ হপাৰ","Leaf folder":"পাত মুড়া","Aphids":"জাব পোক","Yellow rust":"হালধীয়া মৰিছা","Fall Armyworm":"ফল আৰ্মিৱৰ্ম","Bollworm":"বলৱৰ্ম","Whitefly":"বগা মাখি","Early Blight":"আগতীয়া পচন","Thrips":"থ্ৰিপছ"},
 };
 
-// ── Market labels ──
 const MARKET_T = {
   en: {above_msp:'Above MSP',below_msp:'Below MSP',per_quintal:'per quintal',msp:'MSP',demand:'Demand',price_up:'Price Up',price_down:'Price Down',live:'LIVE',indicative:'INDICATIVE'},
   hi: {above_msp:'MSP से ऊपर',below_msp:'MSP से नीचे',per_quintal:'प्रति क्विंटल',msp:'न्यूनतम समर्थन मूल्य',demand:'मांग',price_up:'भाव बढ़ा',price_down:'भाव गिरा',live:'लाइव',indicative:'अनुमानित'},
@@ -417,33 +133,15 @@ const MARKET_T = {
   as: {above_msp:'MSP ৰ উপৰত',below_msp:'MSP ৰ তলত',per_quintal:'প্ৰতি কুইন্টাল',msp:'নিম্নতম সমৰ্থন মূল্য',demand:'চাহিদা',price_up:'দাম বাঢ়িল',price_down:'দাম কমিল',live:'লাইভ',indicative:'আনুমানিক'},
 };
 
-// ── Helper functions ──
-function getCropName(name) {
-  return (CROP_NAMES[currentLang] || CROP_NAMES.en)[name] || name;
-}
-function getCropDesc(name) {
-  return (CROP_DESC[currentLang] || CROP_DESC.en)[name] || (CROP_DESC.en)[name] || '';
-}
-function getSeason(key) {
-  return (SEASON_T[currentLang] || SEASON_T.en)[key] || key;
-}
-function getWeatherT(key) {
-  return (WEATHER_T[currentLang] || WEATHER_T.en)[key] || (WEATHER_T.en)[key] || key;
-}
-function getAlertT(key) {
-  return (ALERT_T[currentLang] || ALERT_T.en)[key] || (ALERT_T.en)[key] || key;
-}
-function getSoilT(key) {
-  return (SOIL_T[currentLang] || SOIL_T.en)[key] || (SOIL_T.en)[key] || key;
-}
-function getPestT(key) {
-  return (PEST_T[currentLang] || PEST_T.en)[key] || (PEST_T.en)[key] || key;
-}
-function getMarketT(key) {
-  return (MARKET_T[currentLang] || MARKET_T.en)[key] || (MARKET_T.en)[key] || key;
-}
+function getCropName(name) { return (CROP_NAMES[currentLang] || CROP_NAMES.en)[name] || name; }
+function getCropDesc(name) { return (CROP_DESC[currentLang] || CROP_DESC.en)[name] || (CROP_DESC.en)[name] || ''; }
+function getSeason(key) { return (SEASON_T[currentLang] || SEASON_T.en)[key] || key; }
+function getWeatherT(key) { return (WEATHER_T[currentLang] || WEATHER_T.en)[key] || (WEATHER_T.en)[key] || key; }
+function getAlertT(key) { return (ALERT_T[currentLang] || ALERT_T.en)[key] || (ALERT_T.en)[key] || key; }
+function getSoilT(key) { return (SOIL_T[currentLang] || SOIL_T.en)[key] || (SOIL_T.en)[key] || key; }
+function getPestT(key) { return (PEST_T[currentLang] || PEST_T.en)[key] || (PEST_T.en)[key] || key; }
+function getMarketT(key) { return (MARKET_T[currentLang] || MARKET_T.en)[key] || (MARKET_T.en)[key] || key; }
 
-// ── Static UI translations ──
 const T = {
   en: {
     nav_home:'Home',nav_diagnose:'Diagnose',nav_market:'Mandi Prices',nav_alerts:'Alerts',
@@ -460,9 +158,9 @@ const T = {
     diagnose_hero_title:'Crop Disease Detector',diagnose_hero_sub:'Take a photo — AI tells you what is wrong',
     upload_title:'Drop crop photo here',upload_sub:'JPG, PNG, WEBP — max 10 MB',
     btn_upload:'Upload Photo',btn_camera:'Take Photo',btn_analyze:'Analyze Crop',
-    tips_title:'Tips for Best Results',tip1:'Focus on most affected leaf or stem',
-    tip2:'Use daylight — avoid dark photos',tip3:'Get close — 30 to 50 cm',
-    tip4:'Include both healthy and sick parts',
+    tips_title:'Tips for Best Results',
+    tip1:'Focus on most affected leaf or stem',tip2:'Use daylight — avoid dark photos',
+    tip3:'Get close — 30 to 50 cm',tip4:'Include both healthy and sick parts',
     results_placeholder_title:'Upload a photo to start',results_placeholder_sub:'AI will identify disease and suggest treatment',
     step1_title:'Take a Photo',step1_sub:'Clear photo of affected crop',
     step2_title:'AI Checks It',step2_sub:'Kindwise AI finds the exact disease',
@@ -484,12 +182,13 @@ const T = {
     safe_title:'Safe to Grow Now',safe_sub:'These crops suit current weather',
     chatbot_title:'Kisan Helper',chatbot_sub:'Ask in any language',
     chat_placeholder:'Type or speak...',helpline:'Kisan Helpline',
-    stat_temp:'Temperature',stat_humidity:'Humidity',stat_wind:'Wind',
-    stat_visibility:'Visibility',stat_pressure:'Pressure',install_app:'Install App',cm_season:'Season', cm_water:'Water', cm_yield:'Yield', cm_duration:'Duration',
-    level_very_high:'Very High', level_high:'High', level_medium:'Medium', level_low:'Low',
-    unit_days:'days',diag_cause:'Cause', diag_recovery:'Recovery', diag_eco:'Eco-Friendly Treatment',diag_recommended:'RECOMMENDED', diag_chemical:'Chemical Treatment',
-    diag_prevention:'Prevention', diag_confidence:'Confidence', diag_severity:'Severity',diag_disclaimer:'AI diagnosis for guidance only. Consult a local agronomist for critical decisions.',
-
+    stat_temp:'Temperature',stat_humidity:'Humidity',stat_wind:'Wind',stat_visibility:'Visibility',stat_pressure:'Pressure',stat_total:'Total',
+    install_app:'Install App',cm_season:'Season',cm_water:'Water',cm_yield:'Yield',cm_duration:'Duration',
+    level_very_high:'Very High',level_high:'High',level_medium:'Medium',level_low:'Low',
+    unit_days:'days',diag_cause:'Cause',diag_recovery:'Recovery',diag_eco:'Eco-Friendly Treatment',
+    diag_recommended:'RECOMMENDED',diag_chemical:'Chemical Treatment',diag_prevention:'Prevention',
+    diag_confidence:'Confidence',diag_severity:'Severity',
+    diag_disclaimer:'AI diagnosis for guidance only. Consult a local agronomist for critical decisions.',
   },
   hi: {
     nav_home:'होम',nav_diagnose:'फसल जांच',nav_market:'मंडी भाव',nav_alerts:'अलर्ट',
@@ -506,10 +205,10 @@ const T = {
     diagnose_hero_title:'फसल बीमारी डिटेक्टर',diagnose_hero_sub:'बीमार फसल की फोटो लो — AI बताएगा',
     upload_title:'फसल की फोटो यहाँ डालें',upload_sub:'JPG, PNG, WEBP — max 10 MB',
     btn_upload:'फोटो अपलोड',btn_camera:'फोटो लो',btn_analyze:'फसल जांचें',
-    tips_title:'अच्छी फोटो के टिप्स',tip1:'सबसे बीमार पत्ती दिखाएं',
-    tip2:'धूप में फोटो लें',tip3:'करीब से लो — 30-50 cm',
-    tip4:'ठीक और बीमार दोनों दिखाएं',
-    results_placeholder_title:'फोटो अपलोड करें',results_placeholder_sub:'AI बीमारी ढूंढ कर इलाज बताएगा',
+    tips_title:'अच्छी फोटो के टिप्स',
+    tip1:'सबसे बीमार पत्ती या तना दिखाएं',tip2:'धूप में फोटो लें — अंधेरे से बचें',
+    tip3:'करीब से लो — 30 से 50 सेमी',tip4:'ठीक और बीमार दोनों हिस्से दिखाएं',
+    results_placeholder_title:'शुरू करने के लिए फोटो अपलोड करें',results_placeholder_sub:'AI बीमारी पहचानेगा और इलाज सुझाएगा',
     step1_title:'फोटो लो',step1_sub:'बीमार फसल की साफ फोटो',
     step2_title:'AI जांच करता है',step2_sub:'Kindwise AI सही बीमारी ढूंढता है',
     step3_title:'इलाज पाएं',step3_sub:'जैविक और रासायनिक इलाज',
@@ -525,19 +224,18 @@ const T = {
     filter_all_alerts:'सब',filter_danger:'खतरे',filter_warning:'चेतावनी',
     filter_advisory:'सलाह',filter_weather:'मौसम',filter_pest:'कीड़े',
     no_alerts_title:'सब ठीक! कोई Alert नहीं',no_alerts_sub:'मौसम अच्छा है',
-    pest_calendar_title:'मौसमी कीड़े Calendar',pest_calendar_sub:'इस season में active कीड़े',
+    pest_calendar_title:'मौसमी कीड़े कैलेंडर',pest_calendar_sub:'इस मौसम में सक्रिय कीड़े',
     harmful_title:'अभी जोखिम वाली फसलें',harmful_sub:'इन्हें अभी मत उगाएं',
-    safe_title:'अभी उगाने के लिए Safe फसलें',safe_sub:'ये आपके मौसम के लिए ठीक हैं',
+    safe_title:'अभी उगाने के लिए सुरक्षित फसलें',safe_sub:'ये आपके मौसम के लिए ठीक हैं',
     chatbot_title:'किसान सहायक',chatbot_sub:'किसी भी भाषा में पूछें',
     chat_placeholder:'लिखें या बोलें...',helpline:'किसान हेल्पलाइन',
-    stat_temp:'तापमान',stat_humidity:'आर्द्रता',stat_wind:'हवा',
-    stat_visibility:'दृश्यता',stat_pressure:'दबाव',install_app:'App इंस्टॉल करें',  cm_season:'मौसम', cm_water:'पानी', cm_yield:'उपज', cm_duration:'अवधि',
-    level_very_high:'बहुत अधिक', level_high:'अधिक', level_medium:'मध्यम', level_low:'कम',
-    unit_days:'दिन',diag_cause:'कारण', diag_recovery:'ठीक होने का समय', diag_eco:'पर्यावरण-अनुकूल उपचार',
-diag_recommended:'अनुशंसित', diag_chemical:'रासायनिक उपचार',
-diag_prevention:'रोकथाम', diag_confidence:'विश्वसनीयता', diag_severity:'गंभीरता',
-diag_disclaimer:'AI निदान केवल मार्गदर्शन के लिए है। महत्वपूर्ण निर्णयों के लिए स्थानीय कृषि विशेषज्ञ से सलाह लें।',
-
+    stat_temp:'तापमान',stat_humidity:'आर्द्रता',stat_wind:'हवा',stat_visibility:'दृश्यता',stat_pressure:'दबाव',stat_total:'कुल',
+    install_app:'App इंस्टॉल करें',cm_season:'मौसम',cm_water:'पानी',cm_yield:'उपज',cm_duration:'अवधि',
+    level_very_high:'बहुत अधिक',level_high:'अधिक',level_medium:'मध्यम',level_low:'कम',
+    unit_days:'दिन',diag_cause:'कारण',diag_recovery:'ठीक होने का समय',diag_eco:'पर्यावरण-अनुकूल उपचार',
+    diag_recommended:'अनुशंसित',diag_chemical:'रासायनिक उपचार',diag_prevention:'रोकथाम',
+    diag_confidence:'विश्वसनीयता',diag_severity:'गंभीरता',
+    diag_disclaimer:'AI निदान केवल मार्गदर्शन के लिए है। महत्वपूर्ण निर्णयों के लिए स्थानीय कृषि विशेषज्ञ से सलाह लें।',
   },
   bn: {
     nav_home:'হোম',nav_diagnose:'ফসল নির্ণয়',nav_market:'বাজার মূল্য',nav_alerts:'সতর্কতা',
@@ -555,6 +253,12 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     upload_title:'ফসলের ছবি এখানে রাখুন',upload_sub:'JPG, PNG, WEBP — সর্বোচ্চ 10 MB',
     btn_upload:'ছবি আপলোড',btn_camera:'ছবি তুলুন',btn_analyze:'ফসল পরীক্ষা করুন',
     tips_title:'সেরা ছবির টিপস',
+    tip1:'সবচেয়ে আক্রান্ত পাতা বা কাণ্ডে ফোকাস করুন',tip2:'দিনের আলোতে ছবি তুলুন — অন্ধকার এড়িয়ে চলুন',
+    tip3:'কাছ থেকে তুলুন — ৩০ থেকে ৫০ সেমি',tip4:'সুস্থ এবং অসুস্থ উভয় অংশ অন্তর্ভুক্ত করুন',
+    results_placeholder_title:'শুরু করতে একটি ছবি আপলোড করুন',results_placeholder_sub:'AI রোগ চিহ্নিত করবে এবং চিকিৎসা সুপারিশ করবে',
+    step1_title:'ছবি তুলুন',step1_sub:'আক্রান্ত ফসলের স্পষ্ট ছবি',
+    step2_title:'AI পরীক্ষা করে',step2_sub:'Kindwise AI সঠিক রোগ খুঁজে বের করে',
+    step3_title:'চিকিৎসা পান',step3_sub:'জৈব এবং রাসায়নিক চিকিৎসার বিকল্প',
     market_hero_title:'আজকের বাজার মূল্য',market_hero_sub:'১৫ ফসল · ২০ শহর · MSP তুলনা',
     search_placeholder:'শহর খুঁজুন',btn_search:'খুঁজুন',
     filter_all:'সব',filter_high:'বেশি চাহিদা',filter_rising:'বাড়ছে',filter_falling:'কমছে',
@@ -565,19 +269,18 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     filter_all_alerts:'সব',filter_danger:'বিপদ',filter_warning:'সতর্কতা',
     filter_advisory:'পরামর্শ',filter_weather:'আবহাওয়া',filter_pest:'কীট',
     no_alerts_title:'সব ঠিক আছে!',no_alerts_sub:'আবহাওয়া চাষের জন্য ভালো',
+    pest_calendar_title:'মৌসুমী কীটপতঙ্গ ক্যালেন্ডার',pest_calendar_sub:'এই মৌসুমে সক্রিয় কীট',
+    harmful_title:'এখন ঝুঁকিপূর্ণ ফসল',harmful_sub:'বর্তমান আবহাওয়ায় এগুলো চাষ এড়িয়ে চলুন',
+    safe_title:'এখন চাষের জন্য নিরাপদ',safe_sub:'এই ফসলগুলো বর্তমান আবহাওয়ার জন্য উপযুক্ত',
     chatbot_title:'কিসান সহায়ক',chatbot_sub:'যেকোনো ভাষায় জিজ্ঞাসা',
     chat_placeholder:'টাইপ করুন বা বলুন...',helpline:'কিসান হেল্পলাইন',
-    stat_temp:'তাপমাত্রা',stat_humidity:'আর্দ্রতা',stat_wind:'বায়ু',stat_visibility:'দৃশ্যমানতা',stat_pressure:'চাপ',  cm_season:'মৌসুম', cm_water:'জল', cm_yield:'ফলন', cm_duration:'সময়কাল',
-    level_very_high:'অত্যধিক', level_high:'বেশি', level_medium:'মাঝারি', level_low:'কম',
-    unit_days:'দিন',diag_cause:'কারণ',
-  diag_recovery: 'সেরে উঠতে সময়',
-  diag_eco: 'পরিবেশ-বান্ধব চিকিৎসা',
-  diag_recommended: 'প্রস্তাবিত',
-  diag_chemical: 'রাসায়নিক চিকিৎসা',
-  diag_prevention: 'প্রতিরোধ',
-  diag_confidence: 'নিশ্চয়তা',
-  diag_severity: 'তীব্রতা',
-  diag_disclaimer: 'AI রোগ নির্ণয় শুধু গাইডেন্সের জন্য। গুরুত্বপূর্ণ সিদ্ধান্তে স্থানীয় কৃষি বিশেষজ্ঞের পরামর্শ নিন।'
+    stat_temp:'তাপমাত্রা',stat_humidity:'আর্দ্রতা',stat_wind:'বায়ু',stat_visibility:'দৃশ্যমানতা',stat_pressure:'চাপ',stat_total:'মোট',
+    cm_season:'মৌসুম',cm_water:'জল',cm_yield:'ফলন',cm_duration:'সময়কাল',
+    level_very_high:'অত্যধিক',level_high:'বেশি',level_medium:'মাঝারি',level_low:'কম',
+    unit_days:'দিন',diag_cause:'কারণ',diag_recovery:'সেরে উঠতে সময়',diag_eco:'পরিবেশ-বান্ধব চিকিৎসা',
+    diag_recommended:'প্রস্তাবিত',diag_chemical:'রাসায়নিক চিকিৎসা',diag_prevention:'প্রতিরোধ',
+    diag_confidence:'নিশ্চয়তা',diag_severity:'তীব্রতা',
+    diag_disclaimer:'AI রোগ নির্ণয় শুধু গাইডেন্সের জন্য। গুরুত্বপূর্ণ সিদ্ধান্তে স্থানীয় কৃষি বিশেষজ্ঞের পরামর্শ নিন।',
   },
   ta: {
     nav_home:'முகப்பு',nav_diagnose:'பயிர் நோய்',nav_market:'சந்தை விலை',nav_alerts:'எச்சரிக்கை',
@@ -595,6 +298,12 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     upload_title:'பயிர் படம் இங்கே போடுங்கள்',upload_sub:'JPG, PNG, WEBP — அதிகபட்சம் 10 MB',
     btn_upload:'படம் பதிவேற்று',btn_camera:'படம் எடு',btn_analyze:'பயிர் பரிசோதனை',
     tips_title:'சிறந்த படத்திற்கான குறிப்புகள்',
+    tip1:'அதிகம் பாதிக்கப்பட்ட இலை அல்லது தண்டில் கவனம் செலுத்துங்கள்',tip2:'பகல் வெளிச்சத்தில் எடுங்கள் — இருட்டான படங்களை தவிருங்கள்',
+    tip3:'நெருங்கி எடுங்கள் — 30 முதல் 50 செமீ',tip4:'ஆரோக்கியமான மற்றும் நோய்வாய்ப்பட்ட பகுதிகளை சேர்க்கவும்',
+    results_placeholder_title:'தொடங்க ஒரு படம் பதிவேற்றுங்கள்',results_placeholder_sub:'AI நோயை அடையாளம் கண்டு சிகிச்சை பரிந்துரைக்கும்',
+    step1_title:'படம் எடுங்கள்',step1_sub:'பாதிக்கப்பட்ட பயிரின் தெளிவான படம்',
+    step2_title:'AI சரிபார்க்கிறது',step2_sub:'Kindwise AI சரியான நோயைக் கண்டறியும்',
+    step3_title:'சிகிச்சை பெறுங்கள்',step3_sub:'இயற்கை மற்றும் வேதியியல் சிகிச்சை விருப்பங்கள்',
     market_hero_title:'இன்றைய மாண்டி விலைகள்',market_hero_sub:'15 பயிர் · 20 நகரம் · MSP ஒப்பீடு',
     search_placeholder:'நகரம் தேடுங்கள்',btn_search:'தேடு',
     filter_all:'அனைத்தும்',filter_high:'அதிக தேவை',filter_rising:'உயர்கிறது',filter_falling:'குறைகிறது',
@@ -605,21 +314,18 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     filter_all_alerts:'அனைத்தும்',filter_danger:'அபாயம்',filter_warning:'எச்சரிக்கை',
     filter_advisory:'ஆலோசனை',filter_weather:'வானிலை',filter_pest:'பூச்சி',
     no_alerts_title:'எல்லாம் நல்லது!',no_alerts_sub:'வானிலை விவசாயத்திற்கு நல்லது',
+    pest_calendar_title:'பருவகால பூச்சி நாட்காட்டி',pest_calendar_sub:'இந்த பருவத்தில் செயலில் உள்ள பூச்சிகள்',
+    harmful_title:'இப்போது ஆபத்தான பயிர்கள்',harmful_sub:'தற்போதைய வானிலையில் இவற்றை வளர்க்க வேண்டாம்',
+    safe_title:'இப்போது பாதுகாப்பாக வளர்க்கலாம்',safe_sub:'இந்த பயிர்கள் தற்போதைய வானிலைக்கு ஏற்றவை',
     chatbot_title:'கிசான் உதவியாளர்',chatbot_sub:'எந்த மொழியிலும் கேளுங்கள்',
     chat_placeholder:'தட்டச்சு அல்லது பேசுங்கள்...',helpline:'கிசான் உதவி',
-    stat_temp:'வெப்பநிலை',stat_humidity:'ஈரப்பதம்',stat_wind:'காற்று',stat_visibility:'தெரிவுத்திறன்',stat_pressure:'அழுத்தம்',
-    cm_season:'பருவம்', cm_water:'நீர்', cm_yield:'விளைச்சல்', cm_duration:'காலம்',
-    level_very_high:'மிக அதிகம்', level_high:'அதிகம்', level_medium:'நடுத்தரம்', level_low:'குறைவு',
-    unit_days:'நாட்கள்',
-    diag_cause: 'காரணம்',
-    diag_recovery: 'குணமடைதல்',
-    diag_eco: 'சூழல் நட்பு சிகிச்சை',
-    diag_recommended: 'பரிந்துரைக்கப்படுவது',
-    diag_chemical: 'வேதியியல் சிகிச்சை',
-    diag_prevention: 'தடுப்பு முறை',
-    diag_confidence: 'நம்பிக்கை',
-    diag_severity: 'தீவிரம்',
-    diag_disclaimer: 'AI கண்டறிதல் வழிகாட்டுதலுக்காக மட்டுமே. முக்கியமான முடிவுகளுக்கு உள்ளூர் விவசாய நிபுணரை அணுகவும்.'
+    stat_temp:'வெப்பநிலை',stat_humidity:'ஈரப்பதம்',stat_wind:'காற்று',stat_visibility:'தெரிவுத்திறன்',stat_pressure:'அழுத்தம்',stat_total:'மொத்தம்',
+    cm_season:'பருவம்',cm_water:'நீர்',cm_yield:'விளைச்சல்',cm_duration:'காலம்',
+    level_very_high:'மிக அதிகம்',level_high:'அதிகம்',level_medium:'நடுத்தரம்',level_low:'குறைவு',
+    unit_days:'நாட்கள்',diag_cause:'காரணம்',diag_recovery:'குணமடைதல்',diag_eco:'சூழல் நட்பு சிகிச்சை',
+    diag_recommended:'பரிந்துரைக்கப்படுவது',diag_chemical:'வேதியியல் சிகிச்சை',diag_prevention:'தடுப்பு முறை',
+    diag_confidence:'நம்பிக்கை',diag_severity:'தீவிரம்',
+    diag_disclaimer:'AI கண்டறிதல் வழிகாட்டுதலுக்காக மட்டுமே. முக்கியமான முடிவுகளுக்கு உள்ளூர் விவசாய நிபுணரை அணுகவும்.',
   },
   te: {
     nav_home:'హోమ్',nav_diagnose:'పంట నిర్ధారణ',nav_market:'మార్కెట్ ధరలు',nav_alerts:'హెచ్చరికలు',
@@ -637,6 +343,12 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     upload_title:'పంట ఫోటో ఇక్కడ వేయండి',upload_sub:'JPG, PNG, WEBP — గరిష్ఠం 10 MB',
     btn_upload:'ఫోటో అప్లోడ్',btn_camera:'ఫోటో తీయి',btn_analyze:'పంట పరీక్షించు',
     tips_title:'మంచి ఫోటోకు చిట్కాలు',
+    tip1:'అత్యంత ప్రభావిత ఆకు లేదా కాండంపై దృష్టి పెట్టండి',tip2:'పగలు వెలుతురులో తీయండి — చీకటి ఫోటోలు నివారించండి',
+    tip3:'దగ్గరగా తీయండి — 30 నుండి 50 సెమీ',tip4:'ఆరోగ్యకరమైన మరియు అనారోగ్యకరమైన భాగాలు రెండూ చేర్చండి',
+    results_placeholder_title:'ప్రారంభించడానికి ఒక ఫోటో అప్‌లోడ్ చేయండి',results_placeholder_sub:'AI వ్యాధిని గుర్తించి చికిత్స సూచిస్తుంది',
+    step1_title:'ఫోటో తీయండి',step1_sub:'ప్రభావిత పంట యొక్క స్పష్టమైన ఫోటో',
+    step2_title:'AI తనిఖీ చేస్తుంది',step2_sub:'Kindwise AI ఖచ్చితమైన వ్యాధిని గుర్తిస్తుంది',
+    step3_title:'చికిత్స పొందండి',step3_sub:'సేంద్రీయ మరియు రసాయన చికిత్స ఎంపికలు',
     market_hero_title:'నేటి మండి ధరలు',market_hero_sub:'15 పంటలు · 20 నగరాలు · MSP పోలిక',
     search_placeholder:'నగరం వెతకండి',btn_search:'వెతకు',
     filter_all:'అన్నీ',filter_high:'అధిక డిమాండ్',filter_rising:'పెరుగుతోంది',filter_falling:'తగ్గుతోంది',
@@ -647,19 +359,18 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     filter_all_alerts:'అన్నీ',filter_danger:'ప్రమాదం',filter_warning:'హెచ్చరిక',
     filter_advisory:'సలహా',filter_weather:'వాతావరణం',filter_pest:'పురుగులు',
     no_alerts_title:'అన్నీ బాగున్నాయి!',no_alerts_sub:'వాతావరణం వ్యవసాయానికి అనుకూలంగా ఉంది',
+    pest_calendar_title:'కాలానుగుణ కీట క్యాలెండర్',pest_calendar_sub:'ఈ సీజన్‌లో చురుకుగా ఉన్న కీటకాలు',
+    harmful_title:'ఇప్పుడు ప్రమాదకర పంటలు',harmful_sub:'ప్రస్తుత వాతావరణంలో వీటిని పెంచకండి',
+    safe_title:'ఇప్పుడు సురక్షితంగా పెంచవచ్చు',safe_sub:'ఈ పంటలు ప్రస్తుత వాతావరణానికి అనుకూలం',
     chatbot_title:'కిసాన్ సహాయకుడు',chatbot_sub:'ఏ భాషలోనైనా అడగండి',
     chat_placeholder:'టైప్ చేయండి లేదా మాట్లాడండి...',helpline:'కిసాన్ హెల్ప్‌లైన్',
-    stat_temp:'ఉష్ణోగ్రత',stat_humidity:'తేమ',stat_wind:'గాలి',stat_visibility:'దృశ్యమానత',stat_pressure:'పీడనం',  cm_season:'సీజన్', cm_water:'నీరు', cm_yield:'దిగుబడి', cm_duration:'వ్యవధి',
-    level_very_high:'చాలా అధికం', level_high:'అధికం', level_medium:'మధ్యమం', level_low:'తక్కువ',
-    unit_days:'రోజులు',diag_cause: 'కారణం',
-    diag_recovery: 'కోలుకోవడం',
-    diag_eco: 'పర్యావరణ అనుకూల చికిత్స',
-    diag_recommended: 'సిఫార్సు చేయబడింది',
-    diag_chemical: 'రసాయన చికిత్స',
-    diag_prevention: 'నివారణ',
-    diag_confidence: 'విశ్వాసం',
-    diag_severity: 'తీవ్రత',
-    diag_disclaimer: 'AI నిర్ధారణ కేవలం మార్గదర్శకత్వం కోసం మాత్రమే. కీలక నిర్ణయాల కోసం స్థానిక వ్యవసాయ నిపుణులను సంప్రదించండి.'
+    stat_temp:'ఉష్ణోగ్రత',stat_humidity:'తేమ',stat_wind:'గాలి',stat_visibility:'దృశ్యమానత',stat_pressure:'పీడనం',stat_total:'మొత్తం',
+    cm_season:'సీజన్',cm_water:'నీరు',cm_yield:'దిగుబడి',cm_duration:'వ్యవధి',
+    level_very_high:'చాలా అధికం',level_high:'అధికం',level_medium:'మధ్యమం',level_low:'తక్కువ',
+    unit_days:'రోజులు',diag_cause:'కారణం',diag_recovery:'కోలుకోవడం',diag_eco:'పర్యావరణ అనుకూల చికిత్స',
+    diag_recommended:'సిఫార్సు చేయబడింది',diag_chemical:'రసాయన చికిత్స',diag_prevention:'నివారణ',
+    diag_confidence:'విశ్వాసం',diag_severity:'తీవ్రత',
+    diag_disclaimer:'AI నిర్ధారణ కేవలం మార్గదర్శకత్వం కోసం మాత్రమే. కీలక నిర్ణయాల కోసం స్థానిక వ్యవసాయ నిపుణులను సంప్రదించండి.',
   },
   mr: {
     nav_home:'होम',nav_diagnose:'पीक निदान',nav_market:'बाजारभाव',nav_alerts:'सतर्कता',
@@ -677,6 +388,12 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     upload_title:'पिकाचा फोटो येथे टाका',upload_sub:'JPG, PNG, WEBP — जास्तीत जास्त 10 MB',
     btn_upload:'फोटो अपलोड',btn_camera:'फोटो घ्या',btn_analyze:'पीक तपासा',
     tips_title:'चांगल्या फोटोसाठी टिप्स',
+    tip1:'सर्वाधिक बाधित पान किंवा खोडावर लक्ष केंद्रित करा',tip2:'दिवसाच्या प्रकाशात फोटो घ्या — अंधार टाळा',
+    tip3:'जवळून घ्या — 30 ते 50 सेमी',tip4:'निरोगी आणि आजारी दोन्ही भाग समाविष्ट करा',
+    results_placeholder_title:'सुरू करण्यासाठी फोटो अपलोड करा',results_placeholder_sub:'AI रोग ओळखेल आणि उपचार सुचवेल',
+    step1_title:'फोटो घ्या',step1_sub:'बाधित पिकाचा स्पष्ट फोटो',
+    step2_title:'AI तपासतो',step2_sub:'Kindwise AI अचूक रोग शोधतो',
+    step3_title:'उपचार मिळवा',step3_sub:'सेंद्रिय आणि रासायनिक उपचार पर्याय',
     market_hero_title:'आजचे मंडी भाव',market_hero_sub:'15 पिके · 20 शहरे · MSP तुलना',
     search_placeholder:'शहर शोधा',btn_search:'शोधा',
     filter_all:'सर्व',filter_high:'जास्त मागणी',filter_rising:'भाव वाढत आहे',filter_falling:'भाव घसरत आहे',
@@ -687,19 +404,18 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     filter_all_alerts:'सर्व',filter_danger:'धोका',filter_warning:'सावधानता',
     filter_advisory:'सल्ला',filter_weather:'हवामान',filter_pest:'कीड',
     no_alerts_title:'सर्व ठीक आहे!',no_alerts_sub:'हवामान शेतीसाठी चांगले आहे',
+    pest_calendar_title:'हंगामी कीड दिनदर्शिका',pest_calendar_sub:'या हंगामात सक्रिय कीड',
+    harmful_title:'आत्ता धोकादायक पिके',harmful_sub:'सध्याच्या हवामानात ही पिके घेऊ नका',
+    safe_title:'आत्ता लागवडीसाठी सुरक्षित',safe_sub:'ही पिके सध्याच्या हवामानासाठी योग्य आहेत',
     chatbot_title:'किसान मदतनीस',chatbot_sub:'कोणत्याही भाषेत विचारा',
     chat_placeholder:'लिहा किंवा बोला...',helpline:'किसान हेल्पलाइन',
-    stat_temp:'तापमान',stat_humidity:'आर्द्रता',stat_wind:'वारा',stat_visibility:'दृश्यमानता',stat_pressure:'दाब', cm_season:'हंगाम', cm_water:'पाणी', cm_yield:'उत्पादन', cm_duration:'कालावधी',
-    level_very_high:'खूप जास्त', level_high:'जास्त', level_medium:'मध्यम', level_low:'कमी',
-    unit_days:'दिवस',diag_cause: 'कारण',
-    diag_recovery: 'बरे होणे',
-    diag_eco: 'पर्यावरणपूरक उपचार',
-    diag_recommended: 'शिफारस केलेले',
-    diag_chemical: 'रासायनिक उपचार',
-    diag_prevention: 'प्रतिबंध',
-    diag_confidence: 'विश्वास',
-    diag_severity: 'तीव्रता',
-    diag_disclaimer: 'एआय निदान केवळ मार्गदर्शनासाठी आहे. महत्त्वाच्या निर्णयांसाठी स्थानिक कृषी तज्ञांचा सल्ला घ्या.'
+    stat_temp:'तापमान',stat_humidity:'आर्द्रता',stat_wind:'वारा',stat_visibility:'दृश्यमानता',stat_pressure:'दाब',stat_total:'एकूण',
+    cm_season:'हंगाम',cm_water:'पाणी',cm_yield:'उत्पादन',cm_duration:'कालावधी',
+    level_very_high:'खूप जास्त',level_high:'जास्त',level_medium:'मध्यम',level_low:'कमी',
+    unit_days:'दिवस',diag_cause:'कारण',diag_recovery:'बरे होणे',diag_eco:'पर्यावरणपूरक उपचार',
+    diag_recommended:'शिफारस केलेले',diag_chemical:'रासायनिक उपचार',diag_prevention:'प्रतिबंध',
+    diag_confidence:'विश्वास',diag_severity:'तीव्रता',
+    diag_disclaimer:'एआय निदान केवळ मार्गदर्शनासाठी आहे. महत्त्वाच्या निर्णयांसाठी स्थानिक कृषी तज्ञांचा सल्ला घ्या.',
   },
   pa: {
     nav_home:'ਹੋਮ',nav_diagnose:'ਫਸਲ ਜਾਂਚ',nav_market:'ਮੰਡੀ ਭਾਅ',nav_alerts:'ਚੇਤਾਵਨੀ',
@@ -717,6 +433,12 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     upload_title:'ਫਸਲ ਦੀ ਫੋਟੋ ਇੱਥੇ ਰੱਖੋ',upload_sub:'JPG, PNG, WEBP — ਵੱਧ ਤੋਂ ਵੱਧ 10 MB',
     btn_upload:'ਫੋਟੋ ਅਪਲੋਡ',btn_camera:'ਫੋਟੋ ਲਓ',btn_analyze:'ਫਸਲ ਜਾਂਚੋ',
     tips_title:'ਚੰਗੀ ਫੋਟੋ ਲਈ ਟਿਪਸ',
+    tip1:'ਸਭ ਤੋਂ ਵੱਧ ਪ੍ਰਭਾਵਿਤ ਪੱਤੇ ਜਾਂ ਤਣੇ ਉੱਤੇ ਧਿਆਨ ਦਿਓ',tip2:'ਦਿਨ ਦੀ ਰੌਸ਼ਨੀ ਵਿੱਚ ਲਓ — ਹਨੇਰੇ ਤੋਂ ਬਚੋ',
+    tip3:'ਨੇੜੇ ਤੋਂ ਲਓ — 30 ਤੋਂ 50 ਸੈਮੀ',tip4:'ਤੰਦਰੁਸਤ ਅਤੇ ਬਿਮਾਰ ਦੋਵੇਂ ਹਿੱਸੇ ਸ਼ਾਮਲ ਕਰੋ',
+    results_placeholder_title:'ਸ਼ੁਰੂ ਕਰਨ ਲਈ ਫੋਟੋ ਅਪਲੋਡ ਕਰੋ',results_placeholder_sub:'AI ਬਿਮਾਰੀ ਪਛਾਣੇਗਾ ਅਤੇ ਇਲਾਜ ਸੁਝਾਏਗਾ',
+    step1_title:'ਫੋਟੋ ਲਓ',step1_sub:'ਪ੍ਰਭਾਵਿਤ ਫਸਲ ਦੀ ਸਾਫ਼ ਫੋਟੋ',
+    step2_title:'AI ਜਾਂਚ ਕਰਦਾ ਹੈ',step2_sub:'Kindwise AI ਸਹੀ ਬਿਮਾਰੀ ਲੱਭਦਾ ਹੈ',
+    step3_title:'ਇਲਾਜ ਪ੍ਰਾਪਤ ਕਰੋ',step3_sub:'ਜੈਵਿਕ ਅਤੇ ਰਸਾਇਣਕ ਇਲਾਜ ਵਿਕਲਪ',
     market_hero_title:'ਅੱਜ ਦੇ ਮੰਡੀ ਭਾਅ',market_hero_sub:'15 ਫਸਲਾਂ · 20 ਸ਼ਹਿਰ · MSP ਤੁਲਨਾ',
     search_placeholder:'ਸ਼ਹਿਰ ਲੱਭੋ',btn_search:'ਲੱਭੋ',
     filter_all:'ਸਭ',filter_high:'ਵੱਧ ਮੰਗ',filter_rising:'ਭਾਅ ਵਧ ਰਿਹਾ',filter_falling:'ਭਾਅ ਘਟ ਰਿਹਾ',
@@ -727,19 +449,18 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     filter_all_alerts:'ਸਭ',filter_danger:'ਖ਼ਤਰਾ',filter_warning:'ਚੇਤਾਵਨੀ',
     filter_advisory:'ਸਲਾਹ',filter_weather:'ਮੌਸਮ',filter_pest:'ਕੀੜੇ',
     no_alerts_title:'ਸਭ ਠੀਕ ਹੈ!',no_alerts_sub:'ਮੌਸਮ ਖੇਤੀ ਲਈ ਚੰਗਾ ਹੈ',
+    pest_calendar_title:'ਮੌਸਮੀ ਕੀੜੇ ਕੈਲੰਡਰ',pest_calendar_sub:'ਇਸ ਮੌਸਮ ਵਿੱਚ ਸਰਗਰਮ ਕੀੜੇ',
+    harmful_title:'ਹੁਣ ਜੋਖਮ ਭਰੀਆਂ ਫਸਲਾਂ',harmful_sub:'ਮੌਜੂਦਾ ਮੌਸਮ ਵਿੱਚ ਇਹ ਨਾ ਉਗਾਓ',
+    safe_title:'ਹੁਣ ਉਗਾਉਣ ਲਈ ਸੁਰੱਖਿਅਤ',safe_sub:'ਇਹ ਫਸਲਾਂ ਮੌਜੂਦਾ ਮੌਸਮ ਲਈ ਢੁਕਵੀਆਂ ਹਨ',
     chatbot_title:'ਕਿਸਾਨ ਸਹਾਇਕ',chatbot_sub:'ਕਿਸੇ ਵੀ ਭਾਸ਼ਾ ਵਿੱਚ ਪੁੱਛੋ',
     chat_placeholder:'ਲਿਖੋ ਜਾਂ ਬੋਲੋ...',helpline:'ਕਿਸਾਨ ਹੈਲਪਲਾਈਨ',
-    stat_temp:'ਤਾਪਮਾਨ',stat_humidity:'ਨਮੀ',stat_wind:'ਹਵਾ',stat_visibility:'ਦਿੱਖ',stat_pressure:'ਦਬਾਅ',cm_season:'ਮੌਸਮ', cm_water:'ਪਾਣੀ', cm_yield:'ਝਾੜ', cm_duration:'ਸਮਾਂ',
-    level_very_high:'ਬਹੁਤ ਜ਼ਿਆਦਾ', level_high:'ਜ਼ਿਆਦਾ', level_medium:'ਦਰਮਿਆਨਾ', level_low:'ਘੱਟ',
-    unit_days:'ਦਿਨ',diag_cause: 'ਕਾਰਨ',
-    diag_recovery: 'ਠੀਕ ਹੋਣਾ',
-    diag_eco: 'ਵਾਤਾਵਰਣ-ਅਨੁਕੂਲ ਇਲਾਜ',
-    diag_recommended: 'ਸਿਫਾਰਸ਼ ਕੀਤੀ ਗਈ',
-    diag_chemical: 'ਰਸਾਇਣਕ ਇਲਾਜ',
-    diag_prevention: 'ਰੋਕਥਾਮ',
-    diag_confidence: 'ਵਿਸ਼ਵਾਸ',
-    diag_severity: 'ਗੰਭੀਰਤਾ',
-    diag_disclaimer: 'AI ਨਿਦਾਨ ਸਿਰਫ ਮਾਰਗਦਰਸ਼ਨ ਲਈ ਹੈ। ਮਹੱਤਵਪੂਰਨ ਫੈਸਲਿਆਂ ਲਈ ਸਥਾਨਕ ਖੇਤੀਬਾੜੀ ਮਾਹਰ ਨਾਲ ਸਲਾਹ ਕਰੋ।'
+    stat_temp:'ਤਾਪਮਾਨ',stat_humidity:'ਨਮੀ',stat_wind:'ਹਵਾ',stat_visibility:'ਦਿੱਖ',stat_pressure:'ਦਬਾਅ',stat_total:'ਕੁੱਲ',
+    cm_season:'ਮੌਸਮ',cm_water:'ਪਾਣੀ',cm_yield:'ਝਾੜ',cm_duration:'ਸਮਾਂ',
+    level_very_high:'ਬਹੁਤ ਜ਼ਿਆਦਾ',level_high:'ਜ਼ਿਆਦਾ',level_medium:'ਦਰਮਿਆਨਾ',level_low:'ਘੱਟ',
+    unit_days:'ਦਿਨ',diag_cause:'ਕਾਰਨ',diag_recovery:'ਠੀਕ ਹੋਣਾ',diag_eco:'ਵਾਤਾਵਰਣ-ਅਨੁਕੂਲ ਇਲਾਜ',
+    diag_recommended:'ਸਿਫਾਰਸ਼ ਕੀਤੀ ਗਈ',diag_chemical:'ਰਸਾਇਣਕ ਇਲਾਜ',diag_prevention:'ਰੋਕਥਾਮ',
+    diag_confidence:'ਵਿਸ਼ਵਾਸ',diag_severity:'ਗੰਭੀਰਤਾ',
+    diag_disclaimer:'AI ਨਿਦਾਨ ਸਿਰਫ ਮਾਰਗਦਰਸ਼ਨ ਲਈ ਹੈ। ਮਹੱਤਵਪੂਰਨ ਫੈਸਲਿਆਂ ਲਈ ਸਥਾਨਕ ਖੇਤੀਬਾੜੀ ਮਾਹਰ ਨਾਲ ਸਲਾਹ ਕਰੋ।',
   },
   gu: {
     nav_home:'હોમ',nav_diagnose:'પાક નિદાન',nav_market:'બજાર ભાવ',nav_alerts:'ચેતવણી',
@@ -757,6 +478,12 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     upload_title:'પાકનો ફોટો અહીં મૂકો',upload_sub:'JPG, PNG, WEBP — મહત્તમ 10 MB',
     btn_upload:'ફોટો અપલોડ',btn_camera:'ફોટો લો',btn_analyze:'પાક તપાસો',
     tips_title:'સારા ફોટા માટે ટીપ્સ',
+    tip1:'સૌથી વધુ અસરગ્રસ્ત પાન અથવા દાંડી પર ધ્યાન આપો',tip2:'દિવસના પ્રકાશમાં લો — અંધારાથી બચો',
+    tip3:'નજીકથી લો — 30 થી 50 સેમી',tip4:'તંદુરસ્ત અને બીમાર બંને ભાગ સામેલ કરો',
+    results_placeholder_title:'શરૂ કરવા ફોટો અપલોડ કરો',results_placeholder_sub:'AI રોગ ઓળખશે અને સારવાર સૂચવશે',
+    step1_title:'ફોટો લો',step1_sub:'અસરગ્રસ્ત પાકનો સ્પષ્ટ ફોટો',
+    step2_title:'AI તપાસ કરે છે',step2_sub:'Kindwise AI ચોક્કસ રોગ શોધે છે',
+    step3_title:'સારવાર મેળવો',step3_sub:'કાર્બનિક અને રાસાયણિક સારવારના વિકલ્પો',
     market_hero_title:'આજના મંડી ભાવ',market_hero_sub:'15 પાક · 20 શહેર · MSP સરખામણી',
     search_placeholder:'શહેર શોધો',btn_search:'શોધો',
     filter_all:'બધા',filter_high:'વધુ માંગ',filter_rising:'ભાવ વધી રહ્યો',filter_falling:'ભાવ ઘટી રહ્યો',
@@ -767,19 +494,18 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     filter_all_alerts:'બધા',filter_danger:'ખતરો',filter_warning:'ચેતવણી',
     filter_advisory:'સલાહ',filter_weather:'હવામાન',filter_pest:'જીવાત',
     no_alerts_title:'બધું ઠીક છે!',no_alerts_sub:'હવામાન ખેતી માટે સારું છે',
+    pest_calendar_title:'મોસમી જીવાત કૅલેન્ડર',pest_calendar_sub:'આ મોસમમાં સક્રિય જીવાત',
+    harmful_title:'અત્યારે જોખમી પાક',harmful_sub:'વર્તમાન હવામાનમાં આ ઉગાડવાનું ટાળો',
+    safe_title:'અત્યારે ઉગાડવા માટે સલામત',safe_sub:'આ પાક વર્તમાન હવામાન માટે યોગ્ય છે',
     chatbot_title:'કિસાન મદદગાર',chatbot_sub:'કોઈ પણ ભાષામાં પૂછો',
     chat_placeholder:'લખો અથવા બોલો...',helpline:'કિસાન હેલ્પલાઈન',
-    stat_temp:'તાપમાન',stat_humidity:'ભેજ',stat_wind:'પવન',stat_visibility:'દ્રષ્ટિ',stat_pressure:'દબાણ',cm_season:'ઋતુ', cm_water:'પાણી', cm_yield:'ઉત્પાદન', cm_duration:'સમયગાળો',
-    level_very_high:'ખૂબ વધારે', level_high:'વધારે', level_medium:'મધ્યમ', level_low:'ઓછું',
-    unit_days:'દિવસ',diag_cause: 'કારણ',
-    diag_recovery: 'સાજા થવું',
-    diag_eco: 'પર્યાવરણ-અનુકૂળ સારવાર',
-    diag_recommended: 'ભલામણ કરેલ',
-    diag_chemical: 'રાસાયણિક સારવાર',
-    diag_prevention: 'નિવારણ',
-    diag_confidence: 'આત્મવિશ્વાસ',
-    diag_severity: 'તીવ્રતા',
-    diag_disclaimer: 'AI નિદાન ફક્ત માર્ગદર્શન માટે છે. મહત્વપૂર્ણ નિર્ણયો માટે સ્થાનિક કૃષિ નિષ્ણાતની સલાહ લો.'
+    stat_temp:'તાપમાન',stat_humidity:'ભેજ',stat_wind:'પવન',stat_visibility:'દ્રષ્ટિ',stat_pressure:'દબાણ',stat_total:'કુલ',
+    cm_season:'ઋતુ',cm_water:'પાણી',cm_yield:'ઉત્પાદન',cm_duration:'સમયગાળો',
+    level_very_high:'ખૂબ વધારે',level_high:'વધારે',level_medium:'મધ્યમ',level_low:'ઓછું',
+    unit_days:'દિવસ',diag_cause:'કારણ',diag_recovery:'સાજા થવું',diag_eco:'પર્યાવરણ-અનુકૂળ સારવાર',
+    diag_recommended:'ભલામણ કરેલ',diag_chemical:'રાસાયણિક સારવાર',diag_prevention:'નિવારણ',
+    diag_confidence:'આત્મવિશ્વાસ',diag_severity:'તીવ્રતા',
+    diag_disclaimer:'AI નિદાન ફક્ત માર્ગદર્શન માટે છે. મહત્વપૂર્ણ નિર્ણયો માટે સ્થાનિક કૃષિ નિષ્ણાતની સલાહ લો.',
   },
   kn: {
     nav_home:'ಹೋಮ್',nav_diagnose:'ಬೆಳೆ ರೋಗ',nav_market:'ಬೆಲೆಗಳು',nav_alerts:'ಎಚ್ಚರಿಕೆ',
@@ -797,6 +523,12 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     upload_title:'ಬೆಳೆ ಫೋಟೋ ಇಲ್ಲಿ ಹಾಕಿ',upload_sub:'JPG, PNG, WEBP — ಗರಿಷ್ಠ 10 MB',
     btn_upload:'ಫೋಟೋ ಅಪ್‌ಲೋಡ್',btn_camera:'ಫೋಟೋ ತೆಗೆ',btn_analyze:'ಬೆಳೆ ಪರೀಕ್ಷಿಸಿ',
     tips_title:'ಉತ್ತಮ ಫೋಟೋಗಾಗಿ ಸಲಹೆಗಳು',
+    tip1:'ಹೆಚ್ಚು ಪ್ರಭಾವಿತ ಎಲೆ ಅಥವಾ ಕಾಂಡದ ಮೇಲೆ ಗಮನ ಕೊಡಿ',tip2:'ಹಗಲಿನಲ್ಲಿ ತೆಗೆಯಿರಿ — ಕತ್ತಲೆ ಫೋಟೋ ತಪ್ಪಿಸಿ',
+    tip3:'ಹತ್ತಿರದಿಂದ ತೆಗೆಯಿರಿ — 30 ರಿಂದ 50 ಸೆಮಿ',tip4:'ಆರೋಗ್ಯಕರ ಮತ್ತು ರೋಗಗ್ರಸ್ತ ಭಾಗಗಳೆರಡನ್ನೂ ಸೇರಿಸಿ',
+    results_placeholder_title:'ಪ್ರಾರಂಭಿಸಲು ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ',results_placeholder_sub:'AI ರೋಗ ಗುರುತಿಸಿ ಚಿಕಿತ್ಸೆ ಸೂಚಿಸುತ್ತದೆ',
+    step1_title:'ಫೋಟೋ ತೆಗೆಯಿರಿ',step1_sub:'ಪ್ರಭಾವಿತ ಬೆಳೆಯ ಸ್ಪಷ್ಟ ಫೋಟೋ',
+    step2_title:'AI ಪರಿಶೀಲಿಸುತ್ತದೆ',step2_sub:'Kindwise AI ನಿಖರ ರೋಗ ಕಂಡುಹಿಡಿಯುತ್ತದೆ',
+    step3_title:'ಚಿಕಿತ್ಸೆ ಪಡೆಯಿರಿ',step3_sub:'ಸಾವಯವ ಮತ್ತು ರಾಸಾಯನಿಕ ಚಿಕಿತ್ಸೆ ಆಯ್ಕೆಗಳು',
     market_hero_title:'ಇಂದಿನ ಮಂಡಿ ಬೆಲೆಗಳು',market_hero_sub:'15 ಬೆಳೆಗಳು · 20 ನಗರಗಳು · MSP ಹೋಲಿಕೆ',
     search_placeholder:'ನಗರ ಹುಡುಕಿ',btn_search:'ಹುಡುಕಿ',
     filter_all:'ಎಲ್ಲಾ',filter_high:'ಹೆಚ್ಚು ಬೇಡಿಕೆ',filter_rising:'ಬೆಲೆ ಏರುತ್ತಿದೆ',filter_falling:'ಬೆಲೆ ಇಳಿಯುತ್ತಿದೆ',
@@ -807,19 +539,18 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     filter_all_alerts:'ಎಲ್ಲಾ',filter_danger:'ಅಪಾಯ',filter_warning:'ಎಚ್ಚರಿಕೆ',
     filter_advisory:'ಸಲಹೆ',filter_weather:'ಹವಾಮಾನ',filter_pest:'ಕೀಟ',
     no_alerts_title:'ಎಲ್ಲಾ ಸರಿಯಾಗಿದೆ!',no_alerts_sub:'ಹವಾಮಾನ ಕೃಷಿಗೆ ಅನುಕೂಲ',
+    pest_calendar_title:'ಋತುಮಾನದ ಕೀಟ ಕ್ಯಾಲೆಂಡರ್',pest_calendar_sub:'ಈ ಋತುವಿನಲ್ಲಿ ಸಕ್ರಿಯ ಕೀಟಗಳು',
+    harmful_title:'ಈಗ ಅಪಾಯಕಾರಿ ಬೆಳೆಗಳು',harmful_sub:'ಪ್ರಸ್ತುತ ಹವಾಮಾನದಲ್ಲಿ ಇವುಗಳನ್ನು ಬೆಳೆಯಬೇಡಿ',
+    safe_title:'ಈಗ ಸುರಕ್ಷಿತವಾಗಿ ಬೆಳೆಯಬಹುದು',safe_sub:'ಈ ಬೆಳೆಗಳು ಪ್ರಸ್ತುತ ಹವಾಮಾನಕ್ಕೆ ಸೂಕ್ತ',
     chatbot_title:'ಕಿಸಾನ್ ಸಹಾಯಕ',chatbot_sub:'ಯಾವುದೇ ಭಾಷೆಯಲ್ಲಿ ಕೇಳಿ',
     chat_placeholder:'ಟೈಪ್ ಮಾಡಿ ಅಥವಾ ಮಾತನಾಡಿ...',helpline:'ಕಿಸಾನ್ ಸಹಾಯವಾಣಿ',
-    stat_temp:'ತಾಪಮಾನ',stat_humidity:'ಆರ್ದ್ರತೆ',stat_wind:'ಗಾಳಿ',stat_visibility:'ದೃಶ್ಯಮಾನತೆ',stat_pressure:'ಒತ್ತಡ',  cm_season:'ಋತು', cm_water:'ನೀರು', cm_yield:'ಇಳುವರಿ', cm_duration:'ಅವಧಿ',
-    level_very_high:'ಬಹಳ ಹೆಚ್ಚು', level_high:'ಹೆಚ್ಚು', level_medium:'ಮಧ್ಯಮ', level_low:'ಕಡಿಮೆ',
-    unit_days:'ದಿನಗಳು',diag_cause: 'ಕಾರಣ',
-    diag_recovery: 'ಚೇತರಿಕೆ',
-    diag_eco: 'ಪರಿಸರ ಸ್ನೇಹಿ ಚಿಕಿತ್ಸೆ',
-    diag_recommended: 'ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ',
-    diag_chemical: 'ರಾಸಾಯನಿಕ ಚಿಕಿತ್ಸೆ',
-    diag_prevention: 'ತಡೆಗಟ್ಟುವಿಕೆ',
-    diag_confidence: 'ವಿಶ್ವಾಸ',
-    diag_severity: 'ತೀವ್ರತೆ',
-    diag_disclaimer: 'AI ರೋಗನಿರ್ಣಯವು ಕೇವಲ ಮಾರ್ಗದರ್ಶನಕ್ಕಾಗಿ ಮಾತ್ರ. ನಿರ್ಣಾಯಕ ನಿರ್ಧಾರಗಳಿಗಾಗಿ ಸ್ಥಳೀಯ ಕೃಷಿ ತಜ್ಞರನ್ನು ಸಂಪರ್ಕಿಸಿ.'
+    stat_temp:'ತಾಪಮಾನ',stat_humidity:'ಆರ್ದ್ರತೆ',stat_wind:'ಗಾಳಿ',stat_visibility:'ದೃಶ್ಯಮಾನತೆ',stat_pressure:'ಒತ್ತಡ',stat_total:'ಒಟ್ಟು',
+    cm_season:'ಋತು',cm_water:'ನೀರು',cm_yield:'ಇಳುವರಿ',cm_duration:'ಅವಧಿ',
+    level_very_high:'ಬಹಳ ಹೆಚ್ಚು',level_high:'ಹೆಚ್ಚು',level_medium:'ಮಧ್ಯಮ',level_low:'ಕಡಿಮೆ',
+    unit_days:'ದಿನಗಳು',diag_cause:'ಕಾರಣ',diag_recovery:'ಚೇತರಿಕೆ',diag_eco:'ಪರಿಸರ ಸ್ನೇಹಿ ಚಿಕಿತ್ಸೆ',
+    diag_recommended:'ಶಿಫಾರಸು ಮಾಡಲಾಗಿದೆ',diag_chemical:'ರಾಸಾಯನಿಕ ಚಿಕಿತ್ಸೆ',diag_prevention:'ತಡೆಗಟ್ಟುವಿಕೆ',
+    diag_confidence:'ವಿಶ್ವಾಸ',diag_severity:'ತೀವ್ರತೆ',
+    diag_disclaimer:'AI ರೋಗನಿರ್ಣಯವು ಕೇವಲ ಮಾರ್ಗದರ್ಶನಕ್ಕಾಗಿ ಮಾತ್ರ. ನಿರ್ಣಾಯಕ ನಿರ್ಧಾರಗಳಿಗಾಗಿ ಸ್ಥಳೀಯ ಕೃಷಿ ತಜ್ಞರನ್ನು ಸಂಪರ್ಕಿಸಿ.',
   },
   ml: {
     nav_home:'ഹോം',nav_diagnose:'വിള രോഗം',nav_market:'വിപണി വില',nav_alerts:'മുന്നറിയിപ്പ്',
@@ -837,6 +568,12 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     upload_title:'വിള ഫോട്ടോ ഇവിടെ ഇടൂ',upload_sub:'JPG, PNG, WEBP — പരമാവധി 10 MB',
     btn_upload:'ഫോട്ടോ അപ്‌ലോഡ്',btn_camera:'ഫോട്ടോ എടുക്കൂ',btn_analyze:'വിള പരിശോധിക്കൂ',
     tips_title:'നല്ല ഫോട്ടോക്ക് നുറുങ്ങുകൾ',
+    tip1:'ഏറ്റവും കൂടുതൽ ബാധിക്കപ്പെട്ട ഇലയിലോ തണ്ടിലോ ശ്രദ്ധ കൊടുക്കൂ',tip2:'പകൽ വെളിച്ചത്തിൽ എടുക്കൂ — ഇരുട്ടത്ത് പടമെടുക്കരുത്',
+    tip3:'അടുത്ത് നിന്ന് എടുക്കൂ — 30 മുതൽ 50 സെ.മീ',tip4:'ആരോഗ്യകരവും രോഗബാധിതവുമായ ഭാഗങ്ങൾ ഉൾപ്പെടുത്തൂ',
+    results_placeholder_title:'ആരംഭിക്കാൻ ഒരു ഫോട്ടോ അപ്‌ലോഡ് ചെയ്യൂ',results_placeholder_sub:'AI രോഗം തിരിച്ചറിഞ്ഞ് ചികിത്സ നിർദ്ദേശിക്കും',
+    step1_title:'ഫോട്ടോ എടുക്കൂ',step1_sub:'ബാധിക്കപ്പെട്ട വിളയുടെ വ്യക്തമായ ഫോട്ടോ',
+    step2_title:'AI പരിശോധിക്കുന്നു',step2_sub:'Kindwise AI കൃത്യമായ രോഗം കണ്ടെത്തുന്നു',
+    step3_title:'ചികിത്സ നേടൂ',step3_sub:'ജൈവ, രാസ ചികിത്സ ഓപ്ഷനുകൾ',
     market_hero_title:'ഇന്നത്തെ മണ്ടി വിലകൾ',market_hero_sub:'15 വിളകൾ · 20 നഗരങ്ങൾ · MSP താരതമ്യം',
     search_placeholder:'നഗരം തിരയൂ',btn_search:'തിരയൂ',
     filter_all:'എല്ലാം',filter_high:'ഉയർന്ന ഡിമാൻഡ്',filter_rising:'വില ഉയരുന്നു',filter_falling:'വില കുറയുന്നു',
@@ -847,20 +584,18 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     filter_all_alerts:'എല്ലാം',filter_danger:'അപകടം',filter_warning:'മുന്നറിയിപ്പ്',
     filter_advisory:'ഉപദേശം',filter_weather:'കാലാവസ്ഥ',filter_pest:'കീടം',
     no_alerts_title:'എല്ലാം ശരിയാണ്!',no_alerts_sub:'കാലാവസ്ഥ കൃഷിക്ക് അനുകൂലം',
+    pest_calendar_title:'കാലിക കീട കലണ്ടർ',pest_calendar_sub:'ഈ സീസണിൽ സജീവമായ കീടങ്ങൾ',
+    harmful_title:'ഇപ്പോൾ അപകടകരമായ വിളകൾ',harmful_sub:'നിലവിലെ കാലാവസ്ഥയിൽ ഇവ കൃഷി ചെയ്യരുത്',
+    safe_title:'ഇപ്പോൾ സുരക്ഷിതമായി കൃഷി ചെയ്യാം',safe_sub:'ഈ വിളകൾ നിലവിലെ കാലാവസ്ഥയ്ക്ക് അനുയോജ്യം',
     chatbot_title:'കിസാൻ സഹായി',chatbot_sub:'ഏത് ഭാഷയിലും ചോദിക്കൂ',
     chat_placeholder:'ടൈപ്പ് ചെയ്യുക അല്ലെങ്കിൽ സംസാരിക്കുക...',helpline:'കിസാൻ ഹെൽപ്പ്‌ലൈൻ',
-    stat_temp:'താപനില',stat_humidity:'ആർദ്രത',stat_wind:'കാറ്റ്',stat_visibility:'ദൃശ്യദൂരം',stat_pressure:'മർദ്ദം',
-    cm_season:'സീസൺ', cm_water:'ജലം', cm_yield:'വിളവ്', cm_duration:'കാലാവധി',
-    level_very_high:'വളരെ ഉയർന്ന', level_high:'ഉയർന്ന', level_medium:'മധ്യമം', level_low:'കുറഞ്ഞ',
-    unit_days:'ദിവസം',diag_cause: 'കാരണം',
-    diag_recovery: 'സുഖം പ്രാപിക്കൽ',
-    diag_eco: 'പരിസ്ഥിതി സൗഹൃദ ചികിത്സ',
-    diag_recommended: 'നിർദ്ദേശിക്കുന്നത്',
-    diag_chemical: 'രാസ ചികിത്സ',
-    diag_prevention: 'പ്രതിരോധം',
-    diag_confidence: 'ആത്മവിശ്വാസം',
-    diag_severity: 'തീവ്രത',
-    diag_disclaimer: 'AI രോഗനിർണ്ണയം മാർഗ്ഗനിർദ്ദേശത്തിന് മാത്രമുള്ളതാണ്. നിർണ്ണായക തീരുമാനങ്ങൾക്കായി ഒരു പ്രാദേശിക കാർഷിക വിദഗ്ദ്ധനെ സമീപിക്കുക.'
+    stat_temp:'താപനില',stat_humidity:'ആർദ്രത',stat_wind:'കാറ്റ്',stat_visibility:'ദൃശ്യദൂരം',stat_pressure:'മർദ്ദം',stat_total:'ആകെ',
+    cm_season:'സീസൺ',cm_water:'ജലം',cm_yield:'വിളവ്',cm_duration:'കാലാവധി',
+    level_very_high:'വളരെ ഉയർന്ന',level_high:'ഉയർന്ന',level_medium:'മധ്യമം',level_low:'കുറഞ്ഞ',
+    unit_days:'ദിവസം',diag_cause:'കാരണം',diag_recovery:'സുഖം പ്രാപിക്കൽ',diag_eco:'പരിസ്ഥിതി സൗഹൃദ ചികിത്സ',
+    diag_recommended:'നിർദ്ദേശിക്കുന്നത്',diag_chemical:'രാസ ചികിത്സ',diag_prevention:'പ്രതിരോധം',
+    diag_confidence:'ആത്മവിശ്വാസം',diag_severity:'തീവ്രത',
+    diag_disclaimer:'AI രോഗനിർണ്ണയം മാർഗ്ഗനിർദ്ദേശത്തിന് മാത്രമുള്ളതാണ്. നിർണ്ണായക തീരുമാനങ്ങൾക്കായി ഒരു പ്രാദേശിക കാർഷിക വിദഗ്ദ്ധനെ സമീപിക്കുക.',
   },
   or: {
     nav_home:'ହୋମ',nav_diagnose:'ଫସଲ ରୋଗ',nav_market:'ବଜାର ଦର',nav_alerts:'ସତର୍କତା',
@@ -878,6 +613,12 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     upload_title:'ଫସଲ ଫୋଟୋ ଏଠି ରଖନ୍ତୁ',upload_sub:'JPG, PNG, WEBP — ସର୍ବାଧିକ 10 MB',
     btn_upload:'ଫୋଟୋ ଅପଲୋଡ',btn_camera:'ଫୋଟୋ ନିଅ',btn_analyze:'ଫସଲ ପରୀକ୍ଷା',
     tips_title:'ଭଲ ଫୋଟୋ ଟିପ୍ସ',
+    tip1:'ସବୁଠୁ ଅଧିକ ପ୍ରଭାବିତ ପତ୍ର ବା ଡାଳ ଉପରେ ଧ୍ୟାନ ଦିଅ',tip2:'ଦିନ ଆଲୋକରେ ଫୋଟୋ ନିଅ — ଅନ୍ଧକାରରୁ ଦୂରେ ରୁହ',
+    tip3:'ନଜିକ ରୁ ନିଅ — 30 ରୁ 50 ସେମି',tip4:'ସୁସ୍ଥ ଓ ଅସୁସ୍ଥ ଉଭୟ ଅଂଶ ଅନ୍ତର୍ଭୁକ୍ତ କରନ୍ତୁ',
+    results_placeholder_title:'ଆରମ୍ଭ କରିବାକୁ ଫୋଟୋ ଅପଲୋଡ କରନ୍ତୁ',results_placeholder_sub:'AI ରୋଗ ଚିହ୍ନଟ କରି ଚିକିତ୍ସା ପରାମର୍ଶ ଦେବ',
+    step1_title:'ଫୋଟୋ ନିଅ',step1_sub:'ପ୍ରଭାବିତ ଫସଲର ସ୍ପଷ୍ଟ ଫୋଟୋ',
+    step2_title:'AI ଯାଞ୍ଚ କରେ',step2_sub:'Kindwise AI ସଠିକ ରୋଗ ଖୋଜେ',
+    step3_title:'ଚିକିତ୍ସା ପାଅ',step3_sub:'ଜୈବ ଓ ରାସାୟନିକ ଚିକିତ୍ସା ବିକଳ୍ପ',
     market_hero_title:'ଆଜର ମଣ୍ଡି ଦର',market_hero_sub:'15 ଫସଲ · 20 ସହର · MSP ତୁଳନା',
     search_placeholder:'ସହର ଖୋଜନ୍ତୁ',btn_search:'ଖୋଜ',
     filter_all:'ସବୁ',filter_high:'ଅଧିକ ଚାହିଦା',filter_rising:'ଦର ବଢ଼ୁଛି',filter_falling:'ଦର କମୁଛି',
@@ -888,20 +629,18 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     filter_all_alerts:'ସବୁ',filter_danger:'ବିପଦ',filter_warning:'ସତର୍କତା',
     filter_advisory:'ପରାମର୍ଶ',filter_weather:'ପାଣିପାଗ',filter_pest:'କୀଟ',
     no_alerts_title:'ସବୁ ଠିକ ଅଛି!',no_alerts_sub:'ପାଣିପାଗ କୃଷି ଲାଗି ଭଲ',
+    pest_calendar_title:'ଋତୁ କୀଟ କ୍ୟାଲେଣ୍ଡର',pest_calendar_sub:'ଏହି ଋତୁରେ ସକ୍ରିୟ କୀଟ',
+    harmful_title:'ଏବେ ବିପଦଜନକ ଫସଲ',harmful_sub:'ବର୍ତ୍ତମାନ ପାଣିପାଗରେ ଏଗୁଡ଼ିକ ଚାଷ ନ କରନ୍ତୁ',
+    safe_title:'ଏବେ ସୁରକ୍ଷିତ ଭାବେ ଚାଷ ହୋଇ ପାରିବ',safe_sub:'ଏହି ଫସଲ ବର୍ତ୍ତମାନ ପାଣିପାଗ ପାଇଁ ଉପଯୁକ୍ତ',
     chatbot_title:'କିସାନ ସହାୟକ',chatbot_sub:'ଯେ କୌଣସି ଭାଷାରେ ପଚାରନ୍ତୁ',
     chat_placeholder:'ଲେଖ ବା କୁହ...',helpline:'କିସାନ ହେଲ୍ପଲାଇନ',
-    stat_temp:'ତାପମାତ୍ରା',stat_humidity:'ଆର୍ଦ୍ରତା',stat_wind:'ପବନ',stat_visibility:'ଦୃଶ୍ୟମାନତା',stat_pressure:'ଚାପ',
-    cm_season:'ଋତୁ', cm_water:'ଜଳ', cm_yield:'ଅମଳ', cm_duration:'ଅବଧି',
-    level_very_high:'ଅତ୍ୟଧିକ', level_high:'ଅଧିକ', level_medium:'ମଧ୍ୟମ', level_low:'କମ',
-    unit_days:'ଦିନ',diag_cause: 'କାରଣ',
-    diag_recovery: 'ସୁସ୍ଥ ହେବା',
-    diag_eco: 'ପରିବେଶ ଅନୁକୂଳ ଚିକିତ୍ସା',
-    diag_recommended: 'ସୁପାରିଶ କରାଯାଇଛି',
-    diag_chemical: 'ରାସାୟନିକ ଚିକିତ୍ସା',
-    diag_prevention: 'ପ୍ରତିରୋଧ',
-    diag_confidence: 'ଆତ୍ମବିଶ୍ୱାସ',
-    diag_severity: 'ଗମ୍ଭୀରତା',
-    diag_disclaimer: 'AI ନିଦାନ କେବଳ ମାର୍ଗଦର୍ଶନ ପାଇଁ। ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ ନିଷ୍ପତ୍ତି ପାଇଁ ସ୍ଥानीय କୃଷି ବିଶେଷଜ୍ଞଙ୍କ ସହିତ ପରାମର୍ଶ କରନ୍ତୁ।'
+    stat_temp:'ତାପମାତ୍ରା',stat_humidity:'ଆର୍ଦ୍ରତା',stat_wind:'ପବନ',stat_visibility:'ଦୃଶ୍ୟମାନତା',stat_pressure:'ଚାପ',stat_total:'ମୋଟ',
+    cm_season:'ଋତୁ',cm_water:'ଜଳ',cm_yield:'ଅମଳ',cm_duration:'ଅବଧି',
+    level_very_high:'ଅତ୍ୟଧିକ',level_high:'ଅଧିକ',level_medium:'ମଧ୍ୟମ',level_low:'କମ',
+    unit_days:'ଦିନ',diag_cause:'କାରଣ',diag_recovery:'ସୁସ୍ଥ ହେବା',diag_eco:'ପରିବେଶ ଅନୁକୂଳ ଚିକିତ୍ସା',
+    diag_recommended:'ସୁପାରିଶ କରାଯାଇଛି',diag_chemical:'ରାସାୟନିକ ଚିକିତ୍ସା',diag_prevention:'ପ୍ରତିରୋଧ',
+    diag_confidence:'ଆତ୍ମବିଶ୍ୱାସ',diag_severity:'ଗମ୍ଭୀରତା',
+    diag_disclaimer:'AI ନିଦାନ କେବଳ ମାର୍ଗଦର୍ଶନ ପାଇଁ। ଗୁରୁତ୍ୱପୂର୍ଣ୍ଣ ନିଷ୍ପତ୍ତି ପାଇଁ ସ୍ଥानीय କୃଷି ବିଶେଷଜ୍ଞଙ୍କ ସହିତ ପରାମର୍ଶ କରନ୍ତୁ।',
   },
   as: {
     nav_home:'হোম',nav_diagnose:'শস্য ৰোগ',nav_market:'বজাৰ মূল্য',nav_alerts:'সতৰ্কতা',
@@ -919,6 +658,12 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     upload_title:'শস্যৰ ফটো ইয়াত দিয়ক',upload_sub:'JPG, PNG, WEBP — সৰ্বাধিক 10 MB',
     btn_upload:'ফটো আপলোড',btn_camera:'ফটো লওক',btn_analyze:'শস্য পৰীক্ষা কৰক',
     tips_title:'ভাল ফটোৰ বাবে টিপছ',
+    tip1:'সৰ্বাধিক আক্ৰান্ত পাত বা কাণ্ডত মনোযোগ দিয়ক',tip2:'দিনৰ পোহৰত লওক — আন্ধাৰত ফটো নলওক',
+    tip3:'ওচৰৰ পৰা লওক — 30 ৰ পৰা 50 ছেমি',tip4:'সুস্থ আৰু অসুস্থ দুয়োটা অংশ অন্তৰ্ভুক্ত কৰক',
+    results_placeholder_title:'আৰম্ভ কৰিবলৈ এটা ফটো আপলোড কৰক',results_placeholder_sub:'AI ৰোগ চিনাক্ত কৰি চিকিৎসা পৰামৰ্শ দিব',
+    step1_title:'ফটো লওক',step1_sub:'আক্ৰান্ত শস্যৰ স্পষ্ট ফটো',
+    step2_title:'AI পৰীক্ষা কৰে',step2_sub:'Kindwise AI সঠিক ৰোগ বিচাৰি উলিয়ায়',
+    step3_title:'চিকিৎসা লওক',step3_sub:'জৈৱিক আৰু ৰাসায়নিক চিকিৎসাৰ বিকল্প',
     market_hero_title:'আজিৰ মণ্ডি মূল্য',market_hero_sub:'15 শস্য · 20 চহৰ · MSP তুলনা',
     search_placeholder:'চহৰ বিচাৰক',btn_search:'বিচাৰক',
     filter_all:'সকলো',filter_high:'অধিক চাহিদা',filter_rising:'মূল্য বাঢ়িছে',filter_falling:'মূল্য কমিছে',
@@ -929,21 +674,20 @@ diag_disclaimer:'AI निदान केवल मार्गदर्शन 
     filter_all_alerts:'সকলো',filter_danger:'বিপদ',filter_warning:'সতৰ্কতা',
     filter_advisory:'পৰামৰ্শ',filter_weather:'বতৰ',filter_pest:'কীট',
     no_alerts_title:'সকলো ঠিক আছে!',no_alerts_sub:'বতৰ কৃষিৰ বাবে ভাল',
+    pest_calendar_title:'ঋতু কীট কেলেণ্ডাৰ',pest_calendar_sub:'এই ঋতুত সক্ৰিয় কীট',
+    harmful_title:'এতিয়া বিপজ্জনক শস্য',harmful_sub:'বৰ্তমান বতৰত এইবোৰ খেতি নকৰিব',
+    safe_title:'এতিয়া নিৰাপদে খেতি কৰিব পাৰি',safe_sub:'এই শস্যবোৰ বৰ্তমান বতৰৰ বাবে উপযুক্ত',
     chatbot_title:'কিছান সহায়ক',chatbot_sub:'যিকোনো ভাষাত সুধিব',
     chat_placeholder:'লিখক বা কওক...',helpline:'কিছান হেল্পলাইন',
-    stat_temp:'তাপমাত্ৰা',stat_humidity:'আর্দ্রতা',stat_wind:'বতাহ',stat_visibility:'দৃশ্যমানতা',stat_pressure:'চাপ',
-    cm_season:'ঋতু', cm_water:'পানী', cm_yield:'উৎপাদন', cm_duration:'সময়কাল',
-    level_very_high:'অতি বেছি', level_high:'বেছি', level_medium:'মধ্যমীয়া', level_low:'কম',
-    unit_days:'দিন',diag_cause: 'কাৰণ',
-    diag_recovery: 'সুস্থ হোৱা',
-    diag_eco: 'পৰিৱেশ-অনুকূল চিকিৎসা',
-    diag_recommended: 'পৰামৰ্শ দিয়া হৈছে',
-    diag_chemical: 'ৰাসায়নিক চিকিৎসা',
-    diag_prevention: 'প্ৰতিৰোধ',
-    diag_confidence: 'বিশ্বাস',
-    diag_severity: 'তীব্ৰতা',
-    diag_disclaimer: 'AI নিদান কেৱল মাৰ্গদৰ্শনৰ বাবেহে। গুৰুত্বপূৰ্ণ সিদ্ধান্তৰ বাবে স্থানীয় কৃষি বিশেষজ্ঞৰ পৰামৰ্শ লওক।'
-  },};
+    stat_temp:'তাপমাত্ৰা',stat_humidity:'আর্দ্রতা',stat_wind:'বতাহ',stat_visibility:'দৃশ্যমানতা',stat_pressure:'চাপ',stat_total:'মুঠ',
+    cm_season:'ঋতু',cm_water:'পানী',cm_yield:'উৎপাদন',cm_duration:'সময়কাল',
+    level_very_high:'অতি বেছি',level_high:'বেছি',level_medium:'মধ্যমীয়া',level_low:'কম',
+    unit_days:'দিন',diag_cause:'কাৰণ',diag_recovery:'সুস্থ হোৱা',diag_eco:'পৰিৱেশ-অনুকূল চিকিৎসা',
+    diag_recommended:'পৰামৰ্শ দিয়া হৈছে',diag_chemical:'ৰাসায়নিক চিকিৎসা',diag_prevention:'প্ৰতিৰোধ',
+    diag_confidence:'বিশ্বাস',diag_severity:'তীব্ৰতা',
+    diag_disclaimer:'AI নিদান কেৱল মাৰ্গদৰ্শনৰ বাবেহে। গুৰুত্বপূৰ্ণ সিদ্ধান্তৰ বাবে স্থানীয় কৃষি বিশেষজ্ঞৰ পৰামৰ্শ লওক।',
+  },
+};
 
 let currentLang = localStorage.getItem('agrosmart_lang') || 'en';
 
@@ -965,41 +709,23 @@ function applyTranslations() {
     el.textContent = txt;
   });
   document.documentElement.lang = currentLang;
-  // Re-render dynamic content when language changes
   if (window.weatherData) rerenderDynamic();
 }
 
 function rerenderDynamic() {
-  // Re-render crops if available
-  if (typeof renderCrops === 'function' && window._lastCropData) {
-    renderCrops(window._lastCropData);
-  }
-  if (typeof renderSoilTips === 'function' && window._lastSoilData) {
-    renderSoilTips(window._lastSoilData);
-  }
-  if (typeof renderPesticides === 'function' && window._lastPestData) {
-    renderPesticides(window._lastPestData);
-  }
+  if (typeof renderCrops === 'function' && window._lastCropData) renderCrops(window._lastCropData);
+  if (typeof renderSoilTips === 'function' && window._lastSoilData) renderSoilTips(window._lastSoilData);
+  if (typeof renderPesticides === 'function' && window._lastPestData) renderPesticides(window._lastPestData);
   if (typeof renderWeatherSection === 'function' && window.weatherData) {
     renderWeatherSection(window.weatherData.current, window.weatherData.forecast);
     renderStatBar(window.weatherData.current);
     renderRainForecast(window.weatherData.forecast);
   }
-  if (typeof renderAlertsList === 'function' && window._lastAlertsData) {
-    renderAlertsList(window._lastAlertsData);
-  }
-  if (typeof renderGrid === 'function' && window.allMarketData) {
-    renderGrid(window.allMarketData);
-  }
-  if (typeof buildDiagnosisHTML === 'function' && window._lastDiagnosisData) {
-    buildDiagnosisHTML(window._lastDiagnosisData);
-  }
-  if (typeof renderPestCalendar === 'function' && window._lastPestWeather) {
-    renderPestCalendar(window._lastPestWeather);
-  }
-  if (typeof renderHarmfulSafe === 'function' && window._lastHarmfulWeather) {
-    renderHarmfulSafe(window._lastHarmfulWeather);
-  }
+  if (typeof renderAlertsList === 'function' && window._lastAlertsData) renderAlertsList(window._lastAlertsData);
+  if (typeof renderGrid === 'function' && window.allMarketData) renderGrid(window.allMarketData);
+  if (typeof buildDiagnosisHTML === 'function' && window._lastDiagnosisData) buildDiagnosisHTML(window._lastDiagnosisData);
+  if (typeof renderPestCalendar === 'function' && window._lastPestWeather) renderPestCalendar(window._lastPestWeather);
+  if (typeof renderHarmfulSafe === 'function' && window._lastHarmfulWeather) renderHarmfulSafe(window._lastHarmfulWeather);
 }
 
 function setLanguage(code) {
@@ -1014,7 +740,7 @@ function setLanguage(code) {
 
 function updateLangUI() {
   const lang = LANGUAGES.find(l => l.code === currentLang) || LANGUAGES[0];
-  const btn  = document.getElementById('currentLang');
+  const btn = document.getElementById('currentLang');
   if (btn) btn.textContent = lang.label;
 }
 
