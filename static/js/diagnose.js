@@ -37,7 +37,7 @@ function clearImage() {
 function resetResults() {
   const panel = document.getElementById('resultsPanel');
   if (!panel) return;
-  panel.innerHTML=`<div class="results-placeholder"><div class="placeholder-icon"><i class="fas fa-leaf"></i></div><h3>Upload a photo to start</h3><p>AI will find the disease and tell you how to treat it</p><div class="placeholder-steps"><div class="ps-item"><span class="ps-num">1</span> Upload or take photo</div><div class="ps-item"><span class="ps-num">2</span> Click Analyze</div><div class="ps-item"><span class="ps-num">3</span> Get diagnosis</div></div></div>`;
+  panel.innerHTML=`<div class="results-placeholder"><div class="placeholder-icon"><i class="fas fa-leaf"></i></div><h3>${translate('results_placeholder_title')}</h3><p>${translate('results_placeholder_sub')}</p><div class="placeholder-steps"><div class="ps-item"><span class="ps-num">1</span> ${translate('btn_upload')}</div><div class="ps-item"><span class="ps-num">2</span> ${translate('btn_analyze')}</div><div class="ps-item"><span class="ps-num">3</span> ${translate('step3_title')}</div></div></div>`;
   if (remedyChartInst) { remedyChartInst.destroy(); remedyChartInst=null; }
   window._lastDiagnosisData = null;
 }
