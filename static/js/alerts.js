@@ -155,7 +155,7 @@ async function renderPestCalendar(weather) {
         ${active?'<span style="font-size:0.65rem;padding:2px 8px;background:rgba(248,113,113,0.1);color:var(--red);border-radius:50px;border:1px solid rgba(248,113,113,0.2)">⚠ Active</span>':''}
       </div>
       <div class="pcal-body">
-        <div style="font-size:0.78rem;color:var(--text-3);margin-bottom:4px">🌱 ${p.crops}</div>
+        <div style="font-size:0.78rem;color:var(--text-3);margin-bottom:4px">🌱 ${p.crops.split(', ').map(c=>getCropName(c.trim())||c.trim()).join(', ')}</div>
         <div style="font-size:0.8rem;color:var(--text-2);margin-bottom:6px">${descs[i]}</div>
         <div style="font-size:0.75rem;color:var(--teal)">🛡️ ${prevs[i]}</div>
         <span class="pcal-risk risk-${p.risk.toLowerCase()}">${p.risk} Risk</span>
