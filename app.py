@@ -10,12 +10,10 @@ app = Flask(__name__)
 
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
 GROQ_API_KEY        = os.getenv("GROQ_API_KEY", "")
-KINDWISE_API_KEY    = os.getenv("KINDWISE_API_KEY", "")
 DATAGOV_API_KEY     = os.getenv("DATAGOV_API_KEY", "")
 
 print(f"[SmartAgro] Weather : {'OK' if OPENWEATHER_API_KEY else 'MISSING'}")
 print(f"[SmartAgro] Groq    : {'OK' if GROQ_API_KEY else 'MISSING'}")
-print(f"[SmartAgro] Kindwise: {'OK' if KINDWISE_API_KEY else 'MISSING'}")
 print(f"[SmartAgro] DataGov : {'OK' if DATAGOV_API_KEY else 'MISSING'}")
 
 @app.route("/")
@@ -181,7 +179,7 @@ def get_soil_tips(season, temp, humidity):
         tips.append({"icon":"fa-temperature-high","title":"Heat Stress Warning","tip":"Temperature above 38 degrees — increase irrigation frequency and apply shade nets."})
     return tips
 
-# ── Crop Diagnosis (Groq vision only) ────────────────────
+# ── Crop Diagnosis (Groq vision) ──────────────────────────
 @app.route("/api/diagnose", methods=["POST"])
 def diagnose_crop():
     data      = request.json or {}
@@ -208,13 +206,19 @@ Return ONLY valid JSON no markdown:
                         {"type": "text", "text": prompt}
                     ]}
                 ], "temperature": 0.2, "max_tokens": 1000}, timeout=45)
-            if resp.status_code != 200: continue
+            if resp.status_code != 200:
+                print(f"[Groq diagnose error] model={model} status={resp.status_code} body={resp.text[:500]}")
+                continue
             raw   = resp.json()["choices"][0]["message"]["content"].strip()
             clean = re.sub(r"```(?:json)?", "", raw).replace("```", "").strip()
             match = re.search(r"\{.*\}", clean, re.DOTALL)
             if match:
                 return jsonify(json.loads(match.group()))
-        except: continue
+            else:
+                print(f"[Groq diagnose error] model={model} could not parse JSON from: {raw[:500]}")
+        except Exception as e:
+            print(f"[Groq diagnose exception] model={model} error={e}")
+            continue
     return jsonify({"error": "Diagnosis failed. Try again."}), 500
 
 # ── Alerts ───────────────────────────────────────────────
@@ -285,7 +289,7 @@ def fetch_real_mandi_data():
             f"?api-key={DATAGOV_API_KEY}"
             f"&format=json&limit=500"
         )
-        resp = requests.get(url, timeout=15)
+        resp = requests.get(url, timeout=25)
         if resp.status_code != 200:
             return None
         records = resp.json().get("records", [])
