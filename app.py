@@ -181,65 +181,14 @@ def get_soil_tips(season, temp, humidity):
         tips.append({"icon":"fa-temperature-high","title":"Heat Stress Warning","tip":"Temperature above 38 degrees — increase irrigation frequency and apply shade nets."})
     return tips
 
-# ── Kindwise Diagnosis ───────────────────────────────────
+# ── Crop Diagnosis (Groq vision only) ────────────────────
 @app.route("/api/diagnose", methods=["POST"])
 def diagnose_crop():
-    if not KINDWISE_API_KEY:
-        return jsonify({"error": "KINDWISE_API_KEY not set"}), 500
     data      = request.json or {}
     image_b64 = data.get("image", "")
     if not image_b64:
         return jsonify({"error": "No image received"}), 400
-    try:
-        resp = requests.post(
-            "https://crop.kindwise.com/api/v1/identification",
-            headers={"Api-Key": KINDWISE_API_KEY, "Content-Type": "application/json"},
-            json={"images": [f"data:image/jpeg;base64,{image_b64}"],
-                  "latitude": 22.5, "longitude": 78.9, "similar_images": True},
-            timeout=30)
-        if resp.status_code == 200:
-            result = parse_kindwise(resp.json())
-            if result:
-                return jsonify(result)
-    except Exception as e:
-        print(f"[Kindwise error] {e}")
     return diagnose_groq(image_b64)
-
-def parse_kindwise(kw):
-    try:
-        suggestions = kw.get("result", {}).get("disease", {}).get("suggestions", [])
-        if not suggestions:
-            return {
-                "disease": "Healthy Plant", "confidence": 95, "severity": "None",
-                "affected_part": "N/A", "cause": "No disease detected. Plant looks healthy.",
-                "eco_remedies": [{"remedy": "Regular care", "method": "Maintain proper irrigation and fertilization", "frequency": "As needed", "effectiveness": 100}],
-                "chemical_remedies": [], "prevention": ["Maintain proper spacing", "Water at base", "Monitor regularly"],
-                "recovery_timeline": "Plant is healthy"
-            }
-        top    = suggestions[0]
-        conf   = round(top.get("probability", 0) * 100)
-        detail = top.get("details", {})
-        treat  = detail.get("treatment", {})
-        bio    = treat.get("biological", [])
-        chem   = treat.get("chemical", [])
-        prev   = treat.get("prevention", [])
-        eco = [{"remedy": str(r), "method": "Apply on affected area", "frequency": "Every 7 days", "effectiveness": max(60, 85 - i*10)} for i, r in enumerate(bio[:3])]
-        if not eco:
-            eco = [{"remedy": "Neem oil spray", "method": "5ml per litre water, spray on leaves", "frequency": "Every 5-7 days", "effectiveness": 75}]
-        return {
-            "disease":           top.get("name", "Unknown Disease"),
-            "confidence":        conf,
-            "severity":          "Severe" if conf > 80 else "Moderate" if conf > 55 else "Mild",
-            "affected_part":     "Leaves",
-            "cause":             detail.get("description", "")[:300] or f"{top.get('name')} identified by AI.",
-            "eco_remedies":      eco,
-            "chemical_remedies": [{"name": str(c), "dose": "As per label", "interval": "10-14 days"} for c in chem[:3]],
-            "prevention":        [str(p) for p in prev[:4]] or ["Proper spacing", "Avoid overhead watering", "Remove infected parts", "Use certified seeds"],
-            "recovery_timeline": "2-4 weeks with proper treatment"
-        }
-    except Exception as e:
-        print(f"[parse_kindwise] {e}")
-        return None
 
 def diagnose_groq(image_b64):
     if not GROQ_API_KEY:
@@ -331,12 +280,10 @@ def fetch_real_mandi_data():
     if not DATAGOV_API_KEY:
         return None
     try:
-        today = datetime.now().strftime("%d/%m/%Y")
         url = (
             "https://api.data.gov.in/resource/9ef84268-d588-465a-a308-a864a43d0070"
             f"?api-key={DATAGOV_API_KEY}"
             f"&format=json&limit=500"
-            f"&filters[Arrival_Date]={today}"
         )
         resp = requests.get(url, timeout=15)
         if resp.status_code != 200:
