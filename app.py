@@ -10,10 +10,12 @@ app = Flask(__name__)
 
 OPENWEATHER_API_KEY = os.getenv("OPENWEATHER_API_KEY", "")
 GROQ_API_KEY        = os.getenv("GROQ_API_KEY", "")
+KINDWISE_API_KEY    = os.getenv("KINDWISE_API_KEY", "")
 DATAGOV_API_KEY     = os.getenv("DATAGOV_API_KEY", "")
 
 print(f"[SmartAgro] Weather : {'OK' if OPENWEATHER_API_KEY else 'MISSING'}")
 print(f"[SmartAgro] Groq    : {'OK' if GROQ_API_KEY else 'MISSING'}")
+print(f"[SmartAgro] Kindwise: {'OK' if KINDWISE_API_KEY else 'MISSING'}")
 print(f"[SmartAgro] DataGov : {'OK' if DATAGOV_API_KEY else 'MISSING'}")
 
 @app.route("/")
@@ -179,14 +181,68 @@ def get_soil_tips(season, temp, humidity):
         tips.append({"icon":"fa-temperature-high","title":"Heat Stress Warning","tip":"Temperature above 38 degrees — increase irrigation frequency and apply shade nets."})
     return tips
 
-# ── Crop Diagnosis (Groq vision) ──────────────────────────
+# ── Crop Diagnosis (Kindwise primary, Groq fallback) ──────
 @app.route("/api/diagnose", methods=["POST"])
 def diagnose_crop():
     data      = request.json or {}
     image_b64 = data.get("image", "")
     if not image_b64:
         return jsonify({"error": "No image received"}), 400
+
+    if KINDWISE_API_KEY:
+        try:
+            resp = requests.post(
+                "https://crop.kindwise.com/api/v1/identification",
+                headers={"Api-Key": KINDWISE_API_KEY, "Content-Type": "application/json"},
+                json={"images": [f"data:image/jpeg;base64,{image_b64}"],
+                      "latitude": 22.5, "longitude": 78.9, "similar_images": True},
+                timeout=30)
+            if resp.status_code == 200:
+                result = parse_kindwise(resp.json())
+                if result:
+                    return jsonify(result)
+            else:
+                print(f"[Kindwise error] status={resp.status_code} body={resp.text[:300]}")
+        except Exception as e:
+            print(f"[Kindwise exception] {e}")
+
     return diagnose_groq(image_b64)
+
+def parse_kindwise(kw):
+    try:
+        suggestions = kw.get("result", {}).get("disease", {}).get("suggestions", [])
+        if not suggestions:
+            return {
+                "disease": "Healthy Plant", "confidence": 95, "severity": "None",
+                "affected_part": "N/A", "cause": "No disease detected. Plant looks healthy.",
+                "eco_remedies": [{"remedy": "Regular care", "method": "Maintain proper irrigation and fertilization", "frequency": "As needed", "effectiveness": 100}],
+                "chemical_remedies": [], "prevention": ["Maintain proper spacing", "Water at base", "Monitor regularly"],
+                "recovery_timeline": "Plant is healthy"
+            }
+        top    = suggestions[0]
+        conf   = round(top.get("probability", 0) * 100)
+        detail = top.get("details", {})
+        treat  = detail.get("treatment", {})
+        bio    = treat.get("biological", [])
+        chem   = treat.get("chemical", [])
+        prev   = treat.get("prevention", [])
+        eco = [{"remedy": str(r), "method": "Apply on affected area", "frequency": "Every 7 days", "effectiveness": max(60, 85 - i*10)} for i, r in enumerate(bio[:3])]
+        if not eco:
+            eco = [{"remedy": "Neem oil spray", "method": "5ml per litre water, spray on leaves", "frequency": "Every 5-7 days", "effectiveness": 75}]
+        return {
+            "disease":           top.get("name", "Unknown Disease"),
+            "confidence":        conf,
+            "severity":          "Severe" if conf > 80 else "Moderate" if conf > 55 else "Mild",
+            "affected_part":     "Leaves",
+            "cause":             detail.get("description", "")[:300] or f"{top.get('name')} identified by AI.",
+            "eco_remedies":      eco,
+            "chemical_remedies": [{"name": str(c), "dose": "As per label", "interval": "10-14 days"} for c in chem[:3]],
+            "prevention":        [str(p) for p in prev[:4]] or ["Proper spacing", "Avoid overhead watering", "Remove infected parts", "Use certified seeds"],
+            "recovery_timeline": "2-4 weeks with proper treatment"
+        }
+    except Exception as e:
+        print(f"[parse_kindwise] {e}")
+        return None
 
 def diagnose_groq(image_b64):
     if not GROQ_API_KEY:
